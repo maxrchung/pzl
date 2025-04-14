@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 
-const msg = 'poopoo'
+const list = ref(['pee', 'poo', 'ew', 'cool'])
+const showList = true
 </script>
 
 <template>
-  <p>{{ msg }}</p>
+  <ul v-if="showList">
+    <li v-for="item of list" :key="item">
+      {{ item }}
+    </li>
+  </ul>
 
   <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
