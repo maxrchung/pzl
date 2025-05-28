@@ -8,6 +8,7 @@ const { title } = defineProps<Props>()
 import Konva from 'konva'
 import type { KonvaNodeEvent } from 'konva/lib/types'
 import { ref, onMounted } from 'vue'
+import { useImage } from 'vue-konva'
 
 const stageSize = {
   width: window.innerWidth,
@@ -16,6 +17,8 @@ const stageSize = {
 
 const list = ref<Konva.ShapeConfig[]>([])
 const dragItemId = ref<string | null>(null)
+
+const [image] = useImage('/sonic-disturb.jpg')
 
 const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
   // save drag element:
@@ -59,6 +62,17 @@ onMounted(() => {
     draggable="true"
   >
     <v-layer ref="layer">
+      <v-image
+        v-if="image"
+        :config="{
+          x: 50,
+          y: 50,
+          image,
+          width: 106,
+          height: 118,
+        }"
+      />
+
       <v-star
         v-for="item in list"
         :key="item.id"
