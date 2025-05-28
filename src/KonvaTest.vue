@@ -70,6 +70,7 @@ onMounted(() => {
           image,
           width: 106,
           height: 118,
+          draggable: true,
         }"
       />
 
