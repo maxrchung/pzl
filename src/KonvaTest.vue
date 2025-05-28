@@ -5,6 +5,8 @@ interface Props {
 
 const { title } = defineProps<Props>()
 
+import Konva from 'konva'
+import type { KonvaNodeEvent } from 'konva/lib/types'
 import { ref, onMounted } from 'vue'
 
 const stageSize = {
@@ -12,20 +14,25 @@ const stageSize = {
   height: window.innerHeight,
 }
 
-const list = ref([])
-const dragItemId = ref(null)
+const list = ref<Konva.ShapeConfig[]>([])
+const dragItemId = ref<string | null>(null)
 
-const handleDragstart = (e) => {
+const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
   // save drag element:
   dragItemId.value = e.target.id()
   // move current element to the top:
   const item = list.value.find((i) => i.id === dragItemId.value)
+
+  if (!item) {
+    return
+  }
+
   const index = list.value.indexOf(item)
   list.value.splice(index, 1)
   list.value.push(item)
 }
 
-const handleDragend = () => {
+const handleDragEnd = () => {
   dragItemId.value = null
 }
 
@@ -36,14 +43,21 @@ onMounted(() => {
       x: Math.random() * stageSize.width,
       y: Math.random() * stageSize.height,
       rotation: Math.random() * 180,
-      scale: Math.random(),
+      scaleX: Math.random(),
+      scaleY: Math.random(),
     })
   }
 })
 </script>
 
 <template>
-  <v-stage ref="stage" :config="stageSize" @dragstart="handleDragstart" @dragend="handleDragend">
+  <v-stage
+    ref="stage"
+    :config="stageSize"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+    draggable="true"
+  >
     <v-layer ref="layer">
       <v-star
         v-for="item in list"
@@ -59,8 +73,8 @@ onMounted(() => {
           fill: '#89b717',
           opacity: 0.8,
           draggable: true,
-          scaleX: dragItemId === item.id ? item.scale * 1.2 : item.scale,
-          scaleY: dragItemId === item.id ? item.scale * 1.2 : item.scale,
+          scaleX: dragItemId === item.id ? (item.scale ?? 1 * 1.2) : item.scale,
+          scaleY: dragItemId === item.id ? (item.scale ?? 1 * 1.2) : item.scale,
           shadowColor: 'black',
           shadowBlur: 10,
           shadowOffsetX: dragItemId === item.id ? 15 : 5,
