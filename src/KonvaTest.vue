@@ -7,7 +7,7 @@ const { title } = defineProps<Props>()
 
 import Konva from 'konva'
 import type { KonvaNodeEvent } from 'konva/lib/types'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
 const stageSize = {
@@ -19,6 +19,67 @@ const list = ref<Konva.ShapeConfig[]>([])
 const dragItemId = ref<string | null>(null)
 
 const [image] = useImage('/sonic-disturb.jpg')
+const pieces = ref<Konva.ImageConfig[]>([])
+
+watchEffect(() => {
+  console.log(image)
+  console.log(image.value?.width)
+
+  const width = image.value?.width
+  const height = image.value?.height
+
+  if (!image.value || !width || !height) {
+    return
+  }
+
+  pieces.value.push({
+    id: '0',
+    image: image.value,
+    crop: {
+      height: height / 2,
+      width: width / 2,
+      x: 0,
+      y: 0,
+    },
+    draggable: true,
+  })
+
+  pieces.value.push({
+    id: '1',
+    image: image.value,
+    crop: {
+      height: height / 2,
+      width: width / 2,
+      x: width / 2,
+      y: 0,
+    },
+    draggable: true,
+  })
+
+  pieces.value.push({
+    id: '2',
+    image: image.value,
+    crop: {
+      height: height / 2,
+      width: width / 2,
+      x: 0,
+      y: height / 2,
+    },
+    draggable: true,
+  })
+
+  pieces.value.push({
+    id: '3',
+    image: image.value,
+    crop: {
+      height: height / 2,
+      width: width / 2,
+      x: width / 2,
+      y: height / 2,
+    },
+    draggable: true,
+  })
+})
 
 const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
   // save drag element:
@@ -62,6 +123,8 @@ onMounted(() => {
     draggable="true"
   >
     <v-layer ref="layer">
+      <v-image v-for="piece in pieces" :key="piece.id" :config="piece" />
+
       <v-image
         v-if="image"
         :config="{
