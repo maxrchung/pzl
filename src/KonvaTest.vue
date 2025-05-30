@@ -32,6 +32,13 @@ watchEffect(() => {
     return
   }
 
+  const isWidthLarger = width >= height
+  const ratio = width / height
+
+  const imageWidth = 300
+  const pieceWidth = isWidthLarger ? imageWidth : imageWidth * ratio
+  const pieceHeight = isWidthLarger ? imageWidth / ratio : imageWidth
+
   pieces.value.push({
     id: '0',
     image: image.value,
@@ -42,6 +49,8 @@ watchEffect(() => {
       y: 0,
     },
     draggable: true,
+    width: pieceWidth,
+    height: pieceHeight,
   })
 
   pieces.value.push({
@@ -54,6 +63,8 @@ watchEffect(() => {
       y: 0,
     },
     draggable: true,
+    width: pieceWidth,
+    height: pieceHeight,
   })
 
   pieces.value.push({
@@ -66,6 +77,8 @@ watchEffect(() => {
       y: height / 2,
     },
     draggable: true,
+    width: pieceWidth,
+    height: pieceHeight,
   })
 
   pieces.value.push({
@@ -78,6 +91,8 @@ watchEffect(() => {
       y: height / 2,
     },
     draggable: true,
+    width: pieceWidth,
+    height: pieceHeight,
   })
 })
 
