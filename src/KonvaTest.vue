@@ -115,6 +115,23 @@ const handleDragEnd = () => {
   dragItemId.value = null
 }
 
+const haveIntersection = (r1, r2) => {
+  return !(
+    r2.x > r1.x + r1.width ||
+    r2.x + r2.width < r1.x ||
+    r2.y > r1.y + r1.height ||
+    r2.y + r2.height < r1.y
+  )
+}
+
+const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, pieceId: string) => {
+  for (const piece of pieces.value) {
+    if (piece.id === pieceId) {
+      continue
+    }
+  }
+}
+
 onMounted(() => {
   for (let n = 0; n < 30; n++) {
     list.value.push({
@@ -138,18 +155,11 @@ onMounted(() => {
     draggable="true"
   >
     <v-layer ref="layer">
-      <v-image v-for="piece in pieces" :key="piece.id" :config="piece" />
-
       <v-image
-        v-if="image"
-        :config="{
-          x: 50,
-          y: 50,
-          image,
-          width: 106,
-          height: 118,
-          draggable: true,
-        }"
+        v-for="piece in pieces"
+        :key="piece.id"
+        :config="piece"
+        @dragmove="(e) => handleDragMove(e, piece.id ?? '')"
       />
 
       <v-star
