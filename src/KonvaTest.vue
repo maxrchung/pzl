@@ -6,7 +6,7 @@ interface Props {
 const { title } = defineProps<Props>()
 
 import Konva from 'konva'
-import type { KonvaNodeEvent } from 'konva/lib/types'
+import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
 import { ref, onMounted, computed, watch, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
@@ -115,19 +115,47 @@ const handleDragEnd = () => {
   dragItemId.value = null
 }
 
-const haveIntersection = (r1, r2) => {
+const hasIntersection = (a: IRect, b: IRect) => {
+  if (!a.x || !a.y || !a.width || !a.height || !b.x || !b.y || !b.width || !b.height) {
+    return
+  }
+
   return !(
-    r2.x > r1.x + r1.width ||
-    r2.x + r2.width < r1.x ||
-    r2.y > r1.y + r1.height ||
-    r2.y + r2.height < r1.y
+    b.x > a.x + a.width ||
+    b.x + b.width < a.x ||
+    b.y > a.y + a.height ||
+    b.y + b.height < a.y
   )
 }
 
-const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, pieceId: string) => {
+const handleDragMove = (
+  e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>,
+  current: Konva.ImageConfig,
+) => {
+  const target = e.target
+  const layer = target.getLayer()
+
+  if (!layer) {
+    return
+  }
+
+  const currentRect = target.getClientRect()
+
   for (const piece of pieces.value) {
-    if (piece.id === pieceId) {
+    if (piece.id === current.id) {
       continue
+    }
+
+    const other = layer?.findOne(`#${piece.id}`)
+
+    if (!other) {
+      continue
+    }
+
+    const otherRect = other?.getClientRect()
+
+    if (hasIntersection(currentRect, otherRect)) {
+      console.log('intersect')
     }
   }
 }
@@ -159,7 +187,7 @@ onMounted(() => {
         v-for="piece in pieces"
         :key="piece.id"
         :config="piece"
-        @dragmove="(e) => handleDragMove(e, piece.id ?? '')"
+        @dragmove="(e) => handleDragMove(e, piece)"
       />
 
       <v-star
