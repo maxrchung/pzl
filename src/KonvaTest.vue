@@ -7,7 +7,7 @@ const { title } = defineProps<Props>()
 
 import Konva from 'konva'
 import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
-import { ref, onMounted, computed, watch, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
 const stageSize = {
@@ -51,6 +51,8 @@ watchEffect(() => {
     draggable: true,
     width: pieceWidth,
     height: pieceHeight,
+    pieceX: 0,
+    pieceY: 0,
   })
 
   pieces.value.push({
@@ -65,6 +67,8 @@ watchEffect(() => {
     draggable: true,
     width: pieceWidth,
     height: pieceHeight,
+    pieceX: 1,
+    pieceY: 0,
   })
 
   pieces.value.push({
@@ -79,6 +83,8 @@ watchEffect(() => {
     draggable: true,
     width: pieceWidth,
     height: pieceHeight,
+    pieceX: 0,
+    pieceY: 1,
   })
 
   pieces.value.push({
@@ -93,6 +99,8 @@ watchEffect(() => {
     draggable: true,
     width: pieceWidth,
     height: pieceHeight,
+    pieceX: 1,
+    pieceY: 1,
   })
 })
 
@@ -155,6 +163,7 @@ const handleDragMove = (
     const otherRect = other?.getClientRect()
 
     if (hasIntersection(currentRect, otherRect)) {
+      console.log(`${other?.getAttr('pieceX')}, ${other?.getAttr('pieceY')}`)
       console.log('intersect')
     }
   }
