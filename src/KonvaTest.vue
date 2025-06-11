@@ -3,6 +3,11 @@ interface Props {
   title?: string
 }
 
+interface Piece extends Konva.ImageConfig {
+  pieceX: number
+  pieceY: number
+}
+
 const { title } = defineProps<Props>()
 
 import Konva from 'konva'
@@ -19,7 +24,7 @@ const list = ref<Konva.ShapeConfig[]>([])
 const dragItemId = ref<string | null>(null)
 
 const [image] = useImage('/sonic-disturb.jpg')
-const pieces = ref<Konva.ImageConfig[]>([])
+const pieces = ref<Piece[]>([])
 
 watchEffect(() => {
   console.log(image)
@@ -136,10 +141,7 @@ const hasIntersection = (a: IRect, b: IRect) => {
   )
 }
 
-const handleDragMove = (
-  e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>,
-  current: Konva.ImageConfig,
-) => {
+const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, current: Piece) => {
   const target = e.target
   const layer = target.getLayer()
 
@@ -149,10 +151,21 @@ const handleDragMove = (
 
   const currentRect = target.getClientRect()
 
+  const p1x = current.pieceX
+  const p1y = current.pieceY
+
   for (const piece of pieces.value) {
     if (piece.id === current.id) {
       continue
     }
+
+    const p2x = piece.pieceX
+    const p2y = piece.pieceY
+    const isAdjacentX = Math.abs(p1x - p2x) < 1
+    const isAdjacentY = Math.abs(p1y - p2y) < 1
+
+    // Only do collision test if pieces are directly adjacent
+    if (!isAdjacentX && !isAdjacentY) continue
 
     const other = layer?.findOne(`#${piece.id}`)
 
@@ -196,7 +209,7 @@ onMounted(() => {
         v-for="piece in pieces"
         :key="piece.id"
         :config="piece"
-        @dragmove="(e) => handleDragMove(e, piece)"
+        @dragmove="(e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>) => handleDragMove(e, piece)"
       />
 
       <v-star
