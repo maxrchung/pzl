@@ -6,6 +6,7 @@ interface Props {
 interface Piece extends Konva.ImageConfig {
   pieceX: number
   pieceY: number
+  groupId: string
 }
 
 const { title } = defineProps<Props>()
@@ -26,6 +27,9 @@ const dragItemId = ref<string | null>(null)
 const [image] = useImage('/sonic-disturb.jpg')
 const pieces = ref<Piece[]>([])
 
+// Mapping from group to its pieces
+const groupMap = ref<{ [groupId: string]: Piece[] }>({})
+
 watchEffect(() => {
   console.log(image)
   console.log(image.value?.width)
@@ -44,8 +48,9 @@ watchEffect(() => {
   const pieceWidth = isWidthLarger ? imageWidth : imageWidth * ratio
   const pieceHeight = isWidthLarger ? imageWidth / ratio : imageWidth
 
-  pieces.value.push({
+  const piece0 = {
     id: '0',
+    groupId: '0',
     image: image.value,
     crop: {
       height: height / 2,
@@ -58,10 +63,13 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 0,
     pieceY: 0,
-  })
+  }
+  pieces.value.push(piece0)
+  groupMap.value['0'] = [piece0]
 
-  pieces.value.push({
+  const piece1 = {
     id: '1',
+    groupId: '1',
     image: image.value,
     crop: {
       height: height / 2,
@@ -74,10 +82,13 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 1,
     pieceY: 0,
-  })
+  }
+  pieces.value.push(piece1)
+  groupMap.value['1'] = [piece1]
 
-  pieces.value.push({
+  const piece2 = {
     id: '2',
+    groupId: '2',
     image: image.value,
     crop: {
       height: height / 2,
@@ -90,10 +101,13 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 0,
     pieceY: 1,
-  })
+  }
+  pieces.value.push(piece2)
+  groupMap.value['2'] = [piece2]
 
-  pieces.value.push({
+  const piece3 = {
     id: '3',
+    groupId: '3',
     image: image.value,
     crop: {
       height: height / 2,
@@ -106,7 +120,9 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 1,
     pieceY: 1,
-  })
+  }
+  pieces.value.push(piece3)
+  groupMap.value['3'] = [piece3]
 })
 
 const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
@@ -205,36 +221,16 @@ onMounted(() => {
     draggable="true"
   >
     <v-layer ref="layer">
-      <v-image
-        v-for="piece in pieces"
-        :key="piece.id"
-        :config="piece"
-        @dragmove="(e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>) => handleDragMove(e, piece)"
-      />
-
-      <v-star
-        v-for="item in list"
-        :key="item.id"
-        :config="{
-          x: item.x,
-          y: item.y,
-          rotation: item.rotation,
-          id: item.id,
-          numPoints: 5,
-          innerRadius: 30,
-          outerRadius: 50,
-          fill: '#89b717',
-          opacity: 0.8,
-          draggable: true,
-          scaleX: dragItemId === item.id ? (item.scale ?? 1 * 1.2) : item.scale,
-          scaleY: dragItemId === item.id ? (item.scale ?? 1 * 1.2) : item.scale,
-          shadowColor: 'black',
-          shadowBlur: 10,
-          shadowOffsetX: dragItemId === item.id ? 15 : 5,
-          shadowOffsetY: dragItemId === item.id ? 15 : 5,
-          shadowOpacity: 0.6,
-        }"
-      />
+      <v-group v-for="(pieces, groupId) in groupMap" :key="groupId">
+        <v-image
+          v-for="piece in pieces"
+          :key="piece.id"
+          :config="piece"
+          @dragmove="
+            (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>) => handleDragMove(e, piece)
+          "
+        />
+      </v-group>
     </v-layer>
   </v-stage>
 </template>
