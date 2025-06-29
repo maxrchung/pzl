@@ -25,7 +25,6 @@ const list = ref<Konva.ShapeConfig[]>([])
 const dragItemId = ref<string | null>(null)
 
 const [image] = useImage('/sonic-disturb.jpg')
-const pieces = ref<Piece[]>([])
 
 // Mapping from group to its pieces
 const groupMap = ref<{ [groupId: string]: Piece[] }>({})
@@ -64,7 +63,6 @@ watchEffect(() => {
     pieceX: 0,
     pieceY: 0,
   }
-  pieces.value.push(piece0)
   groupMap.value['0'] = [piece0]
 
   const piece1 = {
@@ -82,47 +80,45 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 1,
     pieceY: 0,
+    x: 500,
   }
-  pieces.value.push(piece1)
   groupMap.value['1'] = [piece1]
 
-  const piece2 = {
-    id: '2',
-    groupId: '2',
-    image: image.value,
-    crop: {
-      height: height / 2,
-      width: width / 2,
-      x: 0,
-      y: height / 2,
-    },
-    draggable: true,
-    width: pieceWidth,
-    height: pieceHeight,
-    pieceX: 0,
-    pieceY: 1,
-  }
-  pieces.value.push(piece2)
-  groupMap.value['2'] = [piece2]
+  // const piece2 = {
+  //   id: '2',
+  //   groupId: '2',
+  //   image: image.value,
+  //   crop: {
+  //     height: height / 2,
+  //     width: width / 2,
+  //     x: 0,
+  //     y: height / 2,
+  //   },
+  //   draggable: true,
+  //   width: pieceWidth,
+  //   height: pieceHeight,
+  //   pieceX: 0,
+  //   pieceY: 1,
+  // }
+  // groupMap.value['2'] = [piece2]
 
-  const piece3 = {
-    id: '3',
-    groupId: '3',
-    image: image.value,
-    crop: {
-      height: height / 2,
-      width: width / 2,
-      x: width / 2,
-      y: height / 2,
-    },
-    draggable: true,
-    width: pieceWidth,
-    height: pieceHeight,
-    pieceX: 1,
-    pieceY: 1,
-  }
-  pieces.value.push(piece3)
-  groupMap.value['3'] = [piece3]
+  // const piece3 = {
+  //   id: '3',
+  //   groupId: '3',
+  //   image: image.value,
+  //   crop: {
+  //     height: height / 2,
+  //     width: width / 2,
+  //     x: width / 2,
+  //     y: height / 2,
+  //   },
+  //   draggable: true,
+  //   width: pieceWidth,
+  //   height: pieceHeight,
+  //   pieceX: 1,
+  //   pieceY: 1,
+  // }
+  // groupMap.value['3'] = [piece3]
 })
 
 const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
@@ -157,7 +153,9 @@ const hasIntersection = (a: IRect, b: IRect) => {
   )
 }
 
-const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, current: Piece) => {
+const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, curr: Piece) => {
+  console.log('asdf', groupMap.value)
+
   const target = e.target
   const layer = target.getLayer()
 
@@ -165,35 +163,54 @@ const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, curr
     return
   }
 
-  const currentRect = target.getClientRect()
+  const currRect = target.getClientRect()
+  const currX = curr.pieceX
+  const currY = curr.pieceY
+  const currPieceId = curr.id
+  const currGroupId = curr.groupId
 
-  const p1x = current.pieceX
-  const p1y = current.pieceY
-
-  for (const piece of pieces.value) {
-    if (piece.id === current.id) {
+  for (const groupId in groupMap.value) {
+    if (groupId === currGroupId) {
       continue
     }
 
-    const p2x = piece.pieceX
-    const p2y = piece.pieceY
-    const isAdjacentX = Math.abs(p1x - p2x) < 1
-    const isAdjacentY = Math.abs(p1y - p2y) < 1
+    for (const piece of groupMap.value[groupId]) {
+      if (piece.id === currPieceId) {
+        continue
+      }
 
-    // Only do collision test if pieces are directly adjacent
-    if (!isAdjacentX && !isAdjacentY) continue
+      const otherX = piece.pieceX
+      const otherY = piece.pieceY
+      const isAdjacentX = Math.abs(currX - otherX) < 1
+      const isAdjacentY = Math.abs(currY - otherY) < 1
 
-    const other = layer?.findOne(`#${piece.id}`)
+      // Only do collision test if pieces are directly adjacent
+      if (!isAdjacentX && !isAdjacentY) continue
 
-    if (!other) {
-      continue
-    }
+      const other = layer?.findOne(`#${piece.id}`)
 
-    const otherRect = other?.getClientRect()
+      if (!other) {
+        continue
+      }
 
-    if (hasIntersection(currentRect, otherRect)) {
-      console.log(`${other?.getAttr('pieceX')}, ${other?.getAttr('pieceY')}`)
-      console.log('intersect')
+      const otherRect = other?.getClientRect()
+
+      console.log(`Curr:  ${currX}, ${currY}`)
+      console.log(currPieceId)
+      console.log(piece.id)
+      if (hasIntersection(currRect, otherRect)) {
+        console.log(`Other: ${other?.getAttr('pieceX')}, ${other?.getAttr('pieceY')}`)
+        console.log('intersect')
+
+        delete groupMap.value[currGroupId]
+
+        const copy = { ...curr, groupId }
+        groupMap.value[groupId].push(copy)
+
+        console.log('aaaaa', groupMap.value)
+
+        return
+      }
     }
   }
 }
@@ -221,12 +238,12 @@ onMounted(() => {
     draggable="true"
   >
     <v-layer ref="layer">
-      <v-group v-for="(pieces, groupId) in groupMap" :key="groupId">
+      <v-group v-for="(pieces, groupId) in groupMap" :key="groupId" draggable>
         <v-image
           v-for="piece in pieces"
           :key="piece.id"
           :config="piece"
-          @dragmove="
+          @dragend="
             (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>) => handleDragMove(e, piece)
           "
         />
