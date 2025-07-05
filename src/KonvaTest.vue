@@ -1,28 +1,19 @@
 <script setup lang="ts">
-interface Props {
-  title?: string
-}
-
 interface Piece extends Konva.ImageConfig {
   pieceX: number
   pieceY: number
   groupId: string
 }
 
-const { title } = defineProps<Props>()
-
 import Konva from 'konva'
 import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
 const stageSize = {
   width: window.innerWidth,
   height: window.innerHeight,
 }
-
-const list = ref<Konva.ShapeConfig[]>([])
-const dragItemId = ref<string | null>(null)
 
 const [image] = useImage('/sonic-disturb.jpg')
 
@@ -57,7 +48,6 @@ watchEffect(() => {
       x: 0,
       y: 0,
     },
-    draggable: true,
     width: pieceWidth,
     height: pieceHeight,
     pieceX: 0,
@@ -75,7 +65,6 @@ watchEffect(() => {
       x: width / 2,
       y: 0,
     },
-    draggable: true,
     width: pieceWidth,
     height: pieceHeight,
     pieceX: 1,
@@ -94,7 +83,6 @@ watchEffect(() => {
   //     x: 0,
   //     y: height / 2,
   //   },
-  //   draggable: true,
   //   width: pieceWidth,
   //   height: pieceHeight,
   //   pieceX: 0,
@@ -112,7 +100,6 @@ watchEffect(() => {
   //     x: width / 2,
   //     y: height / 2,
   //   },
-  //   draggable: true,
   //   width: pieceWidth,
   //   height: pieceHeight,
   //   pieceX: 1,
@@ -121,23 +108,8 @@ watchEffect(() => {
   // groupMap.value['3'] = [piece3]
 })
 
-const handleDragStart = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragstart>) => {
-  // save drag element:
-  dragItemId.value = e.target.id()
-  // move current element to the top:
-  const item = list.value.find((i) => i.id === dragItemId.value)
-
-  if (!item) {
-    return
-  }
-
-  const index = list.value.indexOf(item)
-  list.value.splice(index, 1)
-  list.value.push(item)
-}
-
-const handleDragEnd = () => {
-  dragItemId.value = null
+const groupConfig = {
+  draggable: true,
 }
 
 const hasIntersection = (a: IRect, b: IRect) => {
@@ -153,9 +125,10 @@ const hasIntersection = (a: IRect, b: IRect) => {
   )
 }
 
-const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, curr: Piece) => {
-  console.log('asdf', groupMap.value)
-
+const handleDragEnd = (
+  e: Konva.KonvaEventObject<KonvaNodeEvent.dragend>,
+  groupId: string | number,
+) => {
   const target = e.target
   const layer = target.getLayer()
 
@@ -163,90 +136,62 @@ const handleDragMove = (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>, curr
     return
   }
 
-  const currRect = target.getClientRect()
-  const currX = curr.pieceX
-  const currY = curr.pieceY
-  const currPieceId = curr.id
-  const currGroupId = curr.groupId
+  for (const piece of groupMap.value[groupId]) {
+    const rect = target.getClientRect()
+    const currX = piece.pieceX
+    const currY = piece.pieceY
 
-  for (const groupId in groupMap.value) {
-    if (groupId === currGroupId) {
-      continue
-    }
-
-    for (const piece of groupMap.value[groupId]) {
-      if (piece.id === currPieceId) {
+    for (const otherGroupId in groupMap.value) {
+      if (otherGroupId === groupId) {
         continue
       }
 
-      const otherX = piece.pieceX
-      const otherY = piece.pieceY
-      const isAdjacentX = Math.abs(currX - otherX) < 1
-      const isAdjacentY = Math.abs(currY - otherY) < 1
+      for (const piece of groupMap.value[otherGroupId]) {
+        const otherX = piece.pieceX
+        const otherY = piece.pieceY
+        const isAdjacentX = Math.abs(currX - otherX) < 1
+        const isAdjacentY = Math.abs(currY - otherY) < 1
 
-      // Only do collision test if pieces are directly adjacent
-      if (!isAdjacentX && !isAdjacentY) continue
+        // Only do collision test if pieces are directly adjacent
+        if (!isAdjacentX && !isAdjacentY) continue
 
-      const other = layer?.findOne(`#${piece.id}`)
+        const other = layer?.findOne(`#${piece.id}`)
 
-      if (!other) {
-        continue
-      }
+        if (!other) {
+          continue
+        }
 
-      const otherRect = other?.getClientRect()
+        const otherRect = other?.getClientRect()
 
-      console.log(`Curr:  ${currX}, ${currY}`)
-      console.log(currPieceId)
-      console.log(piece.id)
-      if (hasIntersection(currRect, otherRect)) {
-        console.log(`Other: ${other?.getAttr('pieceX')}, ${other?.getAttr('pieceY')}`)
-        console.log('intersect')
+        if (hasIntersection(rect, otherRect)) {
+          console.log('intersect')
 
-        delete groupMap.value[currGroupId]
+          // Move all pieces to other group
+          for (const piece of groupMap.value[groupId]) {
+            const copy = { ...piece, groupId: otherGroupId }
+            groupMap.value[otherGroupId].push(copy)
+          }
 
-        const copy = { ...curr, groupId }
-        groupMap.value[groupId].push(copy)
+          delete groupMap.value[groupId]
 
-        console.log('aaaaa', groupMap.value)
-
-        return
+          return
+        }
       }
     }
   }
 }
-
-onMounted(() => {
-  for (let n = 0; n < 30; n++) {
-    list.value.push({
-      id: Math.round(Math.random() * 10000).toString(),
-      x: Math.random() * stageSize.width,
-      y: Math.random() * stageSize.height,
-      rotation: Math.random() * 180,
-      scaleX: Math.random(),
-      scaleY: Math.random(),
-    })
-  }
-})
 </script>
 
 <template>
-  <v-stage
-    ref="stage"
-    :config="stageSize"
-    @dragstart="handleDragStart"
-    @dragend="handleDragEnd"
-    draggable="true"
-  >
+  <v-stage ref="stage" :config="stageSize">
     <v-layer ref="layer">
-      <v-group v-for="(pieces, groupId) in groupMap" :key="groupId" draggable>
-        <v-image
-          v-for="piece in pieces"
-          :key="piece.id"
-          :config="piece"
-          @dragend="
-            (e: Konva.KonvaEventObject<KonvaNodeEvent.dragmove>) => handleDragMove(e, piece)
-          "
-        />
+      <v-group
+        v-for="(pieces, groupId) in groupMap"
+        :key="groupId"
+        :config="groupConfig"
+        @dragend="(e: Konva.KonvaEventObject<KonvaNodeEvent.dragend>) => handleDragEnd(e, groupId)"
+      >
+        <v-image v-for="piece in pieces" :key="piece.id" :config="piece" />
       </v-group>
     </v-layer>
   </v-stage>
