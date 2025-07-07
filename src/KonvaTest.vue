@@ -6,6 +6,7 @@ interface Piece extends Konva.ImageConfig {
 }
 
 import Konva from 'konva'
+import type { GroupConfig } from 'konva/lib/Group'
 import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
 import { ref, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
@@ -15,10 +16,20 @@ const stageSize = {
   height: window.innerHeight,
 }
 
+const imageWidth = 300
+
+const getInitialPosition = () => {
+  const x = Math.random() * (stageSize.width - imageWidth)
+  const y = Math.random() * (stageSize.height - imageWidth)
+
+  return { x, y }
+}
+
 const [image] = useImage('/sonic-disturb.jpg')
 
 // Mapping from group to its pieces
-const groupMap = ref<{ [groupId: string]: Piece[] }>({})
+const pieces = ref<{ [groupId: string]: Piece[] }>({})
+const configs = ref<{ [groupId: string]: GroupConfig }>({})
 
 watchEffect(() => {
   console.log(image)
@@ -34,7 +45,6 @@ watchEffect(() => {
   const isWidthLarger = width >= height
   const ratio = width / height
 
-  const imageWidth = 300
   const pieceWidth = isWidthLarger ? imageWidth : imageWidth * ratio
   const pieceHeight = isWidthLarger ? imageWidth / ratio : imageWidth
 
@@ -53,7 +63,8 @@ watchEffect(() => {
     pieceX: 0,
     pieceY: 0,
   }
-  groupMap.value['0'] = [piece0]
+  pieces.value['0'] = [piece0]
+  configs.value['0'] = getInitialPosition()
 
   const piece1 = {
     id: '1',
@@ -69,9 +80,9 @@ watchEffect(() => {
     height: pieceHeight,
     pieceX: 1,
     pieceY: 0,
-    x: 500,
   }
-  groupMap.value['1'] = [piece1]
+  pieces.value['1'] = [piece1]
+  configs.value['1'] = getInitialPosition()
 
   // const piece2 = {
   //   id: '2',
@@ -108,10 +119,6 @@ watchEffect(() => {
   // groupMap.value['3'] = [piece3]
 })
 
-const groupConfig = {
-  draggable: true,
-}
-
 const hasIntersection = (a: IRect, b: IRect) => {
   if (!a.x || !a.y || !a.width || !a.height || !b.x || !b.y || !b.width || !b.height) {
     return
@@ -136,17 +143,17 @@ const handleDragEnd = (
     return
   }
 
-  for (const piece of groupMap.value[groupId]) {
+  for (const piece of pieces.value[groupId]) {
     const rect = target.getClientRect()
     const currX = piece.pieceX
     const currY = piece.pieceY
 
-    for (const otherGroupId in groupMap.value) {
+    for (const otherGroupId in pieces.value) {
       if (otherGroupId === groupId) {
         continue
       }
 
-      for (const piece of groupMap.value[otherGroupId]) {
+      for (const piece of pieces.value[otherGroupId]) {
         const otherX = piece.pieceX
         const otherY = piece.pieceY
         const isAdjacentX = Math.abs(currX - otherX) < 1
@@ -166,13 +173,21 @@ const handleDragEnd = (
         if (hasIntersection(rect, otherRect)) {
           console.log('intersect')
 
+          const base = pieces.value[otherGroupId][0]
+
           // Move all pieces to other group
-          for (const piece of groupMap.value[groupId]) {
-            const copy = { ...piece, groupId: otherGroupId }
-            groupMap.value[otherGroupId].push(copy)
+          for (const piece of pieces.value[groupId]) {
+            const copy = {
+              ...piece,
+              groupId: otherGroupId,
+              x: (piece.pieceX - base.pieceX) * 300,
+              y: (piece.pieceY - base.pieceY) * 168.75,
+            }
+
+            pieces.value[otherGroupId].push(copy)
           }
 
-          delete groupMap.value[groupId]
+          delete pieces.value[groupId]
 
           return
         }
@@ -186,9 +201,10 @@ const handleDragEnd = (
   <v-stage ref="stage" :config="stageSize">
     <v-layer ref="layer">
       <v-group
-        v-for="(pieces, groupId) in groupMap"
+        v-for="(pieces, groupId) in pieces"
         :key="groupId"
-        :config="groupConfig"
+        :draggable="true"
+        :config="configs[groupId]"
         @dragend="(e: Konva.KonvaEventObject<KonvaNodeEvent.dragend>) => handleDragEnd(e, groupId)"
       >
         <v-image v-for="piece in pieces" :key="piece.id" :config="piece" />
