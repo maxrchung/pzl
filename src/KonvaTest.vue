@@ -16,11 +16,15 @@ const stageSize = {
   height: window.innerHeight,
 }
 
-const imageWidth = 300
+const imageLength = 200
+
+// We don't know what the width/height will be exactly until the image loads
+let imageWidth = imageLength
+let imageHeight = imageLength
 
 const getInitialPosition = () => {
   const x = Math.random() * (stageSize.width - imageWidth)
-  const y = Math.random() * (stageSize.height - imageWidth)
+  const y = Math.random() * (stageSize.height - imageHeight)
 
   return { x, y }
 }
@@ -32,9 +36,6 @@ const pieces = ref<{ [groupId: string]: Piece[] }>({})
 const configs = ref<{ [groupId: string]: GroupConfig }>({})
 
 watchEffect(() => {
-  console.log(image)
-  console.log(image.value?.width)
-
   const width = image.value?.width
   const height = image.value?.height
 
@@ -45,8 +46,8 @@ watchEffect(() => {
   const isWidthLarger = width >= height
   const ratio = width / height
 
-  const pieceWidth = isWidthLarger ? imageWidth : imageWidth * ratio
-  const pieceHeight = isWidthLarger ? imageWidth / ratio : imageWidth
+  imageWidth = isWidthLarger ? imageLength : imageLength * ratio
+  imageHeight = isWidthLarger ? imageLength / ratio : imageLength
 
   const piece0 = {
     id: '0',
@@ -58,8 +59,8 @@ watchEffect(() => {
       x: 0,
       y: 0,
     },
-    width: pieceWidth,
-    height: pieceHeight,
+    width: imageWidth,
+    height: imageHeight,
     pieceX: 0,
     pieceY: 0,
   }
@@ -76,8 +77,8 @@ watchEffect(() => {
       x: width / 2,
       y: 0,
     },
-    width: pieceWidth,
-    height: pieceHeight,
+    width: imageWidth,
+    height: imageHeight,
     pieceX: 1,
     pieceY: 0,
   }
@@ -119,6 +120,7 @@ watchEffect(() => {
   // groupMap.value['3'] = [piece3]
 })
 
+/** Simple box collision */
 const hasIntersection = (a: IRect, b: IRect) => {
   if (!a.x || !a.y || !a.width || !a.height || !b.x || !b.y || !b.width || !b.height) {
     return
@@ -180,8 +182,8 @@ const handleDragEnd = (
             const copy = {
               ...piece,
               groupId: otherGroupId,
-              x: (piece.pieceX - base.pieceX) * 300,
-              y: (piece.pieceY - base.pieceY) * 168.75,
+              x: (piece.pieceX - base.pieceX) * imageWidth,
+              y: (piece.pieceY - base.pieceY) * imageHeight,
             }
 
             pieces.value[otherGroupId].push(copy)
