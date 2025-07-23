@@ -11,20 +11,20 @@ import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
 import { ref, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
-const stageSize = {
+const stageConfig = {
   width: window.innerWidth,
   height: window.innerHeight,
 }
 
-const imageLength = 200
+const sides = 4
 
 // We don't know what the width/height will be exactly until the image loads
-let imageWidth = imageLength
-let imageHeight = imageLength
+let pieceWidth = 100
+let pieceHeight = 100
 
 const getInitialPosition = () => {
-  const x = Math.random() * (stageSize.width - imageWidth)
-  const y = Math.random() * (stageSize.height - imageHeight)
+  const x = Math.random() * (stageConfig.width - pieceWidth)
+  const y = Math.random() * (stageConfig.height - pieceHeight)
 
   return { x, y }
 }
@@ -43,81 +43,42 @@ watchEffect(() => {
     return
   }
 
+  const imageWidth = width / sides
+  const imageHeight = height / sides
+
+  const pieceLength = Math.min(stageConfig.width, stageConfig.height) / sides
+
   const isWidthLarger = width >= height
   const ratio = width / height
 
-  imageWidth = isWidthLarger ? imageLength : imageLength * ratio
-  imageHeight = isWidthLarger ? imageLength / ratio : imageLength
+  pieceWidth = isWidthLarger ? pieceLength : pieceLength * ratio
+  pieceHeight = isWidthLarger ? pieceLength / ratio : pieceLength
 
-  const piece0 = {
-    id: '0',
-    groupId: '0',
-    image: image.value,
-    crop: {
-      height: height / 2,
-      width: width / 2,
-      x: 0,
-      y: 0,
-    },
-    width: imageWidth,
-    height: imageHeight,
-    pieceX: 0,
-    pieceY: 0,
+  let id = 0
+
+  for (let i = 0; i < sides; ++i) {
+    for (let j = 0; j < sides; ++j) {
+      const stringId = (id++).toString()
+
+      const piece = {
+        id: stringId,
+        groupId: stringId,
+        image: image.value,
+        crop: {
+          height: imageHeight,
+          width: imageWidth,
+          x: j * imageWidth,
+          y: i * imageHeight,
+        },
+        width: pieceWidth,
+        height: pieceHeight,
+        pieceX: j,
+        pieceY: i,
+      }
+      pieces.value[stringId] = [piece]
+      configs.value[stringId] = getInitialPosition()
+    }
   }
-  pieces.value['0'] = [piece0]
-  configs.value['0'] = getInitialPosition()
-
-  const piece1 = {
-    id: '1',
-    groupId: '1',
-    image: image.value,
-    crop: {
-      height: height / 2,
-      width: width / 2,
-      x: width / 2,
-      y: 0,
-    },
-    width: imageWidth,
-    height: imageHeight,
-    pieceX: 1,
-    pieceY: 0,
-  }
-  pieces.value['1'] = [piece1]
-  configs.value['1'] = getInitialPosition()
-
-  // const piece2 = {
-  //   id: '2',
-  //   groupId: '2',
-  //   image: image.value,
-  //   crop: {
-  //     height: height / 2,
-  //     width: width / 2,
-  //     x: 0,
-  //     y: height / 2,
-  //   },
-  //   width: pieceWidth,
-  //   height: pieceHeight,
-  //   pieceX: 0,
-  //   pieceY: 1,
-  // }
-  // groupMap.value['2'] = [piece2]
-
-  // const piece3 = {
-  //   id: '3',
-  //   groupId: '3',
-  //   image: image.value,
-  //   crop: {
-  //     height: height / 2,
-  //     width: width / 2,
-  //     x: width / 2,
-  //     y: height / 2,
-  //   },
-  //   width: pieceWidth,
-  //   height: pieceHeight,
-  //   pieceX: 1,
-  //   pieceY: 1,
-  // }
-  // groupMap.value['3'] = [piece3]
 })
 
 /** Simple box collision */
@@ -158,11 +119,11 @@ const handleDragEnd = (
       for (const piece of pieces.value[otherGroupId]) {
         const otherX = piece.pieceX
         const otherY = piece.pieceY
-        const isAdjacentX = Math.abs(currX - otherX) < 1
-        const isAdjacentY = Math.abs(currY - otherY) < 1
+        const diffX = Math.abs(currX - otherX)
+        const diffY = Math.abs(currY - otherY)
 
         // Only do collision test if pieces are directly adjacent
-        if (!isAdjacentX && !isAdjacentY) continue
+        if (diffX > 1 || diffY > 1 || (diffX === 1 && diffY === 1)) continue
 
         const other = layer?.findOne(`#${piece.id}`)
 
@@ -182,8 +143,8 @@ const handleDragEnd = (
             const copy = {
               ...piece,
               groupId: otherGroupId,
-              x: (piece.pieceX - base.pieceX) * imageWidth,
-              y: (piece.pieceY - base.pieceY) * imageHeight,
+              x: (piece.pieceX - base.pieceX) * pieceWidth,
+              y: (piece.pieceY - base.pieceY) * pieceHeight,
             }
 
             pieces.value[otherGroupId].push(copy)
@@ -200,7 +161,7 @@ const handleDragEnd = (
 </script>
 
 <template>
-  <v-stage ref="stage" :config="stageSize">
+  <v-stage ref="stage" :config="stageConfig">
     <v-layer ref="layer">
       <v-group
         v-for="(pieces, groupId) in pieces"
