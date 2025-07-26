@@ -7,7 +7,7 @@ interface Piece extends Konva.ImageConfig {
 
 import Konva from 'konva'
 import type { GroupConfig } from 'konva/lib/Group'
-import type { IRect, KonvaNodeEvent } from 'konva/lib/types'
+import type { IRect, KonvaNodeEvent, Vector2d } from 'konva/lib/types'
 import { ref, watchEffect } from 'vue'
 import { useImage } from 'vue-konva'
 
@@ -81,18 +81,57 @@ watchEffect(() => {
   }
 })
 
-/** Simple box collision */
-const hasIntersection = (a: IRect, b: IRect) => {
-  if (!a.x || !a.y || !a.width || !a.height || !b.x || !b.y || !b.width || !b.height) {
-    return
+const distanceSquared = (a: Vector2d, b: Vector2d) => {
+  const dx = a.x - b.x
+  const dy = a.y - b.y
+  const distance = dx * dx + dy * dy
+  return distance
+}
+
+const snapBounds = 100
+const snap = (a: Vector2d, b: Vector2d) => {
+  const hasSnap = distanceSquared(a, b) < snapBounds
+  return hasSnap
+}
+
+const snapLeftRight = (a: IRect, b: IRect) => {
+  const left: Vector2d = {
+    x: a.x + a.width,
+    y: a.y + a.height / 2,
   }
 
-  return !(
-    b.x > a.x + a.width ||
-    b.x + b.width < a.x ||
-    b.y > a.y + a.height ||
-    b.y + b.height < a.y
-  )
+  const right: Vector2d = {
+    x: b.x,
+    y: b.y + a.height / 2,
+  }
+
+  return snap(left, right)
+}
+
+const snapTopBottom = (a: IRect, b: IRect) => {
+  const top: Vector2d = {
+    x: a.x + a.width / 2,
+    y: a.y + a.height,
+  }
+
+  const bottom: Vector2d = {
+    x: b.x + b.width / 2,
+    y: b.y,
+  }
+
+  return snap(top, bottom)
+}
+
+const hasSnap = (a: IRect, aX: number, aY: number, b: IRect, bX: number, bY: number) => {
+  if (aX < bX) {
+    return snapLeftRight(a, b)
+  } else if (aX > bX) {
+    return snapLeftRight(b, a)
+  } else if (aY < bY) {
+    return snapTopBottom(a, b)
+  } else if (aY > bY) {
+    return snapTopBottom(b, a)
+  }
 }
 
 const handleDragEnd = (
@@ -101,20 +140,20 @@ const handleDragEnd = (
 ) => {
   const target = e.target
   const layer = target.getLayer()
-
-  if (!layer) {
-    return
-  }
+  if (!layer) return
 
   for (const piece of pieces.value[groupId]) {
-    const rect = target.getClientRect()
+    if (!piece) continue
+
+    const curr = layer.findOne(`#${piece.id}`)
+    if (!curr) continue
+
+    const currRect = curr.getClientRect()
     const currX = piece.pieceX
     const currY = piece.pieceY
 
     for (const otherGroupId in pieces.value) {
-      if (otherGroupId === groupId) {
-        continue
-      }
+      if (otherGroupId === groupId) continue
 
       for (const piece of pieces.value[otherGroupId]) {
         const otherX = piece.pieceX
@@ -123,19 +162,14 @@ const handleDragEnd = (
         const diffY = Math.abs(currY - otherY)
 
         // Only do collision test if pieces are directly adjacent
-        if (diffX > 1 || diffY > 1 || (diffX === 1 && diffY === 1)) continue
+        if (!(diffX === 1 && diffY === 0) && !(diffX === 0 && diffY === 1)) continue
 
-        const other = layer?.findOne(`#${piece.id}`)
+        const other = layer.findOne(`#${piece.id}`)
+        if (!other) continue
 
-        if (!other) {
-          continue
-        }
+        const otherRect = other.getClientRect()
 
-        const otherRect = other?.getClientRect()
-
-        if (hasIntersection(rect, otherRect)) {
-          console.log('intersect')
-
+        if (hasSnap(currRect, currX, currY, otherRect, otherX, otherY)) {
           const base = pieces.value[otherGroupId][0]
 
           // Move all pieces to other group
