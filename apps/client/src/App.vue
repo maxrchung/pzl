@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import KonvaTest from './KonvaTest.vue'
+import KonvaTest from './KonvaTest.vue';
 </script>
 
 <template>
