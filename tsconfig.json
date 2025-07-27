@@ -7,10 +7,10 @@
       "path": "./apps/client"
     },
     {
-      "path": "./server"
+      "path": "./apps/server"
     },
     {
-      "path": "./shared"
+      "path": "./libs/shared"
     }
   ]
 }

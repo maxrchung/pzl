@@ -47,7 +47,6 @@
   },
   "workspaces": [
     "apps/*",
-    "server",
-    "shared"
+    "libs/*"
   ]
 }
