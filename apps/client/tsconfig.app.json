@@ -3,7 +3,7 @@
   "compilerOptions": {
     "lib": ["esnext", "dom", "dom.iterable"],
     "outDir": "dist",
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "rootDir": "src",
     "resolveJsonModule": true,
     "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo"
