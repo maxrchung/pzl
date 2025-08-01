@@ -14,6 +14,7 @@ import { useImage } from 'vue-konva';
 const stageConfig = {
   width: window.innerWidth,
   height: window.innerHeight,
+  draggable: true,
 };
 
 const sides = 4;
