@@ -1,15 +1,16 @@
 <script setup lang="ts">
+import Konva from 'konva';
+import type { GroupConfig } from 'konva/lib/Group';
+import type { IRect, KonvaNodeEvent, Vector2d } from 'konva/lib/types';
+import { ref, watch } from 'vue';
+import { useImage } from 'vue-konva';
+import ClientPanel from '../components/ClientPanel.vue';
+
 interface Piece extends Konva.ImageConfig {
   pieceX: number;
   pieceY: number;
   groupId: string;
 }
-
-import Konva from 'konva';
-import type { GroupConfig } from 'konva/lib/Group';
-import type { IRect, KonvaNodeEvent, Vector2d } from 'konva/lib/types';
-import { ref, watchEffect } from 'vue';
-import { useImage } from 'vue-konva';
 
 const stageConfig = {
   width: window.innerWidth,
@@ -36,11 +37,11 @@ const [image] = useImage('/sonic-disturb.jpg');
 const pieces = ref<{ [groupId: string]: Piece[] }>({});
 const configs = ref<{ [groupId: string]: GroupConfig }>({});
 
-watchEffect(() => {
-  const width = image.value?.width;
-  const height = image.value?.height;
+watch(image, (image) => {
+  const width = image?.width;
+  const height = image?.height;
 
-  if (!image.value || !width || !height) {
+  if (!image || !width || !height) {
     return;
   }
 
@@ -64,7 +65,7 @@ watchEffect(() => {
       const piece = {
         id: stringId,
         groupId: stringId,
-        image: image.value,
+        image,
         crop: {
           height: imageHeight,
           width: imageWidth,
@@ -222,4 +223,6 @@ const handleDragEnd = (
       </v-group>
     </v-layer>
   </v-stage>
+
+  <ClientPanel />
 </template>

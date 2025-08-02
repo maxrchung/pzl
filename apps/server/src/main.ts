@@ -18,6 +18,10 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (reason) => {
     console.log(`Client ${socket.id} disconnected: ${reason}`);
   });
+
+  socket.on('resetSecret', () => {
+    socket.emit('resetSecret', { connections: io.sockets.sockets.size });
+  });
 });
 
 httpServer.listen(PORT, () => {

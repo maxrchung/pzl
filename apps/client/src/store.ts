@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
+import { SecretState } from '@pzl/shared';
 
 export const useStore = defineStore('store', {
   state: () => ({
     isConnected: false,
+    secret: {
+      connections: 0,
+    } as SecretState,
   }),
   actions: {
     bindEvents() {
@@ -14,14 +18,22 @@ export const useStore = defineStore('store', {
       socket.on('disconnect', () => {
         this.isConnected = false;
       });
+
+      socket.on('resetSecret', (data) => {
+        this.secret = data;
+      });
     },
 
-    connect() {
+    connectSocket() {
       socket.connect();
     },
 
-    disconnect() {
+    disconnectSocket() {
       socket.disconnect();
+    },
+
+    resetSecret() {
+      socket.emit('resetSecret');
     },
   },
 });
