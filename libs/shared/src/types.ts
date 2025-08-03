@@ -3,14 +3,14 @@ export interface SecretState {
 }
 
 export interface ServerToClientEvents {
-  resetSecret: (data: SecretState) => void;
-  resetState: () => void;
+  refreshSecret: (data: SecretState) => void;
+  refreshGame: () => void;
   movePiece: () => void;
   moveGroup: () => void;
 }
 
 export interface ClientToServerEvents {
-  resetSecret: () => void;
+  refreshSecret: () => void;
   uploadImage: () => void;
   updateSides: () => void;
   movePiece: () => void;

@@ -8,9 +8,8 @@ const store = useStore();
 store.connectSocket();
 
 // Refresh every second for updates
-store.resetSecret();
 const intervalId = setInterval(() => {
-  store.resetSecret();
+  store.refreshSecret();
 }, 1000);
 
 onUnmounted(() => {

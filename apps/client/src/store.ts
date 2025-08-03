@@ -19,7 +19,7 @@ export const useStore = defineStore('store', {
         this.isConnected = false;
       });
 
-      socket.on('resetSecret', (data) => {
+      socket.on('refreshSecret', (data) => {
         this.secret = data;
       });
     },
@@ -32,8 +32,8 @@ export const useStore = defineStore('store', {
       socket.disconnect();
     },
 
-    resetSecret() {
-      socket.emit('resetSecret');
+    refreshSecret() {
+      socket.emit('refreshSecret');
     },
   },
 });

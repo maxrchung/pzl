@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { PORT } from './constants';
 
 import type { ClientToServerEvents, ServerToClientEvents } from '@pzl/shared';
@@ -12,15 +12,21 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
   },
 });
 
+const refreshSecret = (socket: Socket) => {
+  socket.emit('refreshSecret', { connections: io.sockets.sockets.size });
+};
+
 io.on('connection', (socket) => {
   console.log(`Client connected: ${socket.id}`);
+  socket.emit('refreshGame');
+  refreshSecret(socket);
 
   socket.on('disconnect', (reason) => {
     console.log(`Client ${socket.id} disconnected: ${reason}`);
   });
 
-  socket.on('resetSecret', () => {
-    socket.emit('resetSecret', { connections: io.sockets.sockets.size });
+  socket.on('refreshSecret', () => {
+    refreshSecret(socket);
   });
 });
 

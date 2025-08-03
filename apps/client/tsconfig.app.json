@@ -25,5 +25,10 @@
     "src/**/*.ts",
     "src/**/*.vue",
     "vue-shims.d.ts"
+  ],
+  "references": [
+    {
+      "path": "../../libs/shared/tsconfig.lib.json"
+    }
   ]
 }
