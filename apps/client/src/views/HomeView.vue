@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import Konva from 'konva';
-import type { GroupConfig } from 'konva/lib/Group';
 import type { IRect, KonvaNodeEvent, Vector2d } from 'konva/lib/types';
-import { ref, watch } from 'vue';
+import { computed, ComputedRef } from 'vue';
 import { useImage } from 'vue-konva';
 import ClientPanel from '../components/ClientPanel.vue';
-
-interface Piece extends Konva.ImageConfig {
-  pieceX: number;
-  pieceY: number;
-  groupId: string;
-}
+import { PiecesMap } from '@pzl/shared';
+import { KonvaEventObject } from 'konva/lib/Node';
+import { useStore } from '../store';
 
 const stageConfig = {
   width: window.innerWidth,
@@ -18,70 +13,48 @@ const stageConfig = {
   draggable: true,
 };
 
-const sides = 4;
+const [image] = useImage('/image.jpg');
 
-// We don't know what the width/height will be exactly until the image loads
-let pieceWidth = 100;
-let pieceHeight = 100;
+const store = useStore();
 
-const getInitialPosition = () => {
-  const x = Math.random() * (stageConfig.width - pieceWidth);
-  const y = Math.random() * (stageConfig.height - pieceHeight);
-
-  return { x, y };
-};
-
-const [image] = useImage('/sonic-disturb.jpg');
-
-// Mapping from group to its pieces
-const pieces = ref<{ [groupId: string]: Piece[] }>({});
-const configs = ref<{ [groupId: string]: GroupConfig }>({});
-
-watch(image, (image) => {
-  const width = image?.width;
-  const height = image?.height;
-
-  if (!image || !width || !height) {
-    return;
+const pieces: ComputedRef<PiecesMap> = computed(() => {
+  if (!image) {
+    return {};
   }
 
-  const imageWidth = width / sides;
-  const imageHeight = height / sides;
+  // image has to be set from browser side since it's an HTML element
+  const addedImage = Object.fromEntries(
+    Object.entries(store.game.pieces).map(([groupId, pieces]) => [
+      groupId,
+      pieces.map((piece) => ({
+        ...piece,
+        image: image.value ?? undefined,
+      })),
+    ]),
+  );
 
-  const pieceLength = Math.min(stageConfig.width, stageConfig.height) / sides;
+  return addedImage;
+});
 
-  const isWidthLarger = width >= height;
-  const ratio = width / height;
-
-  pieceWidth = isWidthLarger ? pieceLength : pieceLength * ratio;
-  pieceHeight = isWidthLarger ? pieceLength / ratio : pieceLength;
-
-  let id = 0;
-
-  for (let i = 0; i < sides; ++i) {
-    for (let j = 0; j < sides; ++j) {
-      const stringId = (id++).toString();
-
-      const piece = {
-        id: stringId,
-        groupId: stringId,
-        image,
-        crop: {
-          height: imageHeight,
-          width: imageWidth,
-          x: j * imageWidth,
-          y: i * imageHeight,
-        },
-        width: pieceWidth,
-        height: pieceHeight,
-        pieceX: j,
-        pieceY: i,
+const pieceSize = computed(() => {
+  const pieces = store.game.pieces;
+  for (const groupId in pieces) {
+    const piece = pieces[groupId][0];
+    if (piece) {
+      return {
+        width: piece.width || 1,
+        height: piece.height || 1,
       };
-      pieces.value[stringId] = [piece];
-      configs.value[stringId] = getInitialPosition();
     }
   }
+
+  return {
+    width: 1,
+    height: 1,
+  };
 });
+
+const configs = computed(() => store.game.configs);
 
 const distanceSquared = (a: Vector2d, b: Vector2d) => {
   const dx = a.x - b.x;
@@ -146,7 +119,7 @@ const hasSnap = (
 };
 
 const handleDragEnd = (
-  e: Konva.KonvaEventObject<KonvaNodeEvent.dragend>,
+  e: KonvaEventObject<KonvaNodeEvent.dragend>,
   groupId: string | number,
 ) => {
   const target = e.target;
@@ -189,8 +162,8 @@ const handleDragEnd = (
             const copy = {
               ...piece,
               groupId: otherGroupId,
-              x: (piece.pieceX - base.pieceX) * pieceWidth,
-              y: (piece.pieceY - base.pieceY) * pieceHeight,
+              x: (piece.pieceX - base.pieceX) * pieceSize.value.width,
+              y: (piece.pieceY - base.pieceY) * pieceSize.value.height,
             };
 
             pieces.value[otherGroupId].push(copy);
@@ -212,10 +185,9 @@ const handleDragEnd = (
       <v-group
         v-for="(pieces, groupId) in pieces"
         :key="groupId"
-        :draggable="true"
         :config="configs[groupId]"
         @dragend="
-          (e: Konva.KonvaEventObject<KonvaNodeEvent.dragend>) =>
+          (e: KonvaEventObject<KonvaNodeEvent.dragend>) =>
             handleDragEnd(e, groupId)
         "
       >

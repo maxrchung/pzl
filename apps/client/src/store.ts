@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import { SecretState } from '@pzl/shared';
+import { ConfigMap, PiecesMap, SecretState } from '@pzl/shared';
 
 export const useStore = defineStore('store', {
   state: () => ({
     isConnected: false,
+    game: {
+      pieces: {} as PiecesMap,
+      configs: {} as ConfigMap,
+    },
     secret: {
       connections: 0,
     } as SecretState,
@@ -19,8 +23,13 @@ export const useStore = defineStore('store', {
         this.isConnected = false;
       });
 
-      socket.on('refreshSecret', (data) => {
-        this.secret = data;
+      socket.on('refreshSecret', (secret) => {
+        this.secret = secret;
+      });
+
+      socket.on('refreshGame', (pieces, configs) => {
+        this.game.pieces = pieces;
+        this.game.configs = configs;
       });
     },
 
