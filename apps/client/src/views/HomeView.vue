@@ -22,38 +22,31 @@ const pieces: ComputedRef<PiecesMap> = computed(() => {
     return {};
   }
 
-  // image has to be set from browser side since it's an HTML element
-  const addedImage = Object.fromEntries(
-    Object.entries(store.game.pieces).map(([groupId, pieces]) => [
+  const { data, cropSize, pieceSize } = store.game;
+
+  const piecesMap: PiecesMap = Object.fromEntries(
+    Object.entries(data).map(([groupId, pieces]) => [
       groupId,
       pieces.map((piece) => ({
         ...piece,
         image: image.value ?? undefined,
+        crop: {
+          height: cropSize.height,
+          width: cropSize.width,
+          x: piece.index.x * cropSize.width,
+          y: piece.index.y * cropSize.height,
+        },
+        height: pieceSize.height,
+        width: pieceSize.width,
+        draggable: true,
       })),
     ]),
   );
 
-  return addedImage;
+  return piecesMap;
 });
 
-const pieceSize = computed(() => {
-  const pieces = store.game.pieces;
-  for (const groupId in pieces) {
-    const piece = pieces[groupId][0];
-    if (piece) {
-      return {
-        width: piece.width || 1,
-        height: piece.height || 1,
-      };
-    }
-  }
-
-  return {
-    width: 1,
-    height: 1,
-  };
-});
-
+const pieceSize = computed(() => store.game.pieceSize);
 const configs = computed(() => store.game.configs);
 
 const distanceSquared = (a: Vector2d, b: Vector2d) => {
@@ -133,15 +126,15 @@ const handleDragEnd = (
     if (!curr) continue;
 
     const currRect = curr.getClientRect();
-    const currX = piece.pieceX;
-    const currY = piece.pieceY;
+    const currX = piece.index.x;
+    const currY = piece.index.y;
 
     for (const otherGroupId in pieces.value) {
       if (otherGroupId === groupId) continue;
 
       for (const piece of pieces.value[otherGroupId]) {
-        const otherX = piece.pieceX;
-        const otherY = piece.pieceY;
+        const otherX = piece.index.x;
+        const otherY = piece.index.y;
         const diffX = Math.abs(currX - otherX);
         const diffY = Math.abs(currY - otherY);
 
@@ -162,8 +155,8 @@ const handleDragEnd = (
             const copy = {
               ...piece,
               groupId: otherGroupId,
-              x: (piece.pieceX - base.pieceX) * pieceSize.value.width,
-              y: (piece.pieceY - base.pieceY) * pieceSize.value.height,
+              x: (piece.index.x - base.index.x) * pieceSize.value.width,
+              y: (piece.index.y - base.index.y) * pieceSize.value.height,
             };
 
             pieces.value[otherGroupId].push(copy);

@@ -2,12 +2,12 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import sharp from 'sharp';
 import { PORT } from './constants';
-import type {
-  ClientToServerEvents,
-  ConfigMap,
-  PieceConfig,
-  PiecesMap,
-  ServerToClientEvents,
+import {
+  type ClientToServerEvents,
+  type SecretState,
+  type ServerToClientEvents,
+  INITIAL_GAME_STATE,
+  PieceData,
 } from '@pzl/shared';
 import path from 'path';
 
@@ -21,11 +21,15 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 
 io.on('connection', (socket) => {
   const refreshSecret = (socket: Socket) => {
-    socket.emit('refreshSecret', { connections: io.sockets.sockets.size });
+    const secret: SecretState = {
+      connections: io.sockets.sockets.size,
+    };
+
+    socket.emit('refreshSecret', secret);
   };
 
   console.log(`Client connected: ${socket.id}`);
-  socket.emit('refreshGame', pieces, configs);
+  socket.emit('refreshGame', game);
   refreshSecret(socket);
 
   socket.on('disconnect', (reason) => {
@@ -47,30 +51,30 @@ const getImageDimensions = async () => {
   };
 };
 
+const STAGE_LENGTH = 1000;
 const sides = 5;
-const stageLength = 1000;
+let game = INITIAL_GAME_STATE;
 
-const pieces: PiecesMap = {};
-const configs: ConfigMap = {};
+const resetGame = async () => {
+  game = INITIAL_GAME_STATE;
 
-httpServer.listen(PORT, async () => {
-  console.log(`Server listening on port: ${PORT}`);
+  const { data, configs, cropSize, pieceSize } = game;
 
   const { width, height } = await getImageDimensions();
 
-  const cropWidth = width / sides;
-  const cropHeight = height / sides;
+  cropSize.height = height / sides;
+  cropSize.width = width / sides;
 
   const isWidthLarger = width >= height;
   const ratio = width / height;
 
-  const pieceLength = stageLength / sides;
-  const pieceWidth = isWidthLarger ? pieceLength : stageLength * ratio;
-  const pieceHeight = isWidthLarger ? pieceLength / ratio : stageLength;
+  const pieceLength = STAGE_LENGTH / sides;
+  pieceSize.width = isWidthLarger ? pieceLength : STAGE_LENGTH * ratio;
+  pieceSize.height = isWidthLarger ? pieceLength / ratio : STAGE_LENGTH;
 
   const getInitialPosition = () => {
-    const x = Math.random() * (stageLength - pieceWidth);
-    const y = Math.random() * (stageLength - pieceHeight);
+    const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
+    const y = Math.random() * (STAGE_LENGTH - pieceSize.height);
 
     return { x, y };
   };
@@ -81,27 +85,23 @@ httpServer.listen(PORT, async () => {
     for (let j = 0; j < sides; ++j) {
       const stringId = (id++).toString();
 
-      const piece: PieceConfig = {
+      const piece: PieceData = {
         id: stringId,
         groupId: stringId,
-        // image is required in ImageConfig but we can't set it on the server
-        // because it's an HTML element
-        image: undefined,
-        crop: {
-          height: cropHeight,
-          width: cropWidth,
-          x: j * cropWidth,
-          y: i * cropHeight,
+        index: {
+          x: j,
+          y: i,
         },
-        width: pieceWidth,
-        height: pieceHeight,
-        pieceX: j,
-        pieceY: i,
-        draggable: true,
       };
 
-      pieces[stringId] = [piece];
+      data[stringId] = [piece];
       configs[stringId] = getInitialPosition();
     }
   }
+};
+
+httpServer.listen(PORT, async () => {
+  console.log(`Server listening on port: ${PORT}`);
+
+  await resetGame();
 });

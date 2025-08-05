@@ -2,7 +2,7 @@
 
 ~~Game state from server~~
 
-Refactor to only send needed data
+~~Refactor to only send needed data~~
 
 Update piece position
 
