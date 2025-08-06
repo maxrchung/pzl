@@ -4,7 +4,7 @@
 
 ~~Refactor to only send needed data~~
 
-Update piece position
+~~Update piece position~~
 
 Update piece snap
 
@@ -29,3 +29,5 @@ Jigsaw shape
 Lobbies?
 
 Start screen
+
+Optimize pieces/configs computed

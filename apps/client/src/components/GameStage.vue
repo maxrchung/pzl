@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { IRect, KonvaNodeEvent, Vector2d } from 'konva/lib/types';
+import type { IRect, Vector2d } from 'konva/lib/types';
 import { computed, ComputedRef } from 'vue';
 import { useImage } from 'vue-konva';
-import { PiecesMap } from '@pzl/shared';
-import { KonvaEventObject } from 'konva/lib/Node';
+import { ConfigMap, PiecesMap } from '@pzl/shared';
 import { useStore } from '../store';
+import { Group } from 'konva/lib/Group';
+import { Image } from 'konva/lib/shapes/Image';
+import { throttle } from '../throttle';
 
 const stageConfig = {
   width: window.innerWidth,
@@ -37,7 +39,6 @@ const pieces: ComputedRef<PiecesMap> = computed(() => {
         },
         height: pieceSize.height,
         width: pieceSize.width,
-        draggable: true,
       })),
     ]),
   );
@@ -45,8 +46,36 @@ const pieces: ComputedRef<PiecesMap> = computed(() => {
   return piecesMap;
 });
 
+const groupRefs: Record<string, Group | null> = {};
+const pieceRefs: Record<string, Image | null> = {};
+
+const configs = computed(() => {
+  const configMap: ConfigMap = Object.fromEntries(
+    Object.entries(store.game.configs).map(([groupId, config]) => [
+      groupId,
+      {
+        ...config,
+        id: `g${groupId}`,
+        draggable: true,
+      },
+    ]),
+  );
+
+  return configMap;
+});
+
 const pieceSize = computed(() => store.game.pieceSize);
-const configs = computed(() => store.game.configs);
+
+const THROTTLE_DELAY_IN_MS = 100;
+
+const handleDragMove = throttle((groupId: string) => {
+  const group = groupRefs[groupId];
+  if (!group) {
+    return;
+  }
+
+  store.moveGroup(groupId, group.position());
+}, THROTTLE_DELAY_IN_MS);
 
 const distanceSquared = (a: Vector2d, b: Vector2d) => {
   const dx = a.x - b.x;
@@ -110,18 +139,11 @@ const hasSnap = (
   return false;
 };
 
-const handleDragEnd = (
-  e: KonvaEventObject<KonvaNodeEvent.dragend>,
-  groupId: string | number,
-) => {
-  const target = e.target;
-  const layer = target.getLayer();
-  if (!layer) return;
-
+const handleDragEnd = (groupId: string) => {
   for (const piece of pieces.value[groupId]) {
     if (!piece) continue;
 
-    const curr = layer.findOne(`#${piece.id}`);
+    const curr = pieceRefs[piece.id];
     if (!curr) continue;
 
     const currRect = curr.getClientRect();
@@ -141,7 +163,7 @@ const handleDragEnd = (
         if (!(diffX === 1 && diffY === 0) && !(diffX === 0 && diffY === 1))
           continue;
 
-        const other = layer.findOne(`#${piece.id}`);
+        const other = pieceRefs[piece.id];
         if (!other) continue;
 
         const otherRect = other.getClientRect();
@@ -178,12 +200,16 @@ const handleDragEnd = (
         v-for="(pieces, groupId) in pieces"
         :key="groupId"
         :config="configs[groupId]"
-        @dragend="
-          (e: KonvaEventObject<KonvaNodeEvent.dragend>) =>
-            handleDragEnd(e, groupId)
-        "
+        @dragmove="handleDragMove(groupId)"
+        @dragend="() => handleDragEnd(groupId)"
+        :ref="(el: any) => (groupRefs[groupId] = el?.getNode())"
       >
-        <v-image v-for="piece in pieces" :key="piece.id" :config="piece" />
+        <v-image
+          v-for="piece in pieces"
+          :key="piece.id"
+          :config="piece"
+          :ref="(el: any) => (groupRefs[piece.id] = el?.getNode())"
+        />
       </v-group>
     </v-layer>
   </v-stage>

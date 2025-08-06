@@ -1,5 +1,6 @@
 import { GroupConfig } from 'konva/lib/Group.js';
 import { ImageConfig } from 'konva/lib/shapes/Image.js';
+import { Vector2d } from 'konva/lib/types.js';
 
 export interface SecretState {
   connections: number;
@@ -21,9 +22,9 @@ export type DataMap = { [groupId: string]: PieceData[] };
  * element */
 export type PieceConfig = PieceData & ImageConfig;
 
-export type PiecesMap = { [groupId: string]: PieceConfig[] };
+export type PiecesMap = Record<string, PieceConfig[]>;
 
-export type ConfigMap = { [groupId: string]: GroupConfig };
+export type ConfigMap = Record<string, GroupConfig>;
 
 export interface GameState {
   /** How much to crop from the image */
@@ -45,8 +46,8 @@ export interface GameState {
 export interface ServerToClientEvents {
   refreshSecret: (secret: SecretState) => void;
   refreshGame: (game: GameState) => void;
-  movePiece: () => void;
   moveGroup: () => void;
+  snapGroup: () => void;
 }
 
 export interface ClientToServerEvents {
@@ -54,5 +55,6 @@ export interface ClientToServerEvents {
   resetGame: () => void;
   uploadImage: () => void;
   updateSides: () => void;
-  movePiece: () => void;
+  moveGroup: (groupId: string, position: Vector2d) => void;
+  snapGroup: () => void;
 }

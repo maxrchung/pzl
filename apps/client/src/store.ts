@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
 import { INITIAL_GAME_STATE, SecretState } from '@pzl/shared';
+import { Vector2d } from 'konva/lib/types';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -39,6 +40,10 @@ export const useStore = defineStore('store', {
 
     refreshSecret() {
       socket.emit('refreshSecret');
+    },
+
+    moveGroup(groupId: string, position: Vector2d) {
+      socket.emit('moveGroup', groupId, position);
     },
   },
 });

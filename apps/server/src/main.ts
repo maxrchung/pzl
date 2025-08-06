@@ -39,6 +39,11 @@ io.on('connection', (socket) => {
   socket.on('refreshSecret', () => {
     refreshSecret(socket);
   });
+
+  socket.on('moveGroup', (groupId, position) => {
+    game.configs[groupId].x = position.x;
+    game.configs[groupId].y = position.y;
+  });
 });
 
 const getImageDimensions = async () => {
@@ -86,7 +91,7 @@ const resetGame = async () => {
       const stringId = (id++).toString();
 
       const piece: PieceData = {
-        id: stringId,
+        id: 'p' + stringId,
         groupId: stringId,
         index: {
           x: j,
