@@ -49,20 +49,7 @@ const pieces: ComputedRef<PiecesMap> = computed(() => {
 const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
-const configs = computed(() => {
-  const configMap: ConfigMap = Object.fromEntries(
-    Object.entries(store.game.configs).map(([groupId, config]) => [
-      groupId,
-      {
-        ...config,
-        id: `g${groupId}`,
-        draggable: true,
-      },
-    ]),
-  );
-
-  return configMap;
-});
+const configs = computed(() => store.game.configs);
 
 const pieceSize = computed(() => store.game.pieceSize);
 
