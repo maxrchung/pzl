@@ -50,7 +50,6 @@ const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
 const configs = computed(() => store.game.configs);
-
 const pieceSize = computed(() => store.game.pieceSize);
 
 const THROTTLE_DELAY_IN_MS = 100;
