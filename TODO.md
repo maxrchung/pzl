@@ -6,6 +6,8 @@
 
 Update piece position
 
+Update piece snap
+
 Reset game command
 
 Change sides in secret
