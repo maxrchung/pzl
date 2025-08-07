@@ -16,7 +16,7 @@ export interface PieceData {
   };
 }
 
-export type DataMap = { [groupId: string]: PieceData[] };
+export type DataMap = Record<string, PieceData[]>;
 
 /** Client uses this type, which contains additional parameters like HTML image
  * element */

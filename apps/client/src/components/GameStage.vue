@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { IRect, Vector2d } from 'konva/lib/types';
-import { computed, ComputedRef } from 'vue';
+import { computed } from 'vue';
 import { useImage } from 'vue-konva';
-import { ConfigMap, PiecesMap } from '@pzl/shared';
 import { useStore } from '../store';
 import { Group } from 'konva/lib/Group';
 import { Image } from 'konva/lib/shapes/Image';
-import { throttle } from '../throttle';
+import GamePiece from './GamePiece.vue';
+import GameGroup from './GameGroup.vue';
 
 const stageConfig = {
   width: window.innerWidth,
@@ -17,51 +17,28 @@ const stageConfig = {
 const [image] = useImage('/image.jpg');
 
 const store = useStore();
-
-const pieces: ComputedRef<PiecesMap> = computed(() => {
-  if (!image) {
-    return {};
-  }
-
-  const { data, cropSize, pieceSize } = store.game;
-
-  const piecesMap: PiecesMap = Object.fromEntries(
-    Object.entries(data).map(([groupId, pieces]) => [
-      groupId,
-      pieces.map((piece) => ({
-        ...piece,
-        image: image.value ?? undefined,
-        crop: {
-          height: cropSize.height,
-          width: cropSize.width,
-          x: piece.index.x * cropSize.width,
-          y: piece.index.y * cropSize.height,
-        },
-        height: pieceSize.height,
-        width: pieceSize.width,
-      })),
-    ]),
-  );
-
-  return piecesMap;
-});
+const data = computed(() => store.game.data);
+const pieceSize = computed(() => store.game.pieceSize);
 
 const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
-const configs = computed(() => store.game.configs);
-const pieceSize = computed(() => store.game.pieceSize);
-
 const THROTTLE_DELAY_IN_MS = 100;
+const lastThrottle = 0;
 
-const handleDragMove = throttle((groupId: string) => {
+const handleDragMove = (groupId: string, force: boolean = false) => {
+  const now = Date.now();
+  if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) {
+    return;
+  }
+
   const group = groupRefs[groupId];
   if (!group) {
     return;
   }
 
   store.moveGroup(groupId, group.position());
-}, THROTTLE_DELAY_IN_MS);
+};
 
 const distanceSquared = (a: Vector2d, b: Vector2d) => {
   const dx = a.x - b.x;
@@ -126,7 +103,10 @@ const hasSnap = (
 };
 
 const handleDragEnd = (groupId: string) => {
-  for (const piece of pieces.value[groupId]) {
+  // Ensure end position is updated
+  handleDragMove(groupId, true);
+
+  for (const piece of data.value[groupId]) {
     if (!piece) continue;
 
     const curr = pieceRefs[piece.id];
@@ -136,10 +116,10 @@ const handleDragEnd = (groupId: string) => {
     const currX = piece.index.x;
     const currY = piece.index.y;
 
-    for (const otherGroupId in pieces.value) {
+    for (const otherGroupId in data.value) {
       if (otherGroupId === groupId) continue;
 
-      for (const piece of pieces.value[otherGroupId]) {
+      for (const piece of data.value[otherGroupId]) {
         const otherX = piece.index.x;
         const otherY = piece.index.y;
         const diffX = Math.abs(currX - otherX);
@@ -155,10 +135,10 @@ const handleDragEnd = (groupId: string) => {
         const otherRect = other.getClientRect();
 
         if (hasSnap(currRect, currX, currY, otherRect, otherX, otherY)) {
-          const base = pieces.value[otherGroupId][0];
+          const base = data.value[otherGroupId][0];
 
           // Move all pieces to other group
-          for (const piece of pieces.value[groupId]) {
+          for (const piece of data.value[groupId]) {
             const copy = {
               ...piece,
               groupId: otherGroupId,
@@ -166,10 +146,10 @@ const handleDragEnd = (groupId: string) => {
               y: (piece.index.y - base.index.y) * pieceSize.value.height,
             };
 
-            pieces.value[otherGroupId].push(copy);
+            data.value[otherGroupId].push(copy);
           }
 
-          delete pieces.value[groupId];
+          delete data.value[groupId];
 
           return;
         }
@@ -180,23 +160,33 @@ const handleDragEnd = (groupId: string) => {
 </script>
 
 <template>
-  <v-stage ref="stage" :config="stageConfig">
+  <v-stage ref="stage" :config="stageConfig" v-if="image">
     <v-layer ref="layer">
-      <v-group
-        v-for="(pieces, groupId) in pieces"
+      <GameGroup
+        v-for="(datas, groupId) in data"
         :key="groupId"
-        :config="configs[groupId]"
-        @dragmove="handleDragMove(groupId)"
+        :groupId="groupId"
+        @dragmove="() => handleDragMove(groupId)"
         @dragend="() => handleDragEnd(groupId)"
-        :ref="(el: any) => (groupRefs[groupId] = el?.getNode())"
+        :ref="
+          // Not sure but this should get the node back for us?
+          (el: any) => {
+            groupRefs[groupId] = el?.groupRef?.getNode();
+          }
+        "
       >
-        <v-image
-          v-for="piece in pieces"
-          :key="piece.id"
-          :config="piece"
-          :ref="(el: any) => (groupRefs[piece.id] = el?.getNode())"
+        <GamePiece
+          v-for="data in datas"
+          :key="data.id"
+          :image="image"
+          :data="data"
+          :ref="
+            (el: any) => {
+              pieceRefs[data.id] = el?.imageRef?.getNode();
+            }
+          "
         />
-      </v-group>
+      </GameGroup>
     </v-layer>
   </v-stage>
 </template>
