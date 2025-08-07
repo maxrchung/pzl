@@ -7,6 +7,7 @@ import {
   type SecretState,
   type ServerToClientEvents,
   INITIAL_GAME_STATE,
+  moveGroup,
   PieceData,
 } from '@pzl/shared';
 import path from 'path';
@@ -41,8 +42,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('moveGroup', (groupId, position) => {
-    game.configs[groupId].x = position.x;
-    game.configs[groupId].y = position.y;
+    moveGroup(game, groupId, position);
+
+    socket.broadcast.emit('moveGroup', groupId, position);
   });
 });
 

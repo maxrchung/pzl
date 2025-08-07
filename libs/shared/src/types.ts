@@ -46,8 +46,8 @@ export interface GameState {
 export interface ServerToClientEvents {
   refreshSecret: (secret: SecretState) => void;
   refreshGame: (game: GameState) => void;
-  moveGroup: () => void;
-  snapGroup: () => void;
+  moveGroup: (groupId: string, position: Vector2d) => void;
+  snapGroup: (fromGroupId: string, toGroupId: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -56,5 +56,5 @@ export interface ClientToServerEvents {
   uploadImage: () => void;
   updateSides: () => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
-  snapGroup: () => void;
+  snapGroup: (fromGroupId: string, toGroupId: string) => void;
 }

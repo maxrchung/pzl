@@ -30,4 +30,4 @@ Lobbies?
 
 Start screen
 
-Optimize pieces/configs computed
+~~Optimize pieces/configs computed~~ ??? idk if it actually worked though

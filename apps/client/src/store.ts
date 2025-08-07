@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import { INITIAL_GAME_STATE, SecretState } from '@pzl/shared';
+import { INITIAL_GAME_STATE, moveGroup, SecretState } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 
 export const useStore = defineStore('store', {
@@ -27,6 +27,10 @@ export const useStore = defineStore('store', {
 
       socket.on('refreshGame', (game) => {
         this.game = game;
+      });
+
+      socket.on('moveGroup', (groupId, position) => {
+        moveGroup(this.game, groupId, position);
       });
     },
 
