@@ -7,6 +7,10 @@ export const moveGroup = (
   groupId: string,
   position: Vector2d,
 ) => {
+  if (!game.configs[groupId]) {
+    return;
+  }
+
   game.configs[groupId].x = position.x;
   game.configs[groupId].y = position.y;
 };

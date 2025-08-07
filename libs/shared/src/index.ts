@@ -1,3 +1,4 @@
 export * from './types.js';
 export * from './constants.js';
 export * from './moveGroup.js';
+export * from './snapGroup.js';

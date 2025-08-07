@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import { INITIAL_GAME_STATE, moveGroup, SecretState } from '@pzl/shared';
+import {
+  INITIAL_GAME_STATE,
+  moveGroup,
+  SecretState,
+  snapGroup,
+} from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 
 export const useStore = defineStore('store', {
@@ -32,6 +37,10 @@ export const useStore = defineStore('store', {
       socket.on('moveGroup', (groupId, position) => {
         moveGroup(this.game, groupId, position);
       });
+
+      socket.on('snapGroup', (fromGroupId, toGroupId) => {
+        snapGroup(this.game, fromGroupId, toGroupId);
+      });
     },
 
     connectSocket() {
@@ -48,6 +57,12 @@ export const useStore = defineStore('store', {
 
     moveGroup(groupId: string, position: Vector2d) {
       socket.emit('moveGroup', groupId, position);
+    },
+
+    snapGroup(fromGroupId: string, toGroupId: string) {
+      // Snap immediately on client side and broadcast to rest
+      snapGroup(this.game, fromGroupId, toGroupId);
+      socket.emit('snapGroup', fromGroupId, toGroupId);
     },
   },
 });

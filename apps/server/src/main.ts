@@ -9,6 +9,7 @@ import {
   INITIAL_GAME_STATE,
   moveGroup,
   PieceData,
+  snapGroup,
 } from '@pzl/shared';
 import path from 'path';
 
@@ -45,6 +46,12 @@ io.on('connection', (socket) => {
     moveGroup(game, groupId, position);
 
     socket.broadcast.emit('moveGroup', groupId, position);
+  });
+
+  socket.on('snapGroup', (fromGroupId, toGroupId) => {
+    snapGroup(game, fromGroupId, toGroupId);
+
+    socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
   });
 });
 
