@@ -64,5 +64,9 @@ export const useStore = defineStore('store', {
       snapGroup(this.game, fromGroupId, toGroupId);
       socket.emit('snapGroup', fromGroupId, toGroupId);
     },
+
+    resetGame() {
+      socket.emit('resetGame');
+    },
   },
 });

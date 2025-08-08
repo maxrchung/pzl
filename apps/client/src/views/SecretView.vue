@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
 import { useStore } from '../store';
 import SecretPanel from '../components/SecretPanel.vue';
+import { SECRET_INTERVAL_IN_MS } from '../constants';
 
 const store = useStore();
 
-store.connectSocket();
-
 // Refresh every second for updates
-const intervalId = setInterval(() => {
+setInterval(() => {
   store.refreshSecret();
-}, 1000);
-
-onUnmounted(() => {
-  clearInterval(intervalId);
-});
+}, SECRET_INTERVAL_IN_MS);
 </script>
 
 <template>

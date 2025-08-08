@@ -6,11 +6,15 @@
 
 ~~Update piece position~~
 
-Update piece snap
+~~Update piece snap~~
 
-Reset game command
+~~Reset game command~~
 
 Change sides in secret
+
+Deploy
+
+Change file
 
 Run socketio with express
 
@@ -18,11 +22,9 @@ Public folder on express, serve default file
 
 Change default file in secret
 
-Deploy
-
 Mouse zoom
 
-Probably hide client connectivity
+~~Probably hide client connectivity~~
 
 Jigsaw shape
 

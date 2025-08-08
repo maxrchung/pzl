@@ -53,6 +53,12 @@ io.on('connection', (socket) => {
 
     socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
   });
+
+  socket.on('resetGame', () => {
+    resetGame();
+
+    io.emit('refreshGame', game);
+  });
 });
 
 const getImageDimensions = async () => {
