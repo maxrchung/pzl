@@ -19,13 +19,7 @@
           "bundle": false,
           "main": "apps/server/src/main.ts",
           "tsConfig": "apps/server/tsconfig.app.json",
-          "assets": [
-            {
-              "glob": "apps/server/src/image.jpg",
-              "input": "",
-              "output": ""
-            }
-          ],
+          "assets": [],
           "esbuildOptions": {
             "sourcemap": true,
             "outExtension": {

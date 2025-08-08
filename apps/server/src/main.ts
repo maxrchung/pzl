@@ -6,13 +6,12 @@ import {
   type ClientToServerEvents,
   type SecretState,
   type ServerToClientEvents,
-  GameState,
   INITIAL_GAME_STATE,
   moveGroup,
   PieceData,
   snapGroup,
 } from '@pzl/shared';
-import path from 'path';
+import axios from 'axios';
 
 const httpServer = createServer();
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
@@ -21,6 +20,11 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
       process.env.NODE_ENV === 'production' ? 'https://pzl.maxrchung.com' : '*',
   },
 });
+
+const STAGE_LENGTH = 1000;
+let game = INITIAL_GAME_STATE;
+let gameSides = INITIAL_GAME_STATE.sides;
+let gameImageUrl = INITIAL_GAME_STATE.imageUrl;
 
 io.on('connection', (socket) => {
   const refreshSecret = (socket: Socket) => {
@@ -55,41 +59,56 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
   });
 
-  socket.on('resetGame', () => {
-    resetGame();
+  socket.on('resetGame', async () => {
+    await resetGame();
 
     io.emit('refreshGame', game);
   });
 
-  socket.on('updateSides', (newSides) => {
-    resetGame({ sides: newSides });
+  socket.on('updateSides', async (sides) => {
+    gameSides = sides;
+    await resetGame();
+
+    io.emit('refreshGame', game);
+  });
+
+  socket.on('updateImageUrl', async (imageUrl) => {
+    gameImageUrl = imageUrl;
+    await resetGame();
 
     io.emit('refreshGame', game);
   });
 });
 
-const getImageDimensions = async () => {
-  const imagePath = path.join(__dirname, 'image.jpg');
-  const { width, height } = await sharp(imagePath).metadata();
+const getImageDimensions = async (imageUrl: string) => {
+  try {
+    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+    const { width, height } = await sharp(response.data).metadata();
 
-  return {
-    width,
-    height,
-  };
+    return {
+      width,
+      height,
+    };
+  } catch (e) {
+    // Might be some weird crap if it's not an image file ionno
+    console.error(e);
+  }
+
+  return INITIAL_GAME_STATE.cropSize;
 };
 
-const STAGE_LENGTH = 1000;
-let game = INITIAL_GAME_STATE;
-
-const resetGame = async (settings?: Partial<GameState>) => {
+const resetGame = async () => {
   game = {
     ...INITIAL_GAME_STATE,
-    ...settings,
+    data: {},
+    configs: {},
+    sides: gameSides,
+    imageUrl: gameImageUrl,
   };
 
-  const { data, configs, cropSize, pieceSize, sides } = game;
+  const { data, configs, cropSize, pieceSize, sides, imageUrl } = game;
 
-  const { width, height } = await getImageDimensions();
+  const { width, height } = await getImageDimensions(imageUrl);
 
   cropSize.height = height / sides;
   cropSize.width = width / sides;

@@ -15,9 +15,10 @@ const stageConfig = {
   draggable: true,
 };
 
-const [image] = useImage('/image.jpg');
-
 const store = useStore();
+
+const imageUrl = computed(() => store.game.imageUrl);
+const [image] = useImage(imageUrl);
 const data = computed(() => store.game.data);
 
 const groupRefs: Record<string, Group | null> = {};

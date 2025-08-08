@@ -6,9 +6,6 @@ import PrimaryInput from './PrimaryInput.vue';
 
 const store = useStore();
 
-console.log(store.game);
-console.log(store.game.sides);
-
 const handleClick = () => {
   store.resetGame();
 };
@@ -16,7 +13,15 @@ const handleClick = () => {
 const handleSidesChange = (e: Event) => {
   const target = e.target as HTMLInputElement;
   const sides = Number(target.value);
+
   store.updateSides(sides);
+};
+
+const handleImageUrlChange = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const imageUrl = target.value;
+
+  store.updateImageUrl(imageUrl);
 };
 </script>
 
@@ -32,8 +37,17 @@ const handleSidesChange = (e: Event) => {
       sides:
       <PrimaryInput
         type="number"
+        :min="1"
         :value="store.game.sides"
-        @change="handleSidesChange"
+        @input="handleSidesChange"
+      />
+    </p>
+
+    <p>
+      imageUrl:
+      <PrimaryInput
+        :value="store.game.imageUrl"
+        @change="handleImageUrlChange"
       />
     </p>
   </FixedPanel>

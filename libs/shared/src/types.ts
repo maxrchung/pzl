@@ -29,6 +29,8 @@ export type ConfigMap = Record<string, GroupConfig>;
 export interface GameState {
   sides: number;
 
+  imageUrl: string;
+
   /** How much to crop from the image */
   cropSize: {
     height: number;
@@ -55,7 +57,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   refreshSecret: () => void;
   resetGame: () => void;
-  uploadImage: () => void;
+  updateImageUrl: (imageUrl: string) => void;
   updateSides: (sides: number) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;

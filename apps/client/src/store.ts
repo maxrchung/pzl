@@ -72,5 +72,9 @@ export const useStore = defineStore('store', {
     updateSides(sides: number) {
       socket.emit('updateSides', sides);
     },
+
+    updateImageUrl(imageUrl: string) {
+      socket.emit('updateImageUrl', imageUrl);
+    },
   },
 });
