@@ -6,6 +6,7 @@ import {
   type ClientToServerEvents,
   type SecretState,
   type ServerToClientEvents,
+  GameState,
   INITIAL_GAME_STATE,
   moveGroup,
   PieceData,
@@ -59,6 +60,12 @@ io.on('connection', (socket) => {
 
     io.emit('refreshGame', game);
   });
+
+  socket.on('updateSides', (newSides) => {
+    resetGame({ sides: newSides });
+
+    io.emit('refreshGame', game);
+  });
 });
 
 const getImageDimensions = async () => {
@@ -72,13 +79,15 @@ const getImageDimensions = async () => {
 };
 
 const STAGE_LENGTH = 1000;
-const sides = 5;
 let game = INITIAL_GAME_STATE;
 
-const resetGame = async () => {
-  game = INITIAL_GAME_STATE;
+const resetGame = async (settings?: Partial<GameState>) => {
+  game = {
+    ...INITIAL_GAME_STATE,
+    ...settings,
+  };
 
-  const { data, configs, cropSize, pieceSize } = game;
+  const { data, configs, cropSize, pieceSize, sides } = game;
 
   const { width, height } = await getImageDimensions();
 

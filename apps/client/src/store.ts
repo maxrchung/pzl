@@ -68,5 +68,9 @@ export const useStore = defineStore('store', {
     resetGame() {
       socket.emit('resetGame');
     },
+
+    updateSides(sides: number) {
+      socket.emit('updateSides', sides);
+    },
   },
 });

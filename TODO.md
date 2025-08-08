@@ -10,7 +10,7 @@
 
 ~~Reset game command~~
 
-Change sides in secret
+~~Change sides in secret~~
 
 Deploy
 
