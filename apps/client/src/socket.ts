@@ -3,6 +3,6 @@ import { io, Socket } from 'socket.io-client';
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
   process.env.NODE_ENV === 'production'
-    ? 'https://pzl.chng.mx'
+    ? 'https://pzl-377786463713.us-west1.run.app'
     : 'http://localhost:3000',
 );

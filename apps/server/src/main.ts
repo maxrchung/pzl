@@ -16,8 +16,7 @@ import axios from 'axios';
 const httpServer = createServer();
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
   cors: {
-    origin:
-      process.env.NODE_ENV === 'production' ? 'https://pzl.maxrchung.com' : '*',
+    origin: '*',
   },
 });
 
