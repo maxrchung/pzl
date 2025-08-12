@@ -30,6 +30,8 @@
         "configurations": {
           "development": {},
           "production": {
+            "bundle": true,
+            "thirdParty": true,
             "esbuildOptions": {
               "sourcemap": false,
               "outExtension": {
