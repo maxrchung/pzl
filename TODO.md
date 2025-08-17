@@ -1,10 +1,11 @@
 # TODO stuff
 
-Set window to proper stage position/scale
-
+Set window to proper stage scale
 Mouse zoom from center
 
 Jigsaw shape
+border around pieces
+hover effect
 
 Start screen
 
@@ -14,6 +15,8 @@ Better cors and deploy?
 Drag and drop image selector UI
 
 Lobbies?
+
+mobile support pinch and zoom
 
 s3 Bucket
 cloudfront

@@ -12,6 +12,7 @@ import {
   SERVER_PORT,
   SERVER_URL,
   snapGroup,
+  STAGE_LENGTH,
 } from '@pzl/shared';
 import axios from 'axios';
 import express from 'express';
@@ -27,7 +28,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   },
 });
 
-const STAGE_LENGTH = 1000;
 let game = INITIAL_GAME_STATE;
 let gameSides = INITIAL_GAME_STATE.sides;
 let gameImageUrl = INITIAL_GAME_STATE.imageUrl;
@@ -152,6 +152,8 @@ const resetGame = async () => {
       configs[stringId] = getInitialPosition();
     }
   }
+
+  console.log('Game reset');
 };
 
 server.listen(SERVER_PORT, async () => {

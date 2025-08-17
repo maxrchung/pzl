@@ -8,11 +8,15 @@ import GamePiece from './GamePiece.vue';
 import GameGroup from './GameGroup.vue';
 import { THROTTLE_DELAY_IN_MS } from '../constants';
 import { hasSnap } from '../snap';
+import { StageConfig } from 'konva/lib/Stage';
+import { STAGE_LENGTH } from '@pzl/shared';
 
-const stageConfig = {
+const stageConfig: StageConfig = {
   width: window.innerWidth,
   height: window.innerHeight,
   draggable: true,
+  x: window.innerWidth / 2 - STAGE_LENGTH / 2,
+  y: window.innerHeight / 2 - STAGE_LENGTH / 2,
 };
 
 const store = useStore();

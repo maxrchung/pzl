@@ -20,3 +20,6 @@ export const INITIAL_GAME_STATE: GameState = {
   cropSize: { height: 1, width: 1 },
   pieceSize: { height: 1, width: 1 },
 };
+
+/** Length of the default stage that server maintains */
+export const STAGE_LENGTH = 1000;
