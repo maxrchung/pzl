@@ -123,8 +123,8 @@ const resetGame = async () => {
   const ratio = width / height;
 
   const pieceLength = STAGE_LENGTH / sides;
-  pieceSize.width = isWidthLarger ? pieceLength : STAGE_LENGTH * ratio;
-  pieceSize.height = isWidthLarger ? pieceLength / ratio : STAGE_LENGTH;
+  pieceSize.width = isWidthLarger ? pieceLength : pieceLength * ratio;
+  pieceSize.height = isWidthLarger ? pieceLength / ratio : pieceLength;
 
   const getInitialPosition = () => {
     const x = Math.random() * (STAGE_LENGTH - pieceSize.width);

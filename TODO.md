@@ -1,7 +1,5 @@
 # TODO stuff
 
-Bug: Vertical images don't work
-
 Set window to proper stage position/scale
 
 Mouse zoom from center
