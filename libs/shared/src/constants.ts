@@ -7,7 +7,7 @@ export const SERVER_URL =
     ? 'https://pzl-377786463713.us-west1.run.app'
     : `http://localhost:${SERVER_PORT}`;
 
-const DEFAULT_IMAGE_URL =
+export const DEFAULT_IMAGE_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://pzl-377786463713.us-west1.run.app/uploads/default.jpg'
     : `http://localhost:${SERVER_PORT}/uploads/default.jpg`;

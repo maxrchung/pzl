@@ -5,6 +5,7 @@ import {
   type ClientToServerEvents,
   type SecretState,
   type ServerToClientEvents,
+  DEFAULT_IMAGE_URL,
   INITIAL_GAME_STATE,
   moveGroup,
   PieceData,
@@ -176,18 +177,24 @@ app.post('/upload', upload.single('image'), async (request) => {
     return;
   }
 
-  const oldImagePath = path.join(__dirname, new URL(game.imageUrl).pathname);
-  fs.unlink(oldImagePath, (error) => {
-    if (error) {
-      throw error;
-    }
-  });
+  const oldImageUrl = new URL(game.imageUrl);
+
+  // Keep default image so dev server reload doesn't break
+  if (oldImageUrl.href !== DEFAULT_IMAGE_URL) {
+    const oldImagePath = path.join(__dirname, oldImageUrl.pathname);
+    fs.unlink(oldImagePath, (error) => {
+      if (error) {
+        throw error;
+      }
+    });
+  }
 
   const newImageUrl = new URL(
     path.join('uploads', request.file.filename),
     SERVER_URL,
-  ).href;
-  gameImageUrl = newImageUrl;
+  );
+
+  gameImageUrl = newImageUrl.href;
 
   await resetGame();
 

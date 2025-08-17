@@ -26,6 +26,8 @@ Better error handling?
 
 image selection gallery + default images
 
+client side validation
+
 # Dunno
 
 Push docker image with tag?

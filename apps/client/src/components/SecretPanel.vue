@@ -72,7 +72,6 @@ const handleImageChange = async (event: Event) => {
       <p>
         imageUrl:
         <PrimaryInput
-          class="w-96"
           :value="store.game.imageUrl"
           @change="handleImageUrlChange"
         />
