@@ -1,8 +1,6 @@
 # TODO stuff
 
-Upload file to uploads
-
-Changes new file in secret
+Bug: Vertical images don't work
 
 Set window to proper stage position/scale
 

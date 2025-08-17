@@ -9,11 +9,14 @@ import {
   moveGroup,
   PieceData,
   SERVER_PORT,
+  SERVER_URL,
   snapGroup,
 } from '@pzl/shared';
 import axios from 'axios';
 import express from 'express';
-import { join } from 'path';
+import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const server = createServer(app);
@@ -102,7 +105,7 @@ const getImageDimensions = async (imageUrl: string) => {
 const resetGame = async () => {
   game = {
     ...INITIAL_GAME_STATE,
-    data: {},
+    data: {}, // Have to make sure to wipe objects
     configs: {},
     sides: gameSides,
     imageUrl: gameImageUrl,
@@ -156,5 +159,37 @@ server.listen(SERVER_PORT, async () => {
   await resetGame();
 });
 
-app.use(express.static(join(__dirname, 'public')));
-app.use('uploads', express.static(join(__dirname, 'uploads')));
+const uploadsDirectory = path.join(__dirname, 'uploads');
+
+app.use('/uploads', express.static(uploadsDirectory));
+
+const upload = multer({
+  dest: uploadsDirectory,
+  limits: {
+    // 10 MB
+    fileSize: 10_000_000,
+  },
+});
+
+app.post('/upload', upload.single('image'), async (request) => {
+  if (!request.file?.filename) {
+    return;
+  }
+
+  const oldImagePath = path.join(__dirname, new URL(game.imageUrl).pathname);
+  fs.unlink(oldImagePath, (error) => {
+    if (error) {
+      throw error;
+    }
+  });
+
+  const newImageUrl = new URL(
+    path.join('uploads', request.file.filename),
+    SERVER_URL,
+  ).href;
+  gameImageUrl = newImageUrl;
+
+  await resetGame();
+
+  io.emit('refreshGame', game);
+});

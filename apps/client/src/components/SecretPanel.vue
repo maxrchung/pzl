@@ -4,6 +4,7 @@ import PrimaryButton from './PrimaryButton.vue';
 import PrimaryInput from './PrimaryInput.vue';
 import FileInput from './FileInput.vue';
 import HorizontalRule from './HorizontalRule.vue';
+import { SERVER_URL } from '@pzl/shared';
 
 const store = useStore();
 
@@ -11,22 +12,22 @@ const handleClick = () => {
   store.resetGame();
 };
 
-const handleSidesChange = (e: Event) => {
-  const target = e.target as HTMLInputElement;
+const handleSidesChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
   const sides = Number(target.value);
 
   store.updateSides(sides);
 };
 
-const handleImageUrlChange = (e: Event) => {
-  const target = e.target as HTMLInputElement;
+const handleImageUrlChange = (event: Event) => {
+  const target = event.target as HTMLInputElement;
   const imageUrl = target.value;
 
   store.updateImageUrl(imageUrl);
 };
 
-const handleImageChange = async (e: Event) => {
-  const target = e.target as HTMLInputElement;
+const handleImageChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
   if (!file) {
@@ -36,7 +37,7 @@ const handleImageChange = async (e: Event) => {
   const formData = new FormData();
   formData.append('image', file);
 
-  fetch('/upload', {
+  fetch(`${SERVER_URL}/upload`, {
     method: 'POST',
     body: formData,
   });

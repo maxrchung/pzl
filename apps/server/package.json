@@ -21,9 +21,9 @@
           "tsConfig": "apps/server/tsconfig.app.json",
           "assets": [
             {
-              "input": "apps/server/public",
+              "input": "apps/server/uploads",
               "glob": "**/*",
-              "output": "apps/server/src/public"
+              "output": "apps/server/src/uploads"
             }
           ],
           "esbuildOptions": {
