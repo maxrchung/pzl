@@ -1,7 +1,16 @@
 import { ConfigMap, GameState, DataMap } from './types.js';
 
+export const SERVER_PORT = 3000;
+
+export const SERVER_URL =
+  process.env.NODE_ENV === 'production'
+    ? 'https://pzl-377786463713.us-west1.run.app'
+    : `http://localhost:${SERVER_PORT}`;
+
 const DEFAULT_IMAGE_URL =
-  'https://raw.githubusercontent.com/maxrchung/dotfiles/refs/heads/master/daBOiindaMrrr.jpg';
+  process.env.NODE_ENV === 'production'
+    ? 'https://pzl-377786463713.us-west1.run.app/default.jpg'
+    : `http://localhost:${SERVER_PORT}/default.jpg`;
 
 export const INITIAL_GAME_STATE: GameState = {
   sides: 5,

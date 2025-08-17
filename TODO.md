@@ -1,25 +1,34 @@
 # TODO stuff
 
-Dunno if we want NX deploy step? Or it makes sense to
+File selector
 
-Better cors and deploy?
+Upload file to uploads
 
-Maybe better naming, deploy to pzl-client and pzl-server
+Changes default file in secret
 
-pzl.maxrchung.com
+Set window to proper stage position/scale
 
-Run socketio with express?
-
-Push tags
-
-Public folder on express, serve default file
-
-Change default file in secret
-
-Mouse zoom
+Mouse zoom from center
 
 Jigsaw shape
 
+Start screen
+
+pzl.maxrchung.com
+Better cors and deploy?
+
+Drag and drop UI
+
 Lobbies?
 
-Start screen
+s3 Bucket
+cloudfront
+
+cache
+
+# Dunno
+
+Push docker image with tag?
+Dunno if we want NX deploy step? Or it makes sense to
+GitHub action deploy
+Maybe better naming, deploy to pzl-client and pzl-server

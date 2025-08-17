@@ -19,7 +19,13 @@
           "bundle": false,
           "main": "apps/server/src/main.ts",
           "tsConfig": "apps/server/tsconfig.app.json",
-          "assets": [],
+          "assets": [
+            {
+              "input": "apps/server/public",
+              "glob": "**/*",
+              "output": "apps/server/src/public"
+            }
+          ],
           "esbuildOptions": {
             "sourcemap": true,
             "outExtension": {

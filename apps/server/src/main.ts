@@ -1,7 +1,6 @@
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import sharp from 'sharp';
-import { PORT } from './constants';
 import {
   type ClientToServerEvents,
   type SecretState,
@@ -9,12 +8,16 @@ import {
   INITIAL_GAME_STATE,
   moveGroup,
   PieceData,
+  SERVER_PORT,
   snapGroup,
 } from '@pzl/shared';
 import axios from 'axios';
+import express from 'express';
+import { join } from 'path';
 
-const httpServer = createServer();
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
+const app = express();
+const server = createServer(app);
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: {
     origin: '*',
   },
@@ -147,8 +150,11 @@ const resetGame = async () => {
   }
 };
 
-httpServer.listen(PORT, async () => {
-  console.log(`Server listening on port: ${PORT}`);
+server.listen(SERVER_PORT, async () => {
+  console.log(`Server listening on port: ${SERVER_PORT}`);
 
   await resetGame();
 });
+
+app.use(express.static(join(__dirname, 'public')));
+app.use('uploads', express.static(join(__dirname, 'uploads')));

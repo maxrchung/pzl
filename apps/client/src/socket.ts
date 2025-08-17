@@ -1,8 +1,9 @@
-import { ClientToServerEvents, ServerToClientEvents } from '@pzl/shared';
+import {
+  ClientToServerEvents,
+  SERVER_URL,
+  ServerToClientEvents,
+} from '@pzl/shared';
 import { io, Socket } from 'socket.io-client';
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  process.env.NODE_ENV === 'production'
-    ? 'https://pzl-377786463713.us-west1.run.app'
-    : 'http://localhost:3000',
-);
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> =
+  io(SERVER_URL);
