@@ -1,10 +1,8 @@
 # TODO stuff
 
-File selector
-
 Upload file to uploads
 
-Changes default file in secret
+Changes new file in secret
 
 Set window to proper stage position/scale
 
@@ -17,7 +15,7 @@ Start screen
 pzl.maxrchung.com
 Better cors and deploy?
 
-Drag and drop UI
+Drag and drop image selector UI
 
 Lobbies?
 
@@ -25,6 +23,10 @@ s3 Bucket
 cloudfront
 
 cache
+
+Better error handling?
+
+image selection gallery + default images
 
 # Dunno
 
