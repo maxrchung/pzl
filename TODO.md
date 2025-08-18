@@ -1,6 +1,6 @@
 # TODO stuff
 
-Set window to proper stage scale
+Rescale on resize
 Mouse zoom from center
 
 Jigsaw shape

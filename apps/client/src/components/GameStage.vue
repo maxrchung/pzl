@@ -11,12 +11,18 @@ import { hasSnap } from '../snap';
 import { StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
 
+const scale = Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH;
+
 const stageConfig: StageConfig = {
   width: window.innerWidth,
   height: window.innerHeight,
   draggable: true,
-  x: window.innerWidth / 2 - STAGE_LENGTH / 2,
-  y: window.innerHeight / 2 - STAGE_LENGTH / 2,
+  x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * scale,
+  y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * scale,
+  scale: {
+    x: scale,
+    y: scale,
+  },
 };
 
 const store = useStore();
