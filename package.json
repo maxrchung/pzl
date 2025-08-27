@@ -19,7 +19,6 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "@aws/nx-plugin": "^0.44.0",
     "@eslint/js": "^9.8.0",
     "@nx/esbuild": "21.4.1",
     "@nx/eslint": "21.4.1",
