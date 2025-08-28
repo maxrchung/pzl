@@ -5,6 +5,8 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.876.0",
+    "@aws-sdk/s3-presigned-post": "^3.876.0",
     "axios": "^1.11.0",
     "express": "^5.1.0",
     "konva": "^9.3.22",
