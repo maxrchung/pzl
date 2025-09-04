@@ -5,6 +5,7 @@ import {
   type SecretState,
   type ServerToClientEvents,
   createGame,
+  DEFAULT_IMAGE_KEY,
   GameState,
   moveGroup,
   SERVER_CORS,
@@ -94,8 +95,11 @@ io.on('connection', (socket) => {
 
     io.emit('refreshGame', game);
 
-    // Probably best to only delete after people get the new update
-    await deleteUpload(oldKey);
+    // Make sure default file is ok
+    if (oldKey !== DEFAULT_IMAGE_KEY) {
+      // Probably best to only delete after people get the new update
+      await deleteUpload(oldKey);
+    }
   });
 });
 
