@@ -34,7 +34,7 @@ const data = computed(() => store.game.data);
 const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
-const lastThrottle = 0;
+let lastThrottle = 0;
 
 const handleDragMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
@@ -46,6 +46,8 @@ const handleDragMove = (groupId: string, force: boolean = false) => {
   if (!group) {
     return;
   }
+
+  lastThrottle = now + THROTTLE_DELAY_IN_MS;
 
   store.moveGroup(groupId, group.position());
 };
