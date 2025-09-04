@@ -19,13 +19,6 @@ const handleSidesChange = (event: Event) => {
   store.updateSides(sides);
 };
 
-const handleImageUrlChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const imageUrl = target.value;
-
-  store.updateImageUrl(imageUrl);
-};
-
 const handleImageChange = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -34,13 +27,22 @@ const handleImageChange = async (event: Event) => {
     return;
   }
 
-  const formData = new FormData();
-  formData.append('image', file);
+  const { height, width } = await createImageBitmap(file);
 
-  fetch(`${SERVER_URL}/upload`, {
-    method: 'POST',
-    body: formData,
-  });
+  const presign = await fetch(`${SERVER_URL}/presign`);
+  const { url, fields } = await presign.json();
+
+  const formData = new FormData();
+  for (const [key, value] of Object.entries(fields)) {
+    formData.append(key, value as string);
+  }
+  formData.append('file', file);
+
+  const post = { method: 'POST', body: formData };
+  await fetch(url, post);
+
+  const key = fields.key;
+  store.updateImage(key, height, width);
 };
 </script>
 
@@ -69,13 +71,7 @@ const handleImageChange = async (event: Event) => {
       </p>
       <HorizontalRule />
 
-      <p>
-        imageUrl:
-        <PrimaryInput
-          :value="store.game.imageUrl"
-          @change="handleImageUrlChange"
-        />
-      </p>
+      <p>imageUrl: {{ store.game.imageUrl }}</p>
 
       <img class="max-h-96 max-w-96" :src="store.game.imageUrl" />
       <FileInput accept="image/*" type="file" @change="handleImageChange" />

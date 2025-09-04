@@ -1,36 +1,40 @@
 import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import sharp from 'sharp';
 import {
   type ClientToServerEvents,
   type SecretState,
   type ServerToClientEvents,
-  DEFAULT_IMAGE_URL,
-  INITIAL_GAME_STATE,
+  createGame,
+  GameState,
   moveGroup,
-  PieceData,
+  SERVER_CORS,
   SERVER_PORT,
-  SERVER_URL,
   snapGroup,
-  STAGE_LENGTH,
 } from '@pzl/shared';
-import axios from 'axios';
+import {
+  createPresign,
+  deleteAllUploads,
+  deleteUpload,
+  getImageUrl,
+} from './s3';
 import express from 'express';
-import multer from 'multer';
-import fs from 'fs';
-import path from 'path';
+import cors from 'cors';
 
 const app = express();
+app.use(cors(SERVER_CORS));
 const server = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
-  cors: {
-    origin: '*',
-  },
+  cors: SERVER_CORS,
 });
 
-let game = INITIAL_GAME_STATE;
-let gameSides = INITIAL_GAME_STATE.sides;
-let gameImageUrl = INITIAL_GAME_STATE.imageUrl;
+let game = createGame();
+
+const partial: Partial<GameState> = {
+  sides: game.sides,
+  imageKey: game.imageKey,
+  imageUrl: game.imageUrl,
+  imageSize: game.imageSize,
+};
 
 io.on('connection', (socket) => {
   const refreshSecret = (socket: Socket) => {
@@ -72,133 +76,49 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateSides', async (sides) => {
-    gameSides = sides;
+    partial.sides = sides;
     await resetGame();
 
     io.emit('refreshGame', game);
   });
 
-  socket.on('updateImageUrl', async (imageUrl) => {
-    gameImageUrl = imageUrl;
+  socket.on('updateImage', async (key, height, width) => {
+    console.log('Update image');
+
+    const oldKey = game.imageKey;
+
+    partial.imageSize = { height, width };
+    partial.imageKey = key;
+    partial.imageUrl = getImageUrl(key);
     await resetGame();
 
     io.emit('refreshGame', game);
+
+    // Probably best to only delete after people get the new update
+    await deleteUpload(oldKey);
   });
 });
 
-const getImageDimensions = async (imageUrl: string) => {
-  try {
-    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-    const { width, height } = await sharp(response.data).metadata();
-
-    return {
-      width,
-      height,
-    };
-  } catch (e) {
-    // Might be some weird crap if it's not an image file ionno
-    console.error(e);
-  }
-
-  return INITIAL_GAME_STATE.cropSize;
-};
-
 const resetGame = async () => {
-  game = {
-    ...INITIAL_GAME_STATE,
-    data: {}, // Have to make sure to wipe objects
-    configs: {},
-    sides: gameSides,
-    imageUrl: gameImageUrl,
-  };
-
-  const { data, configs, cropSize, pieceSize, sides, imageUrl } = game;
-
-  const { width, height } = await getImageDimensions(imageUrl);
-
-  cropSize.height = height / sides;
-  cropSize.width = width / sides;
-
-  const isWidthLarger = width >= height;
-  const ratio = width / height;
-
-  const pieceLength = STAGE_LENGTH / sides;
-  pieceSize.width = isWidthLarger ? pieceLength : pieceLength * ratio;
-  pieceSize.height = isWidthLarger ? pieceLength / ratio : pieceLength;
-
-  const getInitialPosition = () => {
-    const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
-    const y = Math.random() * (STAGE_LENGTH - pieceSize.height);
-
-    return { x, y };
-  };
-
-  let id = 0;
-
-  for (let i = 0; i < sides; ++i) {
-    for (let j = 0; j < sides; ++j) {
-      const stringId = (id++).toString();
-
-      const piece: PieceData = {
-        id: 'p' + stringId,
-        groupId: stringId,
-        index: {
-          x: j,
-          y: i,
-        },
-      };
-
-      data[stringId] = [piece];
-      configs[stringId] = getInitialPosition();
-    }
-  }
-
   console.log('Game reset');
+
+  game = createGame(partial);
 };
 
 server.listen(SERVER_PORT, async () => {
   console.log(`Server listening on port: ${SERVER_PORT}`);
 
+  // Clear all objects at start
+  // TODO: This probably won't work when there are multiple servers possible
+  await deleteAllUploads();
+
   await resetGame();
 });
 
-const uploadsDirectory = path.join(__dirname, 'uploads');
+app.get('/presign', async (_, response) => {
+  console.log('Presign');
 
-app.use('/uploads', express.static(uploadsDirectory));
+  const presign = await createPresign();
 
-const upload = multer({
-  dest: uploadsDirectory,
-  limits: {
-    // 10 MB
-    fileSize: 10_000_000,
-  },
-});
-
-app.post('/upload', upload.single('image'), async (request) => {
-  if (!request.file?.filename) {
-    return;
-  }
-
-  const oldImageUrl = new URL(game.imageUrl);
-
-  // Keep default image so dev server reload doesn't break
-  if (oldImageUrl.href !== DEFAULT_IMAGE_URL) {
-    const oldImagePath = path.join(__dirname, oldImageUrl.pathname);
-    fs.unlink(oldImagePath, (error) => {
-      if (error) {
-        throw error;
-      }
-    });
-  }
-
-  const newImageUrl = new URL(
-    path.join('uploads', request.file.filename),
-    SERVER_URL,
-  );
-
-  gameImageUrl = newImageUrl.href;
-
-  await resetGame();
-
-  io.emit('refreshGame', game);
+  response.json(presign);
 });

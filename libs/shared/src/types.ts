@@ -29,7 +29,17 @@ export type ConfigMap = Record<string, GroupConfig>;
 export interface GameState {
   sides: number;
 
+  /** S3 image key */
+  imageKey: string;
+
+  /** Full S3 image URL */
   imageUrl: string;
+
+  /** How large the image is */
+  imageSize: {
+    height: number;
+    width: number;
+  };
 
   /** How much to crop from the image */
   cropSize: {
@@ -57,7 +67,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   refreshSecret: () => void;
   resetGame: () => void;
-  updateImageUrl: (imageUrl: string) => void;
+  updateImage: (key: string, height: number, width: number) => void;
   updateSides: (sides: number) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;

@@ -6,10 +6,17 @@ export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new s3.Bucket(this, 'pzl-bucket', {
+    const bucket = new s3.Bucket(this, 'pzl-bucket', {
       bucketName: 'pzl-bucket',
       publicReadAccess: true,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS_ONLY,
+    });
+
+    bucket.addCorsRule({
+      allowedOrigins: ['http://localhost:4200', 'https://pzl.maxrchung.com'], // dev & prod
+      allowedMethods: [s3.HttpMethods.POST],
+      allowedHeaders: ['*'],
+      maxAge: 3000,
     });
   }
 }

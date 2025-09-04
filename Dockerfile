@@ -17,13 +17,6 @@ FROM node:24-alpine AS production
 
 WORKDIR /app
 
-# Install sharp separately again because it contains binaries that esbuild
-# doesn't bundle for some reason. I'm not a huge fan of this since this is
-# pretty brittle but is probably more resistant than manually copying the binary
-# over. Until `generatePackageJson` gets supported again for esbuild, I think
-# I'm gonna go with esbuild third party bundle and this shenanigan.
-RUN npm install sharp
-
 # Copy build output
 COPY --from=builder /app/apps/server/dist .
 
