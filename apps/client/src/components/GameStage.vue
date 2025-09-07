@@ -27,6 +27,7 @@ const stageConfig: StageConfig = {
 
 const store = useStore();
 
+const isConnected = computed(() => store.isConnected);
 const imageUrl = computed(() => store.game.imageUrl);
 const [image] = useImage(imageUrl);
 const data = computed(() => store.game.data);
@@ -96,7 +97,7 @@ const handleDragEnd = (groupId: string) => {
 </script>
 
 <template>
-  <v-stage ref="stage" :config="stageConfig" v-if="image">
+  <v-stage ref="stage" :config="stageConfig" v-if="image && isConnected">
     <v-layer ref="layer">
       <GameGroup
         v-for="(datas, groupId) in data"

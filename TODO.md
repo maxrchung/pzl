@@ -1,9 +1,10 @@
 # TODO stuff
 
-pzl.maxrchung.com
-
+window resize
 Rescale on resize
+
 Mouse zoom from center
+mobile support pinch and zoom
 
 Jigsaw shape
 border around pieces
@@ -14,8 +15,6 @@ Start screen
 Drag and drop image selector UI
 
 Lobbies?
-
-mobile support pinch and zoom
 
 Better error handling?
 
