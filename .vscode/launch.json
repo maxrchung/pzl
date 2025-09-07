@@ -16,11 +16,30 @@
       "autoAttachChildProcesses": true
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch client",
+      "runtimeExecutable": "nx",
+      "runtimeArgs": ["serve", "client"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}",
+      "autoAttachChildProcesses": true
+    },
+    {
       "name": "Attach to client",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/apps/client/src"
+      "webRoot": "${workspaceFolder}/apps/client/src",
+      "runtimeArgs": ["http://localhost:4200", "http://localhost:4200/secret"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug all",
+      "configurations": ["Launch server", "Launch client", "Attach to client"],
+      "stopAll": true
     }
   ]
 }
