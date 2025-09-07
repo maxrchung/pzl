@@ -15,8 +15,8 @@ Amplify automatically builds the Vue client on push and deploys a static site.
 
 ## CDK
 
-We use S3 to generate presign URLs and upload images. You would think this could
-be easily set up through Amplify Storage, but they don't let you have public S3
+We use S3 to presign URLs and upload images. You would think this could be
+easily set up through Amplify Storage, but they don't let you have public S3
 access. We need public read access so users can indefinitely access images at
 permanent locations.
 
