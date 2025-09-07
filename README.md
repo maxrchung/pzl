@@ -11,7 +11,7 @@ Chrome altogether.
 
 ## Amplify
 
-Amplify automatically builds the Vue client on push and deploys as static site.
+Amplify automatically builds the Vue client on push and deploys a static site.
 
 ## CDK
 
@@ -30,13 +30,13 @@ but simple enough. You'll need to `cd` into the `cdk` folder to do commands.
 
 ## Railway
 
-Railway automatically builds the socket.io server on push and deploys Docker
+Railway automatically builds the socket.io server on push and deploys a Docker
 container.
 
 ## Docker Hub
 
-This isn't really necessary since Railway builds the server on push, but if you
-want to build and push to Docker Hub you can do this:
+This isn't really necessary since Railway builds and deploys the server on push,
+but if you ever want to push the server to Docker Hub you can do this:
 
 ```sh
 docker build . -t chngmx/pzl
