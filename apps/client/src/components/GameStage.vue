@@ -10,23 +10,26 @@ import { THROTTLE_DELAY_IN_MS } from '../constants';
 import { hasSnap } from '../snap';
 import { StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
+import { useWindowSize } from '../useWindowSize';
 
 const scale = Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH;
 
-const stageConfig: StageConfig = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-  draggable: true,
-  x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * scale,
-  y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * scale,
-  scale: {
-    x: scale,
-    y: scale,
-  },
-};
+const { windowWidth, windowHeight } = useWindowSize();
+const stageConfig = computed(
+  (): StageConfig => ({
+    width: windowWidth.value,
+    height: windowHeight.value,
+    draggable: true,
+    x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * scale,
+    y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * scale,
+    scale: {
+      x: scale,
+      y: scale,
+    },
+  }),
+);
 
 const store = useStore();
-
 const isConnected = computed(() => store.isConnected);
 const imageUrl = computed(() => store.game.imageUrl);
 const [image] = useImage(imageUrl);
@@ -36,7 +39,6 @@ const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
 let lastThrottle = 0;
-
 const handleDragMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
   if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) {

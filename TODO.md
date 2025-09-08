@@ -1,8 +1,5 @@
 # TODO stuff
 
-window resize
-Rescale on resize
-
 Mouse zoom from center
 mobile support pinch and zoom
 
@@ -34,3 +31,5 @@ GitHub action deploy
 Maybe better naming, deploy to pzl-client and pzl-server
 
 cloudfront??
+
+Rescale on resize
