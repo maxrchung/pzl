@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useImage } from 'vue-konva';
 import { useStore } from '../store';
 import { Group } from 'konva/lib/Group';
 import { Image } from 'konva/lib/shapes/Image';
 import GamePiece from './GamePiece.vue';
 import GameGroup from './GameGroup.vue';
-import { THROTTLE_DELAY_IN_MS } from '../constants';
+import {
+  SCALE_MAX,
+  SCALE_MIN,
+  SCALE_TICK,
+  THROTTLE_DELAY_IN_MS,
+} from '../constants';
 import { hasSnap } from '../snap';
 import { StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
 import { useWindowSize } from '../useWindowSize';
+import { KonvaEventObject } from 'konva/lib/Node';
 
-const scale = Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH;
+const stageScale = ref(
+  Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH,
+);
+const stagePosition = reactive({
+  x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * stageScale.value,
+  y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * stageScale.value,
+});
 
 const { windowWidth, windowHeight } = useWindowSize();
 const stageConfig = computed(
@@ -20,11 +32,11 @@ const stageConfig = computed(
     width: windowWidth.value,
     height: windowHeight.value,
     draggable: true,
-    x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * scale,
-    y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * scale,
+    x: stagePosition.x,
+    y: stagePosition.y,
     scale: {
-      x: scale,
-      y: scale,
+      x: stageScale.value,
+      y: stageScale.value,
     },
   }),
 );
@@ -96,10 +108,48 @@ const handleDragEnd = (groupId: string) => {
     }
   }
 };
+
+// Ionno but seems to work https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html
+const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
+  const stage = event.target.getStage();
+  if (!stage) {
+    return;
+  }
+
+  const pointer = stage.getPointerPosition();
+  if (!pointer) {
+    return;
+  }
+
+  // Position to pointer with old scaled coordinates
+  const positionToPointer = {
+    x: (pointer.x - stage.x()) / stageScale.value,
+    y: (pointer.y - stage.y()) / stageScale.value,
+  };
+
+  const newScale =
+    event.evt.deltaY > 0
+      ? stageScale.value / SCALE_TICK
+      : stageScale.value * SCALE_TICK;
+
+  if (newScale < SCALE_MIN || newScale > SCALE_MAX) {
+    return;
+  }
+
+  stageScale.value = newScale;
+
+  // With the pointer as the center point, determine new position
+  stagePosition.x = pointer.x - positionToPointer.x * newScale;
+  stagePosition.y = pointer.y - positionToPointer.y * newScale;
+};
 </script>
 
 <template>
-  <v-stage ref="stage" :config="stageConfig" v-if="image && isConnected">
+  <v-stage
+    :config="stageConfig"
+    v-if="image && isConnected"
+    @wheel="handleWheel"
+  >
     <v-layer ref="layer">
       <GameGroup
         v-for="(datas, groupId) in data"

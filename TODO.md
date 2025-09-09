@@ -1,6 +1,5 @@
 # TODO stuff
 
-Mouse zoom from center
 mobile support pinch and zoom
 
 Jigsaw shape

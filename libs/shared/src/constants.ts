@@ -19,8 +19,7 @@ export const S3_FOLDER =
 
 export const DEFAULT_IMAGE_KEY = 'static/default.jpg';
 
-export const DEFAULT_IMAGE_URL =
-  'https://pzl-bucket.s3.us-west-1.amazonaws.com/static/default.jpg';
+export const DEFAULT_IMAGE_URL = `https://${S3_BUCKET}.s3.us-west-1.amazonaws.com/${DEFAULT_IMAGE_KEY}`;
 
 // Need to manually update this :O
 export const DEFAULT_IMAGE_SIZE = {
