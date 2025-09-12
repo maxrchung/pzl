@@ -18,13 +18,13 @@ better client side validation?
 
 testing?
 
-# Scaling
+## Scaling
 
 Railway cache if need multiple servers
 
 don't delete s3 on server startup if we have horizontal scaled servers
 
-# Maybe dunno
+## Maybe dunno
 
 image selection gallery + default images. maybe some potential for monetization idk
 

@@ -206,6 +206,14 @@ const groupDragEnd = (groupId: string) => {
   // Ensure end position is updated
   groupDragMove(groupId, true);
 
+  // It's possible for weird data update situations for this to happen. For
+  // example, two players take the same piece and one person snaps it. The
+  // second person will be out of sync and potentially end up in a stuck piece
+  // situation as iterating over undefined throws an exception.
+  if (!data.value[groupId]) {
+    return;
+  }
+
   for (const piece of data.value[groupId]) {
     if (!piece) continue;
 
