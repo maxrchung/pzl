@@ -78,8 +78,6 @@ const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
     return;
   }
 
-  stageScale.value = scale;
-
   // Stage position to pointer with old scaled coordinates
   const toPointer = {
     x: (pointer.x - stage.x()) / stageScale.value,
@@ -89,6 +87,9 @@ const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
   // With the pointer as the center point, determine new position
   stagePosition.x = pointer.x - toPointer.x * scale;
   stagePosition.y = pointer.y - toPointer.y * scale;
+
+  // Make sure this is at the end so old value doesn't mess things up
+  stageScale.value = scale;
 };
 
 // Helper variables for touch detection

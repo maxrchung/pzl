@@ -1,5 +1,7 @@
 # TODO stuff
 
+favicon, seo, etc.
+
 Jigsaw shape
 border around pieces
 hover effect
