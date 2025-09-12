@@ -51,8 +51,18 @@ const stageConfig = computed(
 );
 
 // Ionno but seems to work https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html
-const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
+const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
   event.evt.preventDefault();
+
+  const stage = event.target.getStage();
+  if (!stage) {
+    return;
+  }
+
+  const pointer = stage.getPointerPosition();
+  if (!pointer) {
+    return;
+  }
 
   const deltaY = event.evt.deltaY;
   if (deltaY === 0) {
@@ -68,15 +78,7 @@ const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
     return;
   }
 
-  const stage = event.target.getStage();
-  if (!stage) {
-    return;
-  }
-
-  const pointer = stage.getPointerPosition();
-  if (!pointer) {
-    return;
-  }
+  stageScale.value = scale;
 
   // Stage position to pointer with old scaled coordinates
   const toPointer = {
@@ -87,9 +89,6 @@ const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
   // With the pointer as the center point, determine new position
   stagePosition.x = pointer.x - toPointer.x * scale;
   stagePosition.y = pointer.y - toPointer.y * scale;
-
-  // Ok to save scale now
-  stageScale.value = scale;
 };
 
 // Helper variables for touch detection
@@ -97,14 +96,14 @@ let lastCenter: Vector2d | null = null;
 let lastDistance = 0;
 
 /**
- * If you start a drag with one finger, start pinching, then stop pinching, we
- * want you to still continue dragging to move the stage. This variable helps
- * track that detection.
+ * This variable keeps track of stage specific dragging. Without this, you
+ * cannot drag a puzzle piece as the touch would fall through and get trapped in
+ * the stage touch handler.
  */
 let isDragSuspended = false;
 
 // Pinch zoom yolo I think https://konvajs.org/docs/sandbox/Multi-touch_Scale_Stage.html
-const handleTouchMove = (event: KonvaEventObject<TouchEvent>) => {
+const stageTouchMove = (event: KonvaEventObject<TouchEvent>) => {
   event.evt.preventDefault();
 
   const touch1 = event.evt.touches[0];
@@ -121,7 +120,7 @@ const handleTouchMove = (event: KonvaEventObject<TouchEvent>) => {
     isDragSuspended = false;
   }
 
-  // We're not pinching with 2 touches, so we're done here
+  // If we're not pinching, we're done here
   if (!touch2) {
     return;
   }
@@ -158,12 +157,12 @@ const handleTouchMove = (event: KonvaEventObject<TouchEvent>) => {
   lastCenter = center;
 };
 
-const handleTouchEnd = () => {
+const stageTouchEnd = () => {
   lastDistance = 0;
   lastCenter = null;
 };
 
-const handleDragEnd = (event: KonvaEventObject<DragEvent>) => {
+const stageDragEnd = (event: KonvaEventObject<DragEvent>) => {
   isDragSuspended = false;
 
   const stage = event.target.getStage();
@@ -186,7 +185,7 @@ const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
 let lastThrottle = 0;
-const handleGroupMove = (groupId: string, force: boolean = false) => {
+const groupDragMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
   if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) {
     return;
@@ -202,9 +201,9 @@ const handleGroupMove = (groupId: string, force: boolean = false) => {
   store.moveGroup(groupId, group.position());
 };
 
-const handleGroupEnd = (groupId: string) => {
+const groupDragEnd = (groupId: string) => {
   // Ensure end position is updated
-  handleGroupMove(groupId, true);
+  groupDragMove(groupId, true);
 
   for (const piece of data.value[groupId]) {
     if (!piece) continue;
@@ -249,23 +248,21 @@ const handleGroupEnd = (groupId: string) => {
   <v-stage
     :config="stageConfig"
     v-if="image && isConnected"
-    @wheel="handleWheel"
-    @touchmove="handleTouchMove"
-    @touchend="handleTouchEnd"
-    @dragend="handleDragEnd"
+    @wheel="stageWheel"
+    @touchmove="stageTouchMove"
+    @touchend="stageTouchEnd"
+    @dragend="stageDragEnd"
   >
     <v-layer ref="layer">
       <GameGroup
         v-for="(datas, groupId) in data"
         :key="groupId"
         :groupId="groupId"
-        @dragmove="() => handleGroupMove(groupId)"
-        @dragend="() => handleGroupEnd(groupId)"
+        @dragmove="() => groupDragMove(groupId)"
+        @dragend="() => groupDragEnd(groupId)"
         :ref="
           // Not sure but this should get the node back for us?
-          (el: any) => {
-            groupRefs[groupId] = el?.groupRef?.getNode();
-          }
+          (el: any) => (groupRefs[groupId] = el?.groupRef?.getNode())
         "
       >
         <GamePiece
@@ -273,11 +270,7 @@ const handleGroupEnd = (groupId: string) => {
           :key="data.id"
           :image="image"
           :data="data"
-          :ref="
-            (el: any) => {
-              pieceRefs[data.id] = el?.imageRef?.getNode();
-            }
-          "
+          :ref="(el: any) => (pieceRefs[data.id] = el?.imageRef?.getNode())"
         />
       </GameGroup>
     </v-layer>
