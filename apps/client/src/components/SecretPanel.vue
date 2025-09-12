@@ -4,7 +4,7 @@ import PrimaryButton from './PrimaryButton.vue';
 import PrimaryInput from './PrimaryInput.vue';
 import FileInput from './FileInput.vue';
 import HorizontalRule from './HorizontalRule.vue';
-import { SERVER_URL } from '@pzl/shared';
+import { SERVER_URL } from '../constants';
 
 const store = useStore();
 

@@ -1,16 +1,9 @@
 export const SERVER_CORS = {
   origin:
-    process.env.NODE_ENV === 'production'
-      ? 'https://pzl.maxrchung.com'
-      : 'http://localhost:4200',
+    process.env.NODE_ENV === 'production' ? 'https://pzl.maxrchung.com' : '*',
 };
 
 export const SERVER_PORT = 3000;
-
-export const SERVER_URL =
-  process.env.NODE_ENV === 'production'
-    ? 'https://pzl.up.railway.app'
-    : `http://localhost:${SERVER_PORT}`;
 
 export const S3_BUCKET = 'pzl-bucket';
 

@@ -17,6 +17,15 @@ import { StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
 import { useWindowSize } from '../useWindowSize';
 import { KonvaEventObject } from 'konva/lib/Node';
+import { Vector2d } from 'konva/lib/types';
+import { getCenter, getDistance } from '../vector';
+
+// By default Konva prevent some events when node is dragging. It improve the
+// performance and work well for 95% of cases. We need to enable all events on
+// Konva, even when we are dragging a node so it triggers touchmove correctly.
+// There's no typing for window.Konva so just ignoring it with any.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).Konva.hitOnDragEnabled = true;
 
 const stageScale = ref(
   Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH,
@@ -41,6 +50,132 @@ const stageConfig = computed(
   }),
 );
 
+// Ionno but seems to work https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html
+const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
+  event.evt.preventDefault();
+
+  const deltaY = event.evt.deltaY;
+  if (deltaY === 0) {
+    return;
+  }
+
+  const scale =
+    event.evt.deltaY > 0
+      ? stageScale.value / SCALE_TICK
+      : stageScale.value * SCALE_TICK;
+
+  if (scale < SCALE_MIN || scale > SCALE_MAX) {
+    return;
+  }
+
+  const stage = event.target.getStage();
+  if (!stage) {
+    return;
+  }
+
+  const pointer = stage.getPointerPosition();
+  if (!pointer) {
+    return;
+  }
+
+  // Stage position to pointer with old scaled coordinates
+  const toPointer = {
+    x: (pointer.x - stage.x()) / stageScale.value,
+    y: (pointer.y - stage.y()) / stageScale.value,
+  };
+
+  // With the pointer as the center point, determine new position
+  stagePosition.x = pointer.x - toPointer.x * scale;
+  stagePosition.y = pointer.y - toPointer.y * scale;
+
+  // Ok to save scale now
+  stageScale.value = scale;
+};
+
+// Helper variables for touch detection
+let lastCenter: Vector2d | null = null;
+let lastDistance = 0;
+
+/**
+ * If you start a drag with one finger, start pinching, then stop pinching, we
+ * want you to still continue dragging to move the stage. This variable helps
+ * track that detection.
+ */
+let isDragSuspended = false;
+
+// Pinch zoom yolo I think https://konvajs.org/docs/sandbox/Multi-touch_Scale_Stage.html
+const handleTouchMove = (event: KonvaEventObject<TouchEvent>) => {
+  event.evt.preventDefault();
+
+  const touch1 = event.evt.touches[0];
+  const touch2 = event.evt.touches[1];
+  const stage = event.target.getStage();
+
+  if (!stage) {
+    return;
+  }
+
+  // Restore dragging if it was suspended by multi-touch
+  if (touch1 && !touch2 && !stage.isDragging() && isDragSuspended) {
+    stage.startDrag();
+    isDragSuspended = false;
+  }
+
+  // We're not pinching with 2 touches, so we're done here
+  if (!touch2) {
+    return;
+  }
+
+  if (stage.isDragging()) {
+    stage.stopDrag();
+    isDragSuspended = true;
+  }
+
+  const v1 = { x: touch1.clientX, y: touch1.clientY };
+  const v2 = { x: touch2.clientX, y: touch2.clientY };
+  const center = getCenter(v1, v2);
+  if (!lastCenter) lastCenter = center;
+  const distance = getDistance(v1, v2);
+  if (!lastDistance) lastDistance = distance;
+
+  // Stage position to pointer with old scaled coordinates
+  const toCenter = {
+    x: (center.x - stagePosition.x) / stageScale.value,
+    y: (center.y - stagePosition.y) / stageScale.value,
+  };
+
+  const scale = stageScale.value * (distance / lastDistance);
+  stageScale.value = scale;
+
+  // calculate new position of the stage
+  const dx = center.x - lastCenter.x;
+  const dy = center.y - lastCenter.y;
+
+  stagePosition.x = center.x - toCenter.x * scale + dx;
+  stagePosition.y = center.y - toCenter.y * scale + dy;
+
+  lastDistance = distance;
+  lastCenter = center;
+};
+
+const handleTouchEnd = () => {
+  lastDistance = 0;
+  lastCenter = null;
+};
+
+const handleDragEnd = (event: KonvaEventObject<DragEvent>) => {
+  isDragSuspended = false;
+
+  const stage = event.target.getStage();
+  if (!stage) {
+    return;
+  }
+
+  // Ensure stage position is synchronized
+  stagePosition.x = stage.x();
+  stagePosition.y = stage.y();
+};
+
 const store = useStore();
 const isConnected = computed(() => store.isConnected);
 const imageUrl = computed(() => store.game.imageUrl);
@@ -51,7 +186,7 @@ const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
 
 let lastThrottle = 0;
-const handleDragMove = (groupId: string, force: boolean = false) => {
+const handleGroupMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
   if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) {
     return;
@@ -67,9 +202,9 @@ const handleDragMove = (groupId: string, force: boolean = false) => {
   store.moveGroup(groupId, group.position());
 };
 
-const handleDragEnd = (groupId: string) => {
+const handleGroupEnd = (groupId: string) => {
   // Ensure end position is updated
-  handleDragMove(groupId, true);
+  handleGroupMove(groupId, true);
 
   for (const piece of data.value[groupId]) {
     if (!piece) continue;
@@ -108,40 +243,6 @@ const handleDragEnd = (groupId: string) => {
     }
   }
 };
-
-// Ionno but seems to work https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html
-const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
-  const stage = event.target.getStage();
-  if (!stage) {
-    return;
-  }
-
-  const pointer = stage.getPointerPosition();
-  if (!pointer) {
-    return;
-  }
-
-  // Position to pointer with old scaled coordinates
-  const positionToPointer = {
-    x: (pointer.x - stage.x()) / stageScale.value,
-    y: (pointer.y - stage.y()) / stageScale.value,
-  };
-
-  const newScale =
-    event.evt.deltaY > 0
-      ? stageScale.value / SCALE_TICK
-      : stageScale.value * SCALE_TICK;
-
-  if (newScale < SCALE_MIN || newScale > SCALE_MAX) {
-    return;
-  }
-
-  stageScale.value = newScale;
-
-  // With the pointer as the center point, determine new position
-  stagePosition.x = pointer.x - positionToPointer.x * newScale;
-  stagePosition.y = pointer.y - positionToPointer.y * newScale;
-};
 </script>
 
 <template>
@@ -149,14 +250,17 @@ const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
     :config="stageConfig"
     v-if="image && isConnected"
     @wheel="handleWheel"
+    @touchmove="handleTouchMove"
+    @touchend="handleTouchEnd"
+    @dragend="handleDragEnd"
   >
     <v-layer ref="layer">
       <GameGroup
         v-for="(datas, groupId) in data"
         :key="groupId"
         :groupId="groupId"
-        @dragmove="() => handleDragMove(groupId)"
-        @dragend="() => handleDragEnd(groupId)"
+        @dragmove="() => handleGroupMove(groupId)"
+        @dragend="() => handleGroupEnd(groupId)"
         :ref="
           // Not sure but this should get the node back for us?
           (el: any) => {

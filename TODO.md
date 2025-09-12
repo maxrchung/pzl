@@ -6,29 +6,31 @@ Jigsaw shape
 border around pieces
 hover effect
 
-Start screen
-
 Drag and drop image selector UI
 
 Lobbies?
 
-Better error handling?
+Start screen
 
-image selection gallery + default images
+Better error handling?
 
 better client side validation?
 
-cache if need multiple servers
+testing?
+
+# Scaling
+
+Railway cache if need multiple servers
 
 don't delete s3 on server startup if we have horizontal scaled servers
 
 # Dunno
 
-Push docker image with tag?
-Dunno if we want NX deploy step? Or it makes sense to
-GitHub action deploy
-Maybe better naming, deploy to pzl-client and pzl-server
+cloudfront? idk. probably overkill at this point.
 
-cloudfront??
+initial scale should be based on furthest pieces - not sure about this one
+because it's not exactly easy to know when to trigger this calculation. on
+initial load? ok. on reset game? maybe. on every snapped piece? probably not. we
+can't just put some reactive thing onto game data and call it day.
 
-Rescale on resize
+image selection gallery + default images. maybe some potential for monetization idk
