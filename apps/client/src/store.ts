@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import { createGame, moveGroup, SecretState, snapGroup } from '@pzl/shared';
+import {
+  createGame,
+  Notification,
+  moveGroup,
+  SecretState,
+  snapGroup,
+} from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 
 export const useStore = defineStore('store', {
@@ -10,6 +16,7 @@ export const useStore = defineStore('store', {
     secret: {
       connections: 0,
     } as SecretState,
+    notifications: [] as Notification[],
   }),
   actions: {
     bindEvents() {
@@ -70,6 +77,14 @@ export const useStore = defineStore('store', {
 
     updateImage(key: string, height: number, width: number) {
       socket.emit('updateImage', key, height, width);
+    },
+
+    addNotification(message: string) {
+      this.notifications.push({ message });
+    },
+
+    removeNotification() {
+      this.notifications.shift();
     },
   },
 });

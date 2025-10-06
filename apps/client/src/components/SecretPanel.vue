@@ -44,12 +44,16 @@ const handleImageChange = async (event: Event) => {
   const key = fields.key;
   store.updateImage(key, height, width);
 };
+
+const handleNotification = () => {
+  store.addNotification('Create notification');
+};
 </script>
 
 <template>
   <div class="p-8">
     <div
-      class="flex w-full flex-col items-start gap-4 border-3 border-black bg-white p-6"
+      class="flex w-full flex-col items-start gap-4 border-3 border-black bg-white p-6 shadow-md"
     >
       <p>isConnected: {{ store.isConnected }}</p>
       <HorizontalRule />
@@ -75,6 +79,11 @@ const handleImageChange = async (event: Event) => {
 
       <img class="max-h-96 max-w-96" :src="store.game.imageUrl" />
       <FileInput accept="image/*" type="file" @change="handleImageChange" />
+      <HorizontalRule />
+
+      <PrimaryButton @click="handleNotification">
+        Create notification
+      </PrimaryButton>
     </div>
   </div>
 </template>

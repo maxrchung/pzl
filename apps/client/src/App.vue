@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { socket } from './socket';
 import { useStore } from './store';
+import NotificationMessages from './components/NotificationMessages.vue';
 
 const store = useStore();
 
@@ -11,5 +12,7 @@ store.bindEvents();
 </script>
 
 <template>
-  <RouterView />
+  <NotificationMessages>
+    <RouterView />
+  </NotificationMessages>
 </template>
