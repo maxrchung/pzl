@@ -8,6 +8,8 @@ import {
   snapGroup,
 } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
+import { nanoid } from 'nanoid';
+import { NOTIFICATION_DURATION_IN_MS } from './constants';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -43,6 +45,11 @@ export const useStore = defineStore('store', {
       socket.on('snapGroup', (fromGroupId, toGroupId) => {
         snapGroup(this.game, fromGroupId, toGroupId);
       });
+
+      socket.on('addNotification', (message) => {
+        this.notifications.push({ id: nanoid(), message });
+        setTimeout(this.removeNotification, NOTIFICATION_DURATION_IN_MS);
+      });
     },
 
     connectSocket() {
@@ -77,10 +84,6 @@ export const useStore = defineStore('store', {
 
     updateImage(key: string, height: number, width: number) {
       socket.emit('updateImage', key, height, width);
-    },
-
-    addNotification(message: string) {
-      this.notifications.push({ message });
     },
 
     removeNotification() {

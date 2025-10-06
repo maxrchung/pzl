@@ -9,8 +9,8 @@ export interface SecretState {
 // Need an object type so key by reference works as expected. In the future may
 // add some additional properties like priority (info, success, warning, error).
 export interface Notification {
+  id: string; // nanoid
   message: string;
-  allowDismiss?: boolean;
 }
 
 /** Contains only the essential data needed to maintain on server */
@@ -69,6 +69,7 @@ export interface ServerToClientEvents {
   refreshGame: (game: GameState) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
+  addNotification: (message: string) => void;
 }
 
 export interface ClientToServerEvents {
