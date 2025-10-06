@@ -1,44 +1,63 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useStore } from '../store';
+import { InformationCircleIcon } from '@heroicons/vue/24/outline';
 
-const FADE_IN_MS = 150;
-const TOP_OFFSET_IN_PX = 8;
-const TOP_POSITION = 24;
+const FADE_DURATION_IN_MS = 150;
+const ACTIVE_DURATION_IN_MS = 2000;
 
 const store = useStore();
-const notifications = computed(() => store.notifications);
+// Indicates when Transition should run
+const visible = ref(false);
+// For now I'm only planning to display one message at a time
+const notification = computed(() => store.notifications[0]);
 
-const getTop = (index: number, length: number) => {
-  const reversedIndex = length - 1 - index;
-  const top = TOP_POSITION + reversedIndex * TOP_OFFSET_IN_PX;
-  console.log(top);
+let timeout: number = 0;
 
-  return top + 'px';
+// Watch when notifications changes
+watchEffect(() => {
+  // If there are multiple notifications, get rid of current and proceed to next
+  if (store.notifications.length >= 2) {
+    window.clearTimeout(timeout);
+    visible.value = false;
+  }
+
+  // Otherwise if there is a first notification, show it and get rid of it
+  else if (notification.value) {
+    visible.value = true;
+
+    // Hide after fade-in + visible duration
+    timeout = window.setTimeout(() => {
+      visible.value = false;
+    }, FADE_DURATION_IN_MS + ACTIVE_DURATION_IN_MS);
+  }
+});
+
+const handleAfterLeave = () => {
+  store.removeNotification();
 };
 </script>
 
 <template>
   <slot />
 
-  <TransitionGroup
-    tag="ul"
-    :enter-active-class="`transition-all duration-${FADE_IN_MS} ease-out`"
+  <Transition
+    :enter-active-class="`transition-all duration-${FADE_DURATION_IN_MS} ease-out`"
     enter-from-class="opacity-0 -translate-y-2"
     enter-to-class="opacity-100 translate-y-0"
-    :leave-active-class="`transition-all duration-${FADE_IN_MS} ease-in`"
+    :leave-active-class="`transition-all duration-${FADE_DURATION_IN_MS} ease-in`"
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-2"
+    @after-leave="handleAfterLeave"
   >
-    <li
-      v-for="(notification, index) in notifications"
-      :key="notification.id"
+    <div
+      v-if="visible && notification"
       role="status"
       aria-live="polite"
-      class="fixed left-1/2 flex -translate-x-1/2 justify-between gap-2 border-3 bg-white px-3 py-2 shadow-lg"
-      :style="{ top: getTop(index, notifications.length) }"
+      class="fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border-3 bg-white px-3 py-2 shadow-lg"
     >
+      <InformationCircleIcon class="size-6 shrink-0" />
       {{ notification.message }}
-    </li>
-  </TransitionGroup>
+    </div>
+  </Transition>
 </template>

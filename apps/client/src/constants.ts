@@ -14,5 +14,3 @@ export const SERVER_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://pzl.up.railway.app'
     : `http://${window.location.hostname}:${SERVER_PORT}`;
-
-export const NOTIFICATION_DURATION_IN_MS = 2000;

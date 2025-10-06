@@ -9,7 +9,6 @@ import {
 } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 import { nanoid } from 'nanoid';
-import { NOTIFICATION_DURATION_IN_MS } from './constants';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -48,7 +47,6 @@ export const useStore = defineStore('store', {
 
       socket.on('addNotification', (message) => {
         this.notifications.push({ id: nanoid(), message });
-        setTimeout(this.removeNotification, NOTIFICATION_DURATION_IN_MS);
       });
     },
 
