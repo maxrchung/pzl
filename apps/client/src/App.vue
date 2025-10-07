@@ -12,7 +12,9 @@ store.bindEvents();
 </script>
 
 <template>
-  <NotificationMessages>
-    <RouterView />
-  </NotificationMessages>
+  <div class="font-serif">
+    <NotificationMessages>
+      <RouterView />
+    </NotificationMessages>
+  </div>
 </template>
