@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue';
 import { useStore } from '../store';
-import { InformationCircleIcon } from '@heroicons/vue/24/outline';
+import { InformationCircleIcon } from '@heroicons/vue/24/solid';
 
 const FADE_DURATION_IN_MS = 150;
 const ACTIVE_DURATION_IN_MS = 2000;
