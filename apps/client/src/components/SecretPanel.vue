@@ -49,7 +49,7 @@ const handleImageChange = async (event: Event) => {
 <template>
   <div class="p-8">
     <div
-      class="flex w-full flex-col items-start gap-4 border-3 border-black bg-white p-6 shadow-md"
+      class="flex w-full flex-col items-start gap-4 border border-black bg-white p-6 shadow-md"
     >
       <p>isConnected: {{ store.isConnected }}</p>
       <HorizontalRule />

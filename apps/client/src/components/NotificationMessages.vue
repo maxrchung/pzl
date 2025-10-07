@@ -54,7 +54,7 @@ const handleAfterLeave = () => {
       v-if="visible && notification"
       role="status"
       aria-live="polite"
-      class="fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border-3 bg-white px-3 py-2 shadow-lg"
+      class="fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg"
     >
       <InformationCircleIcon class="size-6 shrink-0" />
       {{ notification.message }}
