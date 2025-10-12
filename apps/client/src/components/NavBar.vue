@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PzlIcon from './PzlIcon.vue';
 import ThemeButton from './ThemeButton.vue';
+import SettingsButton from './SettingsButton.vue';
 </script>
 
 <template>
@@ -14,6 +15,10 @@ import ThemeButton from './ThemeButton.vue';
       <h1 class="-translate-y-0.5 text-2xl">pzl</h1>
     </div>
 
-    <ThemeButton />
+    <div class="flex">
+      <ThemeButton />
+
+      <SettingsButton />
+    </div>
   </nav>
 </template>
