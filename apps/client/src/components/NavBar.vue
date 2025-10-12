@@ -20,13 +20,29 @@ const handleThemeClick = () =>
       <!-- Translate a bit to center better -->
       <h1 class="-translate-y-0.5 text-2xl">pzl</h1>
     </div>
+
     <button
-      aria-label="Toggle theme"
+      aria-label="Change theme"
+      aria-describedby="theme-tooltip"
       @click="handleThemeClick"
-      class="flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 bg-stone-100 shadow-sm transition-colors hover:bg-stone-200 dark:border-l-white dark:bg-stone-900 dark:hover:bg-stone-800"
+      type="button"
+      class="group relative flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 bg-stone-100 shadow-sm transition-colors hover:bg-stone-200 dark:border-l-white dark:bg-stone-900 dark:hover:bg-stone-800"
     >
       <span v-if="theme === 'light'"><SunIcon class="size-6" /></span>
       <span v-else-if="theme === 'dark'"><MoonIcon class="size-6" /></span>
+
+      <div
+        id="theme-tooltip"
+        role="tooltip"
+        class="pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-black"
+      >
+        Change theme
+
+        <!-- Caret -->
+        <div
+          class="absolute -top-1.75 right-0.5 size-3 rotate-45 border-t border-l bg-white transition dark:bg-black"
+        />
+      </div>
     </button>
   </nav>
 </template>
