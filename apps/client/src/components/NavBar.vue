@@ -12,7 +12,7 @@ const handleThemeClick = () =>
 
 <template>
   <nav
-    class="fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-slate-50 transition-colors dark:border-b-white dark:bg-slate-950"
+    class="fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-stone-50 transition-colors dark:border-b-white dark:bg-stone-950"
   >
     <div class="flex items-center gap-1 pl-2">
       <PuzzlePieceIcon class="size-6 rotate-180" />
@@ -23,7 +23,7 @@ const handleThemeClick = () =>
     <button
       aria-label="Toggle theme"
       @click="handleThemeClick"
-      class="flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 bg-slate-100 shadow-sm transition-colors hover:bg-slate-200 dark:border-l-white dark:bg-slate-900 dark:hover:bg-slate-800"
+      class="flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 bg-stone-100 shadow-sm transition-colors hover:bg-stone-200 dark:border-l-white dark:bg-stone-900 dark:hover:bg-stone-800"
     >
       <span v-if="theme === 'light'"><SunIcon class="size-6" /></span>
       <span v-else-if="theme === 'dark'"><MoonIcon class="size-6" /></span>
