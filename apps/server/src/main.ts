@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Game reset');
+    io.emit('addNotification', 'Game reset', 'ArrowPathIcon');
   });
 
   socket.on('updateSides', async (sides) => {
@@ -82,7 +82,11 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Sides updated');
+    io.emit(
+      'addNotification',
+      `Sides changed to ${sides}x${sides}`,
+      'ArrowsPointingOutIcon',
+    );
   });
 
   socket.on('updateImage', async (key, height, width) => {
@@ -96,7 +100,7 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Image updated');
+    io.emit('addNotification', 'Image changed', 'PhotoIcon');
 
     // Make sure default file is ok
     if (oldKey !== DEFAULT_IMAGE_KEY) {

@@ -18,6 +18,12 @@ export const useStore = defineStore('store', {
       connections: 0,
     } as SecretState,
     notifications: [] as Notification[],
+    theme:
+      localStorage.getItem('theme') ||
+      // Depending on user preference
+      (window.matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark'),
   }),
   actions: {
     bindEvents() {
@@ -45,8 +51,8 @@ export const useStore = defineStore('store', {
         snapGroup(this.game, fromGroupId, toGroupId);
       });
 
-      socket.on('addNotification', (message) => {
-        this.notifications.push({ id: nanoid(), message });
+      socket.on('addNotification', (message, icon) => {
+        this.notifications.push({ id: nanoid(), message, icon });
       });
     },
 
@@ -86,6 +92,25 @@ export const useStore = defineStore('store', {
 
     removeNotification() {
       this.notifications.shift();
+    },
+
+    setTheme(theme: string) {
+      this.theme = theme;
+      localStorage.setItem('theme', theme);
+
+      if (theme === 'light') {
+        this.notifications.push({
+          id: nanoid(),
+          message: 'Theme changed to light',
+          icon: 'SunIcon',
+        });
+      } else {
+        this.notifications.push({
+          id: nanoid(),
+          message: 'Theme changed to dark',
+          icon: 'MoonIcon',
+        });
+      }
     },
   },
 });

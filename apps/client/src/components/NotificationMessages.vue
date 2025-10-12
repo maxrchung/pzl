@@ -1,8 +1,22 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, FunctionalComponent, ref, watchEffect } from 'vue';
 import { useStore } from '../store';
-import { InformationCircleIcon } from '@heroicons/vue/24/solid';
+import {
+  ArrowPathIcon,
+  ArrowsPointingOutIcon,
+  InformationCircleIcon,
+  MoonIcon,
+  PhotoIcon,
+  SunIcon,
+} from '@heroicons/vue/24/solid';
 
+const ICONS: { [componentName: string]: FunctionalComponent } = {
+  ArrowPathIcon,
+  ArrowsPointingOutIcon,
+  MoonIcon,
+  PhotoIcon,
+  SunIcon,
+};
 const FADE_DURATION_IN_MS = 150;
 const ACTIVE_DURATION_IN_MS = 2000;
 
@@ -42,10 +56,10 @@ const handleAfterLeave = () => {
   <slot />
 
   <Transition
-    :enter-active-class="`transition-all duration-${FADE_DURATION_IN_MS} ease-out`"
+    enter-active-class="ease-out"
     enter-from-class="opacity-0 -translate-y-2"
     enter-to-class="opacity-100 translate-y-0"
-    :leave-active-class="`transition-all duration-${FADE_DURATION_IN_MS} ease-in`"
+    leave-active-class="ease-in"
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-2"
     @after-leave="handleAfterLeave"
@@ -54,9 +68,12 @@ const handleAfterLeave = () => {
       v-if="visible && notification"
       role="status"
       aria-live="polite"
-      class="fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg"
+      class="duration-${FADE_DURATION_IN_MS} fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black"
     >
-      <InformationCircleIcon class="size-6 shrink-0" />
+      <component
+        :is="ICONS[notification.icon] || InformationCircleIcon"
+        class="size-6 shrink-0"
+      />
       {{ notification.message }}
     </div>
   </Transition>

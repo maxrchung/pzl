@@ -254,34 +254,36 @@ const groupDragEnd = (groupId: string) => {
 </script>
 
 <template>
-  <v-stage
-    :config="stageConfig"
-    v-if="image && isConnected"
-    @wheel="stageWheel"
-    @touchmove="stageTouchMove"
-    @touchend="stageTouchEnd"
-    @dragend="stageDragEnd"
-  >
-    <v-layer ref="layer">
-      <GameGroup
-        v-for="(datas, groupId) in data"
-        :key="groupId"
-        :groupId="groupId"
-        @dragmove="() => groupDragMove(groupId)"
-        @dragend="() => groupDragEnd(groupId)"
-        :ref="
-          // Not sure but this should get the node back for us?
-          (el: any) => (groupRefs[groupId] = el?.groupRef?.getNode())
-        "
-      >
-        <GamePiece
-          v-for="data in datas"
-          :key="data.id"
-          :image="image"
-          :data="data"
-          :ref="(el: any) => (pieceRefs[data.id] = el?.imageRef?.getNode())"
-        />
-      </GameGroup>
-    </v-layer>
-  </v-stage>
+  <main class="transition-colors dark:bg-black">
+    <v-stage
+      :config="stageConfig"
+      v-if="image && isConnected"
+      @wheel="stageWheel"
+      @touchmove="stageTouchMove"
+      @touchend="stageTouchEnd"
+      @dragend="stageDragEnd"
+    >
+      <v-layer ref="layer">
+        <GameGroup
+          v-for="(datas, groupId) in data"
+          :key="groupId"
+          :groupId="groupId"
+          @dragmove="() => groupDragMove(groupId)"
+          @dragend="() => groupDragEnd(groupId)"
+          :ref="
+            // Not sure but this should get the node back for us?
+            (el: any) => (groupRefs[groupId] = el?.groupRef?.getNode())
+          "
+        >
+          <GamePiece
+            v-for="data in datas"
+            :key="data.id"
+            :image="image"
+            :data="data"
+            :ref="(el: any) => (pieceRefs[data.id] = el?.imageRef?.getNode())"
+          />
+        </GameGroup>
+      </v-layer>
+    </v-stage>
+  </main>
 </template>
