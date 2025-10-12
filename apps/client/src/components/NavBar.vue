@@ -13,7 +13,7 @@ const handleThemeClick = () =>
 
 <template>
   <nav
-    class="fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-stone-50 transition-colors dark:border-b-white dark:bg-stone-950"
+    class="fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-stone-50 shadow-md transition-colors dark:border-b-white dark:bg-stone-950"
   >
     <div class="flex items-center gap-1 pl-2">
       <PzlIcon class="size-6 rotate-180" />

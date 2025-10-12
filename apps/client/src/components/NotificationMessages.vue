@@ -11,6 +11,7 @@ import {
 } from '@heroicons/vue/24/solid';
 import PzlIcon from './PzlIcon.vue';
 
+// lol
 const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
   {
     ArrowPathIcon,
