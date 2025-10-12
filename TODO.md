@@ -4,15 +4,15 @@ settings dropdown
 modal
 slider
 
+Start screen
+
+Lobbies?
+
 Jigsaw shape
 border around pieces
 hover effect
 
 Drag and drop image selector UI
-
-Lobbies?
-
-Start screen
 
 Better error handling?
 
@@ -20,7 +20,9 @@ better client side validation?
 
 testing?
 
-## Scaling
+## Infra
+
+Move frontend to Railway static Railpack SPA
 
 Railway cache if need multiple servers
 

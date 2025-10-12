@@ -9,14 +9,17 @@ import {
   PhotoIcon,
   SunIcon,
 } from '@heroicons/vue/24/solid';
+import PzlIcon from './PzlIcon.vue';
 
-const ICONS: { [componentName: string]: FunctionalComponent } = {
-  ArrowPathIcon,
-  ArrowsPointingOutIcon,
-  MoonIcon,
-  PhotoIcon,
-  SunIcon,
-};
+const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
+  {
+    ArrowPathIcon,
+    ArrowsPointingOutIcon,
+    MoonIcon,
+    PhotoIcon,
+    PzlIcon,
+    SunIcon,
+  };
 const FADE_DURATION_IN_MS = 150;
 const ACTIVE_DURATION_IN_MS = 2000;
 

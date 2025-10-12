@@ -67,6 +67,21 @@ io.on('connection', (socket) => {
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
     snapGroup(game, fromGroupId, toGroupId);
 
+    // lil optimization??? idk
+
+    let groups = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const _key in game.data) {
+      groups++;
+      if (groups > 1) {
+        break;
+      }
+    }
+
+    if (groups === 1) {
+      io.emit('addNotification', 'Puzzle solved!', 'PzlIcon');
+    }
+
     socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
   });
 
@@ -74,7 +89,7 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Game reset', 'ArrowPathIcon');
+    io.emit('addNotification', 'Puzzle reset', 'ArrowPathIcon');
   });
 
   socket.on('updateSides', async (sides) => {
