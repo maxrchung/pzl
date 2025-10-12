@@ -1,6 +1,8 @@
 # TODO stuff
 
-favicon, seo, etc.
+settings dropdown
+modal
+slider
 
 Jigsaw shape
 border around pieces
