@@ -48,13 +48,13 @@ const resetGame = () => {
         role="menu"
         aria-labelledby="Open settings... button"
         :class="[
-          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-sm transition-transform duration-1000',
+          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-sm duration-1000',
           Z_INDEX.DROPDOWN,
         ]"
       >
         <li role="menuitem">
           <button
-            class="flex cursor-pointer gap-2 border-b-1 border-l-1 bg-stone-100 px-3 py-2 transition-colors hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
+            class="flex cursor-pointer gap-2 border-b-1 border-l-1 bg-stone-100 px-3 py-2 transition hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
             @click="resetGame"
           >
             <ArrowPathIcon class="size-6" />
