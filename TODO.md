@@ -1,10 +1,12 @@
 # TODO stuff
 
+confirmation modal
+
 modal
-change sides
-change image
 
 slider
+change sides
+change image
 
 space bar move
 
@@ -12,11 +14,18 @@ Start screen
 
 Lobbies?
 
+view image
+
 Jigsaw shape
 border around pieces
 hover effect
+if shape is too small, just go back to straight edges?
 
 Drag and drop image selector UI
+
+Move frontend to Railway static Railpack SPA
+
+performance - some things like zoom don't work well in 50x50
 
 Better error handling?
 
@@ -25,8 +34,6 @@ better client side validation?
 testing?
 
 ## Infra
-
-Move frontend to Railway static Railpack SPA
 
 Railway cache if need multiple servers
 

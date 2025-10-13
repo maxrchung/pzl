@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, FunctionalComponent } from 'vue';
+import { computed, FunctionalComponent, ref, watch } from 'vue';
 import { useStore } from '../store';
 import {
   ArrowPathIcon,
@@ -23,17 +23,33 @@ const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
     SunIcon,
   };
 const FADE_DURATION_IN_MS = 150;
+const ACTIVE_DURATION_IN_MS = 2000;
 
 const store = useStore();
+const visible = ref(false);
 // For now I'm only planning to display one message at a time
-const notifications = computed(() => store.notifications);
+const notification = computed(() => store.notification);
+
+let timeout = 0;
+
+watch(notification, (notification) => {
+  if (notification) {
+    visible.value = true;
+    clearTimeout(timeout);
+
+    timeout = window.setTimeout(() => {
+      store.removeNotification();
+    }, FADE_DURATION_IN_MS + ACTIVE_DURATION_IN_MS);
+  } else {
+    visible.value = false;
+  }
+});
 </script>
 
 <template>
   <slot />
 
-  <TransitionGroup
-    tag="ul"
+  <Transition
     enter-active-class="ease-out"
     enter-from-class="opacity-0 -translate-y-2"
     enter-to-class="opacity-100 translate-y-0"
@@ -41,8 +57,8 @@ const notifications = computed(() => store.notifications);
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-2"
   >
-    <li
-      v-for="notification in notifications"
+    <div
+      v-if="visible && notification"
       :key="notification.id"
       role="status"
       aria-live="polite"
@@ -57,6 +73,6 @@ const notifications = computed(() => store.notifications);
         class="size-6 shrink-0"
       />
       {{ notification.message }}
-    </li>
-  </TransitionGroup>
+    </div>
+  </Transition>
 </template>

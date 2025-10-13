@@ -2,10 +2,6 @@ import { defineStore } from 'pinia';
 import { socket } from './socket';
 import { createGame, moveGroup, SecretState, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
-import {
-  NOTIFICATION_ACTIVE_IN_MS,
-  NOTIFICATION_FADE_IN_MS,
-} from './constants';
 import { Notification } from './types';
 
 export const useStore = defineStore('store', {
@@ -15,7 +11,7 @@ export const useStore = defineStore('store', {
     secret: {
       connections: 0,
     } as SecretState,
-    notifications: [] as Notification[],
+    notification: null as Notification | null,
     theme:
       localStorage.getItem('theme') ||
       // Depending on user preference
@@ -90,16 +86,11 @@ export const useStore = defineStore('store', {
 
     addNotification(message: string, icon: string) {
       const notification = { id: Symbol(), message, icon };
-      this.notifications.push(notification);
-
-      window.setTimeout(() => {
-        const index = this.notifications.indexOf(notification);
-        if (index !== -1) this.notifications.splice(index, 1);
-      }, NOTIFICATION_FADE_IN_MS + NOTIFICATION_ACTIVE_IN_MS);
+      this.notification = notification;
     },
 
     removeNotification() {
-      this.notifications.shift();
+      this.notification = null;
     },
 
     setTheme(theme: string) {
