@@ -48,7 +48,7 @@ const resetGame = () => {
         role="menu"
         aria-labelledby="Open settings... button"
         :class="[
-          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-sm duration-1000',
+          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-sm',
           Z_INDEX.DROPDOWN,
         ]"
       >
