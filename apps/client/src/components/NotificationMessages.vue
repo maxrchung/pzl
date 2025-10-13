@@ -10,6 +10,7 @@ import {
   SunIcon,
 } from '@heroicons/vue/24/solid';
 import PzlIcon from './PzlIcon.vue';
+import { Z_INDEX } from '../constants';
 
 // lol
 const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
@@ -72,7 +73,10 @@ const handleAfterLeave = () => {
       v-if="visible && notification"
       role="status"
       aria-live="polite"
-      class="duration-${FADE_DURATION_IN_MS} fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black"
+      :class="[
+        'duration-${FADE_DURATION_IN_MS} fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black',
+        Z_INDEX.TOOLTIP,
+      ]"
     >
       <component
         :is="ICONS[notification.icon] || InformationCircleIcon"

@@ -14,3 +14,12 @@ export const SERVER_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://pzl.up.railway.app'
     : `http://${window.location.hostname}:${SERVER_PORT}`;
+
+export const Z_INDEX = {
+  STAGE: 'z-0',
+  DROPDOWN: 'z-10',
+  NAVBAR: 'z-20',
+  TOOLTIP: 'z-30',
+  MODAL: 'z-40',
+  NOTIFICATION: 'z-50',
+};

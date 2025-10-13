@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Puzzle reset', 'ArrowPathIcon');
+    io.emit('addNotification', 'Game reset', 'ArrowPathIcon');
   });
 
   socket.on('updateSides', async (sides) => {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Z_INDEX } from '../constants';
+
 interface Props {
   tooltip: string;
   isOpen?: boolean;
@@ -26,6 +28,7 @@ const { tooltip, isOpen = false } = defineProps<Props>();
       role="tooltip"
       :class="[
         'pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-lg transition dark:bg-black',
+        Z_INDEX.TOOLTIP,
         // Focus visible ensures tooltip only appears on keyboard navigation and not on mobile press
         { 'group-hover:opacity-100 group-focus-visible:opacity-100': !isOpen },
       ]"
