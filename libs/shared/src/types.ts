@@ -6,14 +6,6 @@ export interface SecretState {
   connections: number;
 }
 
-// Need an object type so key by reference works as expected. In the future may
-// add some additional properties like priority (info, success, warning, error).
-export interface Notification {
-  id: string; // nanoid
-  message: string;
-  icon: string;
-}
-
 /** Contains only the essential data needed to maintain on server */
 export interface PieceData {
   id: string;

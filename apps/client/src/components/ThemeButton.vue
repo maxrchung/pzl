@@ -7,8 +7,15 @@ import TooltipButton from './TooltipButton.vue';
 const store = useStore();
 const theme = computed(() => store.theme);
 
-const handleClick = () =>
+const handleClick = () => {
   store.setTheme(theme.value === 'light' ? 'dark' : 'light');
+
+  if (theme.value === 'light') {
+    store.addNotification('Theme changed to light', 'SunIcon');
+  } else {
+    store.addNotification('Theme changed to dark', 'MoonIcon');
+  }
+};
 </script>
 
 <template>

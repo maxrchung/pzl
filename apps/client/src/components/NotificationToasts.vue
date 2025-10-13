@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, FunctionalComponent, ref, watchEffect } from 'vue';
+import { computed, FunctionalComponent } from 'vue';
 import { useStore } from '../store';
 import {
   ArrowPathIcon,
@@ -23,54 +23,27 @@ const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
     SunIcon,
   };
 const FADE_DURATION_IN_MS = 150;
-const ACTIVE_DURATION_IN_MS = 2000;
 
 const store = useStore();
-// Indicates when Transition should run
-const visible = ref(false);
 // For now I'm only planning to display one message at a time
-const notification = computed(() => store.notifications[0]);
-
-let timeout: number = 0;
-
-// Watch when notifications changes
-watchEffect(() => {
-  // If there are multiple notifications, get rid of current and proceed to next
-  if (store.notifications.length >= 2) {
-    window.clearTimeout(timeout);
-    visible.value = false;
-  }
-
-  // Otherwise if there is a first notification, show it and get rid of it
-  else if (notification.value) {
-    visible.value = true;
-
-    // Hide after fade-in + visible duration
-    timeout = window.setTimeout(() => {
-      visible.value = false;
-    }, FADE_DURATION_IN_MS + ACTIVE_DURATION_IN_MS);
-  }
-});
-
-const handleAfterLeave = () => {
-  store.removeNotification();
-};
+const notifications = computed(() => store.notifications);
 </script>
 
 <template>
   <slot />
 
-  <Transition
+  <TransitionGroup
+    tag="ul"
     enter-active-class="ease-out"
     enter-from-class="opacity-0 -translate-y-2"
     enter-to-class="opacity-100 translate-y-0"
     leave-active-class="ease-in"
     leave-from-class="opacity-100 translate-y-0"
     leave-to-class="opacity-0 translate-y-2"
-    @after-leave="handleAfterLeave"
   >
-    <div
-      v-if="visible && notification"
+    <li
+      v-for="notification in notifications"
+      :key="notification.id"
       role="status"
       aria-live="polite"
       :class="[
@@ -84,6 +57,6 @@ const handleAfterLeave = () => {
         class="size-6 shrink-0"
       />
       {{ notification.message }}
-    </div>
-  </Transition>
+    </li>
+  </TransitionGroup>
 </template>

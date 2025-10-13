@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { socket } from './socket';
 import { useStore } from './store';
-import NotificationMessages from './components/NotificationMessages.vue';
+import NotificationToasts from './components/NotificationToasts.vue';
 import { computed } from 'vue';
 
 const store = useStore();
@@ -17,8 +17,8 @@ store.bindEvents();
   <div
     :class="['font-serif transition-colors dark:text-white', { dark: isDark }]"
   >
-    <NotificationMessages>
+    <NotificationToasts>
       <RouterView />
-    </NotificationMessages>
+    </NotificationToasts>
   </div>
 </template>

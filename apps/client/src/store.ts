@@ -1,14 +1,12 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import {
-  createGame,
-  Notification,
-  moveGroup,
-  SecretState,
-  snapGroup,
-} from '@pzl/shared';
+import { createGame, moveGroup, SecretState, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
-import { nanoid } from 'nanoid';
+import {
+  NOTIFICATION_ACTIVE_IN_MS,
+  NOTIFICATION_FADE_IN_MS,
+} from './constants';
+import { Notification } from './types';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -52,7 +50,7 @@ export const useStore = defineStore('store', {
       });
 
       socket.on('addNotification', (message, icon) => {
-        this.notifications.push({ id: nanoid(), message, icon });
+        this.addNotification(message, icon);
       });
     },
 
@@ -90,6 +88,16 @@ export const useStore = defineStore('store', {
       socket.emit('updateImage', key, height, width);
     },
 
+    addNotification(message: string, icon: string) {
+      const notification = { id: Symbol(), message, icon };
+      this.notifications.push(notification);
+
+      window.setTimeout(() => {
+        const index = this.notifications.indexOf(notification);
+        if (index !== -1) this.notifications.splice(index, 1);
+      }, NOTIFICATION_FADE_IN_MS + NOTIFICATION_ACTIVE_IN_MS);
+    },
+
     removeNotification() {
       this.notifications.shift();
     },
@@ -97,20 +105,6 @@ export const useStore = defineStore('store', {
     setTheme(theme: string) {
       this.theme = theme;
       localStorage.setItem('theme', theme);
-
-      if (theme === 'light') {
-        this.notifications.push({
-          id: nanoid(),
-          message: 'Theme changed to light',
-          icon: 'SunIcon',
-        });
-      } else {
-        this.notifications.push({
-          id: nanoid(),
-          message: 'Theme changed to dark',
-          icon: 'MoonIcon',
-        });
-      }
     },
   },
 });

@@ -15,6 +15,9 @@ export const SERVER_URL =
     ? 'https://pzl.up.railway.app'
     : `http://${window.location.hostname}:${SERVER_PORT}`;
 
+export const NOTIFICATION_FADE_IN_MS = 150;
+export const NOTIFICATION_ACTIVE_IN_MS = 2000;
+
 export const Z_INDEX = {
   STAGE: 'z-0',
   DROPDOWN: 'z-10',
