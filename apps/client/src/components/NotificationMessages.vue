@@ -74,7 +74,8 @@ const handleAfterLeave = () => {
       role="status"
       aria-live="polite"
       :class="[
-        'duration-${FADE_DURATION_IN_MS} fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black',
+        'fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black',
+        `duration-${FADE_DURATION_IN_MS}`,
         Z_INDEX.TOOLTIP,
       ]"
     >
