@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowPathIcon, WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
-import NavButton from './NavButton.vue';
+import TooltipButton from './TooltipButton.vue';
 import { ref } from 'vue';
 import { Z_INDEX } from '../constants';
 import { useStore } from '../store';
@@ -20,7 +20,7 @@ const resetGame = () => {
 
 <template>
   <div class="relative">
-    <NavButton
+    <TooltipButton
       tooltip="Open settings..."
       :isOpen="isOpen"
       @click="openSettings"
@@ -32,7 +32,7 @@ const resetGame = () => {
       }"
     >
       <WrenchScrewdriverIcon class="size-6" />
-    </NavButton>
+    </TooltipButton>
 
     <Transition
       enter-active-class="ease-out"

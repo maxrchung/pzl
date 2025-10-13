@@ -2,7 +2,7 @@
 import { SunIcon, MoonIcon } from '@heroicons/vue/24/solid';
 import { computed } from 'vue';
 import { useStore } from '../store';
-import NavButton from './NavButton.vue';
+import TooltipButton from './TooltipButton.vue';
 
 const store = useStore();
 const theme = computed(() => store.theme);
@@ -12,8 +12,8 @@ const handleClick = () =>
 </script>
 
 <template>
-  <NavButton tooltip="Change theme" @click="handleClick">
+  <TooltipButton tooltip="Change theme" @click="handleClick">
     <span v-if="theme === 'light'"><SunIcon class="size-6" /></span>
     <span v-else-if="theme === 'dark'"><MoonIcon class="size-6" /></span>
-  </NavButton>
+  </TooltipButton>
 </template>

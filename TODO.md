@@ -1,8 +1,12 @@
 # TODO stuff
 
-settings dropdown
 modal
+change sides
+change image
+
 slider
+
+space bar move
 
 Start screen
 
