@@ -19,7 +19,7 @@ const resetGame = () => {
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative" @mouseleave="isOpen = false">
     <TooltipButton
       tooltip="Open settings..."
       :isOpen="isOpen"

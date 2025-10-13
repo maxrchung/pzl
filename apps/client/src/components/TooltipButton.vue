@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Z_INDEX } from '../constants';
 
 interface Props {
@@ -6,6 +7,9 @@ interface Props {
   isOpen?: boolean;
 }
 
+// Flag so that after click we don't display the tooltip. This feels kind of
+// more intuitive to me?
+const isClick = ref(false);
 const { tooltip, isOpen = false } = defineProps<Props>();
 </script>
 
@@ -15,6 +19,8 @@ const { tooltip, isOpen = false } = defineProps<Props>();
     :aria-describedby="`${tooltip} tooltip`"
     v-bind="$attrs"
     type="button"
+    @mouseleave="isClick = false"
+    @click="isClick = true"
     :class="[
       'group relative flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 shadow-sm transition-colors hover:bg-stone-200 dark:border-l-white dark:hover:bg-stone-800',
       { 'bg-stone-100 dark:bg-stone-900': !isOpen },
@@ -30,7 +36,10 @@ const { tooltip, isOpen = false } = defineProps<Props>();
         'pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-lg transition dark:bg-black',
         Z_INDEX.TOOLTIP,
         // Focus visible ensures tooltip only appears on keyboard navigation and not on mobile press
-        { 'group-hover:opacity-100 group-focus-visible:opacity-100': !isOpen },
+        {
+          'group-hover:opacity-100 group-focus-visible:opacity-100':
+            !isOpen && !isClick,
+        },
       ]"
     >
       {{ tooltip }}
