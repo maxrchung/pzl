@@ -8,6 +8,8 @@ slider
 change sides
 change image
 
+QR code
+
 space bar move
 
 Start screen
