@@ -22,7 +22,7 @@ const { tooltip, isOpen = false } = defineProps<Props>();
     @mouseleave="isClick = false"
     @click="isClick = true"
     :class="[
-      'group relative flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 shadow-sm transition-colors hover:bg-stone-200 dark:border-l-white dark:hover:bg-stone-800',
+      'group relative flex size-10 shrink-0 cursor-pointer items-center justify-center self-start border-b-1 border-l-1 transition-colors hover:bg-stone-200 dark:border-l-white dark:hover:bg-stone-800',
       { 'bg-stone-100 dark:bg-stone-900': !isOpen },
       { 'bg-stone-200 dark:bg-stone-800': isOpen },
     ]"
