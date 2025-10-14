@@ -1,29 +1,27 @@
 <script setup lang="ts">
-import { ArrowPathIcon, WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
+import { WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
 import { ref } from 'vue';
 import { Z_INDEX } from '../constants';
-import { useStore } from '../store';
+import ResetItem from './ResetItem.vue';
 
 const isOpen = ref(false);
-const store = useStore();
 
-const openSettings = () => {
+const toggleSettings = () => {
   isOpen.value = !isOpen.value;
 };
 
-const resetGame = () => {
-  store.resetGame();
+const closeSettings = () => {
   isOpen.value = false;
 };
 </script>
 
 <template>
-  <div class="relative" @mouseleave="isOpen = false">
+  <div class="relative">
     <TooltipButton
       tooltip="Open settings..."
-      :isOpen="isOpen"
-      @click="openSettings"
+      :is-open="isOpen"
+      @click="toggleSettings"
       :aria-expanded="isOpen"
       aria-haspopup="menu"
       id="Open settings... button"
@@ -34,6 +32,8 @@ const resetGame = () => {
       <WrenchScrewdriverIcon class="size-6" />
     </TooltipButton>
 
+    <!-- Even though it's just an opacity transition, this is needed for
+    handling v-if as expected -->
     <Transition
       enter-active-class="ease-out"
       enter-from-class="opacity-0"
@@ -47,20 +47,15 @@ const resetGame = () => {
         id="Settings menu"
         role="menu"
         aria-labelledby="Open settings... button"
+        :aria-hidden="!isOpen"
         :class="[
           'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-sm',
           Z_INDEX.DROPDOWN,
+          { 'opacity-0': !isOpen },
+          { 'opacity-100': isOpen },
         ]"
       >
-        <li role="menuitem">
-          <button
-            class="flex cursor-pointer gap-2 border-b-1 border-l-1 bg-stone-100 px-3 py-2 transition hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
-            @click="resetGame"
-          >
-            <ArrowPathIcon class="size-6" />
-            Reset game
-          </button>
-        </li>
+        <ResetItem :close-settings="closeSettings" />
       </ul>
     </Transition>
   </div>

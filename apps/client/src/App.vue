@@ -15,6 +15,7 @@ store.bindEvents();
 
 <template>
   <div
+    id="top"
     :class="['font-serif transition-colors dark:text-white', { dark: isDark }]"
   >
     <NotificationToast>
