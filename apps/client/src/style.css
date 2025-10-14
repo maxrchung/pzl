@@ -6,7 +6,3 @@
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
-
-*:focus {
-  @apply z-100 ring-3 ring-black outline-none dark:ring-white;
-}
