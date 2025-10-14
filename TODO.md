@@ -1,8 +1,8 @@
 # TODO stuff
 
-confirmation modal
-
-modal
+focus trap
+click outside modal to dismiss
+click outside settings to dismiss
 
 slider
 change sides
@@ -22,6 +22,8 @@ hover effect
 if shape is too small, just go back to straight edges?
 
 Drag and drop image selector UI
+
+multi group snapping
 
 Move frontend to Railway static Railpack SPA
 
