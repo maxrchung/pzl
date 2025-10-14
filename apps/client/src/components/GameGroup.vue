@@ -2,11 +2,11 @@
 import { computed, ref } from 'vue';
 import { useStore } from '../store';
 
-interface GameGroupProps {
+interface Props {
   groupId: string;
 }
 
-const { groupId } = defineProps<GameGroupProps>();
+const { groupId } = defineProps<Props>();
 
 const groupRef = ref();
 

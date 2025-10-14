@@ -3,12 +3,12 @@ import { computed, ref } from 'vue';
 import { PieceData } from '@pzl/shared';
 import { useStore } from '../store';
 
-interface GamePieceProps {
+interface Props {
   image: HTMLImageElement;
   data: PieceData;
 }
 
-const { image, data } = defineProps<GamePieceProps>();
+const { image, data } = defineProps<Props>();
 
 const imageRef = ref();
 
