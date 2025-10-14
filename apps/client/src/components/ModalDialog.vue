@@ -38,7 +38,7 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
 
         <div
           :class="[
-            'mx-3 flex max-w-lg flex-col border-1 bg-stone-50 dark:bg-stone-950',
+            'mx-3 flex max-w-lg flex-col border-1 bg-stone-50 shadow-lg dark:bg-stone-950',
             Z_INDEX.MODAL,
           ]"
         >

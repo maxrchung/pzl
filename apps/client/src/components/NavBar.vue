@@ -8,7 +8,7 @@ import { Z_INDEX } from '../constants';
 <template>
   <nav
     :class="[
-      'fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-stone-50 shadow-sm transition-colors dark:border-b-white dark:bg-stone-950',
+      'fixed top-0 right-0 left-0 flex h-10 items-center justify-between border-b-1 bg-stone-50 shadow-md transition-colors dark:border-b-white dark:bg-stone-950',
       Z_INDEX.NAVBAR,
     ]"
   >
