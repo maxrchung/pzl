@@ -4,6 +4,8 @@ focus trap
 click outside modal to dismiss
 click outside settings to dismiss
 
+favicon
+
 slider
 change sides
 change image
@@ -39,7 +41,8 @@ testing?
 
 ## Infra
 
-Railway cache if need multiple servers
+Railway redis cache - for multiple servers but also saves pending games when
+server updates
 
 don't delete s3 on server startup if we have horizontal scaled servers
 

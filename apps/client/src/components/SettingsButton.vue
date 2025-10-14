@@ -49,7 +49,7 @@ const closeSettings = () => {
         aria-labelledby="Open settings... button"
         :aria-hidden="!isOpen"
         :class="[
-          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-md',
+          'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-md transition-opacity',
           Z_INDEX.DROPDOWN,
           { 'opacity-0': !isOpen },
           { 'opacity-100': isOpen },
