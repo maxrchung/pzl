@@ -9,9 +9,7 @@ const isOpen = ref(false);
 const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
 const menuRef = ref<HTMLUListElement | null>(null);
 
-const toggleSettings = () => {
-  isOpen.value = !isOpen.value;
-};
+const close = () => (isOpen.value = false);
 
 // Handler to close settings menu when clicking outside
 function handleClickOutside(event: MouseEvent) {
@@ -51,7 +49,7 @@ onBeforeUnmount(() =>
       tooltip="Open settings..."
       id="open-settings"
       :isOpen="isOpen"
-      @click="toggleSettings"
+      @click="isOpen = !isOpen"
       :aria-expanded="isOpen"
       aria-haspopup="menu"
       :class="{
@@ -84,7 +82,7 @@ onBeforeUnmount(() =>
           { 'opacity-100': isOpen },
         ]"
       >
-        <ResetItem />
+        <ResetItem @close="close" />
       </ul>
     </Transition>
   </div>

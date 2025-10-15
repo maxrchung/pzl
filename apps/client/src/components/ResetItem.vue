@@ -4,19 +4,18 @@ import { useStore } from '../store';
 import ModalDialog from './ModalDialog.vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/solid';
 
-const store = useStore();
+const emit = defineEmits<{ (e: 'close'): void }>();
 
+const store = useStore();
 const isOpen = ref(false);
 
-const handleClick = () => {
-  isOpen.value = true;
-};
-
 const handleCancel = () => {
+  emit('close');
   isOpen.value = false;
 };
 
 const handleSuccess = () => {
+  emit('close');
   isOpen.value = false;
   store.resetGame();
 };
@@ -25,8 +24,12 @@ const handleSuccess = () => {
 <template>
   <li role="menuitem">
     <button
-      class="flex cursor-pointer gap-2 border-b-1 border-l-1 bg-stone-100 px-3 py-2 transition hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
-      @click="handleClick"
+      :class="[
+        'flex cursor-pointer gap-2 border-b-1 border-l-1 px-3 py-2 transition hover:bg-stone-200 dark:hover:bg-stone-800',
+        { 'bg-stone-100 dark:bg-stone-900': !isOpen },
+        { 'bg-stone-200 dark:bg-stone-800': isOpen },
+      ]"
+      @click="isOpen = true"
       v-bind="$attrs"
     >
       <ArrowPathIcon class="size-6" />
