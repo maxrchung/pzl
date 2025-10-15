@@ -17,18 +17,20 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
 </script>
 
 <template>
-  <Teleport to="#top">
-    <Transition
-      enter-active-class="ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <FocusTrap :active="isOpen">
+  <Teleport to="#modals">
+    <FocusTrap :active="isOpen">
+      <Transition
+        enter-active-class="ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
         <div
           v-if="isOpen"
+          role="dialog"
+          :aria-modal="isOpen"
           :class="[
             'fixed inset-0 flex items-center justify-center transition-opacity',
             Z_INDEX.MODAL,
@@ -82,7 +84,7 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
             </footer>
           </div>
         </div>
-      </FocusTrap>
-    </Transition>
+      </Transition>
+    </FocusTrap>
   </Teleport>
 </template>

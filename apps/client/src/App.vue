@@ -15,11 +15,12 @@ store.bindEvents();
 
 <template>
   <div
-    id="top"
     :class="['font-serif transition-colors dark:text-white', { dark: isDark }]"
   >
     <NotificationToast>
       <RouterView />
     </NotificationToast>
+
+    <div id="modals" />
   </div>
 </template>

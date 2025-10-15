@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, Ref, ref } from 'vue';
 import { Z_INDEX } from '../constants';
 import ResetItem from './ResetItem.vue';
 
 const isOpen = ref(false);
+const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
+const menuRef = ref<HTMLUListElement | null>(null);
 
 const toggleSettings = () => {
   isOpen.value = !isOpen.value;
@@ -14,11 +16,42 @@ const toggleSettings = () => {
 const closeSettings = () => {
   isOpen.value = false;
 };
+
+// Handler to close settings menu when clicking outside
+function handleClickOutside(event: MouseEvent) {
+  if (!isOpen.value) return;
+
+  const target = event.target;
+  if (!(target instanceof Element)) return;
+
+  // In theory I wouldn't think this block necessary, but removing this block
+  // for some reason makes it so that clicking the button sometimes doesn't
+  // allow you to open the settings. There's probably some competing setter
+  // where we try to open but then this handler fires and immediately closes.
+  const button = buttonRef.value?.buttonRef;
+  if (!button) return;
+  if (button.contains(target)) return;
+
+  const menu = menuRef.value;
+  if (!menu) return;
+  if (menu.contains(target)) return;
+
+  const isModal = target.closest('#modals');
+  if (isModal) return;
+
+  isOpen.value = false;
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside));
+onBeforeUnmount(() =>
+  document.removeEventListener('click', handleClickOutside),
+);
 </script>
 
 <template>
   <div class="relative">
     <TooltipButton
+      ref="buttonRef"
       tooltip="Open settings..."
       :is-open="isOpen"
       @click="toggleSettings"
@@ -43,6 +76,7 @@ const closeSettings = () => {
       leave-to-class="opacity-0"
     >
       <ul
+        ref="menuRef"
         v-if="isOpen"
         id="Settings menu"
         role="menu"

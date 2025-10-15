@@ -1,20 +1,16 @@
 # TODO stuff
 
-focus trap
-click outside modal to dismiss
-click outside settings to dismiss
-
 slider
 change sides
 change image
 
-QR code
-
-space bar move
-
 Start screen
 
 Lobbies?
+
+QR code
+
+space bar move
 
 view image
 

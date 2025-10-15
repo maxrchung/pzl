@@ -11,10 +11,14 @@ interface Props {
 // more intuitive to me?
 const isClick = ref(false);
 const { tooltip, isOpen = false } = defineProps<Props>();
+
+const buttonRef = ref();
+defineExpose({ buttonRef });
 </script>
 
 <template>
   <button
+    ref="buttonRef"
     :aria-label="tooltip"
     :aria-describedby="`${tooltip} tooltip`"
     v-bind="$attrs"
