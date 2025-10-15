@@ -4,8 +4,6 @@ focus trap
 click outside modal to dismiss
 click outside settings to dismiss
 
-favicon
-
 slider
 change sides
 change image
