@@ -54,7 +54,7 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
             <header class="flex justify-between">
               <div class="flex items-center gap-2 border-b-black px-3">
                 <component :is="icon" class="size-6" />
-                <h2 id="modal-title">{{ title }}</h2>
+                <h2 class="text-xl" id="modal-title">{{ title }}</h2>
               </div>
 
               <button
