@@ -20,7 +20,6 @@ defineExpose({ buttonRef });
   <button
     ref="buttonRef"
     :aria-label="tooltip"
-    :aria-describedby="`${tooltip} tooltip`"
     v-bind="$attrs"
     type="button"
     @mouseleave="isClick = false"
@@ -34,8 +33,7 @@ defineExpose({ buttonRef });
     <slot />
 
     <div
-      :id="`${tooltip} tooltip`"
-      role="tooltip"
+      aria-hidden="true"
       :class="[
         'pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-lg transition dark:bg-black',
         Z_INDEX.TOOLTIP,

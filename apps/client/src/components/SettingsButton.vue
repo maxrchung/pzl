@@ -49,11 +49,11 @@ onBeforeUnmount(() =>
     <TooltipButton
       ref="buttonRef"
       tooltip="Open settings..."
-      :is-open="isOpen"
+      id="open-settings"
+      :isOpen="isOpen"
       @click="toggleSettings"
       :aria-expanded="isOpen"
       aria-haspopup="menu"
-      id="Open settings... button"
       :class="{
         'border-b-transparent': isOpen,
       }"
@@ -74,9 +74,8 @@ onBeforeUnmount(() =>
       <ul
         ref="menuRef"
         v-if="isOpen"
-        id="Settings menu"
         role="menu"
-        aria-labelledby="Open settings... button"
+        aria-labelledby="open-settings"
         :aria-hidden="!isOpen"
         :class="[
           'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-md transition-opacity',

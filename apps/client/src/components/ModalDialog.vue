@@ -2,9 +2,12 @@
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 import { Z_INDEX } from '../constants';
 import { FocusTrap } from 'focus-trap-vue';
+import type { Component } from 'vue';
 
 interface Props {
   isOpen: boolean;
+  icon: Component;
+  title: string;
   body: string;
   cancelText: string;
   successText: string;
@@ -30,6 +33,7 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
         <div
           v-if="isOpen"
           role="dialog"
+          aria-labelledby="modal-title"
           :aria-modal="isOpen"
           :class="[
             'fixed inset-0 flex items-center justify-center transition-opacity',
@@ -49,7 +53,8 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
           >
             <header class="flex justify-between">
               <div class="flex items-center gap-2 border-b-black px-3">
-                <slot />
+                <component :is="icon" class="size-6" />
+                <h2 id="modal-title">{{ title }}</h2>
               </div>
 
               <button
