@@ -10,6 +10,8 @@
     "@heroicons/vue": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "focus-trap": "^7.6.5",
+    "focus-trap-vue": "^4.1.0",
     "konva": "^9.3.22",
     "nanoid": "^5.1.5",
     "pinia": "^3.0.3",
