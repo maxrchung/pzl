@@ -36,6 +36,7 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
         >
           <div
             class="fixed inset-0 bg-black opacity-80 transition dark:bg-white"
+            @click="onCancel"
           />
 
           <div
