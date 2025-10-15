@@ -13,10 +13,6 @@ const toggleSettings = () => {
   isOpen.value = !isOpen.value;
 };
 
-const closeSettings = () => {
-  isOpen.value = false;
-};
-
 // Handler to close settings menu when clicking outside
 function handleClickOutside(event: MouseEvent) {
   if (!isOpen.value) return;
@@ -89,7 +85,7 @@ onBeforeUnmount(() =>
           { 'opacity-100': isOpen },
         ]"
       >
-        <ResetItem :close-settings="closeSettings" />
+        <ResetItem />
       </ul>
     </Transition>
   </div>

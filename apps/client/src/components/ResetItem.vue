@@ -4,11 +4,6 @@ import { useStore } from '../store';
 import ModalDialog from './ModalDialog.vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/solid';
 
-interface Props {
-  closeSettings: () => void;
-}
-
-const { closeSettings } = defineProps<Props>();
 const store = useStore();
 
 const isOpen = ref(false);
@@ -22,7 +17,6 @@ const handleCancel = () => {
 };
 
 const handleSuccess = () => {
-  closeSettings();
   isOpen.value = false;
   store.resetGame();
 };
