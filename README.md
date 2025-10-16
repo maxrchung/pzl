@@ -1,6 +1,6 @@
 # pzl
 
-Multiplayer online co-op jigsaw puzzle web game.
+Multiplayer online co-op jigsaw puzzle web game
 
 <https://pzl.maxrchung.com>
 
