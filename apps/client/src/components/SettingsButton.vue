@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
+import { ArrowPathIcon, WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
 import { onBeforeUnmount, onMounted, Ref, ref } from 'vue';
 import { Z_INDEX } from '../constants';
-import ResetItem from './ResetItem.vue';
+import MenuItem from './MenuItem.vue';
+import ResetModal from './ResetModal.vue';
+
+type Modal = '' | 'reset';
 
 const isOpen = ref(false);
+const modal = ref<Modal>('');
+
 const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
 const menuRef = ref<HTMLUListElement | null>(null);
 
-const close = () => (isOpen.value = false);
+const openModal = (id: Modal) => {
+  modal.value = id;
+  isOpen.value = false;
+};
+
+const closeModal = () => {
+  modal.value = '';
+};
 
 // Handler to close settings menu when clicking outside
 function handleClickOutside(event: MouseEvent) {
@@ -82,8 +94,17 @@ onBeforeUnmount(() =>
           { 'opacity-100': isOpen },
         ]"
       >
-        <ResetItem @close="close" />
+        <MenuItem
+          :icon="ArrowPathIcon"
+          title="Reset game..."
+          @click="openModal('reset')"
+        />
       </ul>
     </Transition>
+
+    <!-- I had an iteration where modals were inside MenuItem, but this didn't
+    really work for some reason because MenuItem would get unrendered and cause
+    modals to also close. -->
+    <ResetModal :isOpen="modal === 'reset'" @close="closeModal" />
   </div>
 </template>
