@@ -6,16 +6,16 @@ import type { Component } from 'vue';
 
 interface Props {
   isOpen: boolean;
+  isProcessing?: boolean;
   icon: Component;
   title: string;
-  body: string;
   cancelText: string;
   successText: string;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
+const { isOpen, onSuccess, onCancel, cancelText, successText } =
   defineProps<Props>();
 </script>
 
@@ -66,9 +66,9 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
               </button>
             </header>
 
-            <p class="px-3 pt-2 pb-4">
-              {{ body }}
-            </p>
+            <div class="px-3 pt-2 pb-4">
+              <slot />
+            </div>
 
             <footer class="flex justify-end">
               <button
@@ -80,9 +80,10 @@ const { isOpen, onSuccess, onCancel, body, cancelText, successText } =
               </button>
 
               <button
-                class="cursor-pointer border-t border-l bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
+                class="cursor-pointer border-t border-l bg-stone-100 px-3 py-2 hover:bg-stone-200 disabled:cursor-wait disabled:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 dark:disabled:bg-stone-800"
                 type="button"
                 @click="onSuccess"
+                :disabled="isProcessing"
               >
                 {{ successText }}
               </button>

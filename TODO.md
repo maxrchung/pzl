@@ -2,7 +2,6 @@
 
 slider
 change sides
-change image
 
 Start screen
 
@@ -14,18 +13,16 @@ space bar move
 
 view image
 
-Jigsaw shape
 border around pieces
-hover effect
+Jigsaw shape
 if shape is too small, just go back to straight edges?
+hover effect?
 
-Drag and drop image selector UI
+Drag and drop image selector UI?
 
-multi group snapping
+multi group snapping?
 
-Move frontend to Railway static Railpack SPA
-
-performance - some things like zoom don't work well in 50x50
+performance - some things like zoom don't work well in 50x50?
 
 Better error handling?
 
@@ -35,10 +32,14 @@ testing?
 
 ## Infra
 
+Move frontend to Railway static Railpack SPA
+
 Railway redis cache - for multiple servers but also saves pending games when
 server updates
 
-don't delete s3 on server startup if we have horizontal scaled servers
+maybe figure out Railway bucket
+
+btw don't delete s3 on server startup if we have horizontal scaled servers
 
 ## Maybe dunno
 

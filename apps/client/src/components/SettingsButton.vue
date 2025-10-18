@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ArrowPathIcon, WrenchScrewdriverIcon } from '@heroicons/vue/24/solid';
+import {
+  ArrowPathIcon,
+  PhotoIcon,
+  WrenchScrewdriverIcon,
+} from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
 import { onBeforeUnmount, onMounted, Ref, ref } from 'vue';
 import { Z_INDEX } from '../constants';
 import MenuItem from './MenuItem.vue';
 import ResetModal from './ResetModal.vue';
+import ImageModal from './ImageModal.vue';
 
-type Modal = '' | 'reset';
+type Modal = '' | 'reset' | 'image';
 
 const isOpen = ref(false);
 const modal = ref<Modal>('');
@@ -99,6 +104,12 @@ onBeforeUnmount(() =>
           title="Reset game..."
           @click="openModal('reset')"
         />
+
+        <MenuItem
+          :icon="PhotoIcon"
+          title="Change image..."
+          @click="openModal('image')"
+        />
       </ul>
     </Transition>
 
@@ -106,5 +117,7 @@ onBeforeUnmount(() =>
     really work for some reason because MenuItem would get unrendered and cause
     modals to also close. -->
     <ResetModal :isOpen="modal === 'reset'" @close="closeModal" />
+
+    <ImageModal :isOpen="modal === 'image'" @close="closeModal" />
   </div>
 </template>

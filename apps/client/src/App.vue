@@ -19,8 +19,8 @@ store.bindEvents();
   >
     <NotificationToast>
       <RouterView />
-    </NotificationToast>
 
-    <div id="modals" />
+      <div id="modals" />
+    </NotificationToast>
   </div>
 </template>

@@ -1,37 +1,38 @@
 <script setup lang="ts">
 import { useStore } from '../store';
+import { ModalEmits, ModalProps } from '../types';
 import ModalDialog from './ModalDialog.vue';
 import { ArrowPathIcon } from '@heroicons/vue/24/solid';
 
-interface Props {
-  isOpen: boolean;
-}
-
-const { isOpen } = defineProps<Props>();
-const emit = defineEmits<{ (e: 'close'): void }>();
+const { isOpen } = defineProps<ModalProps>();
+const emit = defineEmits<ModalEmits>();
 
 const store = useStore();
 
-const handleCancel = () => {
+const close = () => {
   emit('close');
 };
 
 const handleSuccess = () => {
-  emit('close');
+  close();
   store.resetGame();
 };
 </script>
 
 <template>
   <ModalDialog
+    @cancel="close"
     @success="handleSuccess"
-    @cancel="handleCancel"
     :icon="ArrowPathIcon"
     title="Reset game"
-    body="Are you sure you want to reset the game? You will lose your current progress."
     cancel-text="Cancel"
     success-text="OK"
     :isOpen="isOpen"
     v-bind="$attrs"
-  />
+  >
+    <p>
+      Are you sure you want to reset the game? You will lose your current
+      progress.
+    </p>
+  </ModalDialog>
 </template>

@@ -3,3 +3,11 @@ export interface Notification {
   message: string;
   icon: string;
 }
+
+export interface ModalProps {
+  isOpen: boolean;
+}
+
+export interface ModalEmits {
+  (e: 'close'): void;
+}
