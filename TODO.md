@@ -1,5 +1,7 @@
 # TODO stuff
 
+fix max notification toast size
+
 slider
 change sides
 

@@ -48,7 +48,11 @@ const { isOpen, isProcessing, onSuccess, onCancel, cancelText, successText } =
 
           <div
             :class="[
-              'mx-10 flex max-w-lg flex-col border-1 bg-stone-50 shadow-lg dark:bg-stone-950',
+              'mx-5 flex max-w-lg flex-col border-1 bg-stone-50 shadow-lg dark:bg-stone-950',
+              // I don't really get it but without this min-w-0 then something
+              // something flex content blah blah. Basically I ran into an issue
+              // with long file names on small screens.
+              'min-w-0',
               Z_INDEX.MODAL,
             ]"
           >
