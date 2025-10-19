@@ -117,7 +117,7 @@ const handleSuccess = async () => {
         alt="Preview"
         :src="store.game.imageUrl"
         :class="[
-          'max-h-[320px] max-w-full self-center border object-contain transition',
+          'max-h-[384px] max-w-full self-center border object-contain transition',
         ]"
       />
 

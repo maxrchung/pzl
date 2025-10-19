@@ -61,28 +61,40 @@ watch(notification, (notification) => {
   >
     <div
       v-if="visible && notification"
-      :key="notification.id"
-      role="status"
-      aria-live="polite"
       :class="[
-        'fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
-        { 'border-red-500 dark:border-red-500': notification.type === 'error' },
-        {
-          'border-black dark:border-white':
-            !notification.type || notification.type === 'info',
-        },
-        `duration-${FADE_DURATION_IN_MS}`,
+        'fixed top-4 right-0 left-0 flex justify-center px-5',
+        // I don't know about this one lol
+        'pointer-events-none',
         Z_INDEX.NOTIFICATION,
       ]"
     >
-      <component
-        :is="ICONS[notification.icon] || InformationCircleIcon"
+      <div
+        :key="notification.id"
+        role="status"
+        aria-live="polite"
         :class="[
-          'size-6 shrink-0',
-          { 'text-red-500': notification.type === 'error' },
+          'flex max-w-sm justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
+          // Does this work and will it matter? ionno
+          'pointer-events-auto',
+          {
+            'border-red-500 dark:border-red-500': notification.type === 'error',
+          },
+          {
+            'border-black dark:border-white':
+              !notification.type || notification.type === 'info',
+          },
+          `duration-${FADE_DURATION_IN_MS}`,
         ]"
-      />
-      {{ notification.message }}
+      >
+        <component
+          :is="ICONS[notification.icon] || InformationCircleIcon"
+          :class="[
+            'size-6 shrink-0',
+            { 'text-red-500': notification.type === 'error' },
+          ]"
+        />
+        {{ notification.message }}
+      </div>
     </div>
   </Transition>
 </template>

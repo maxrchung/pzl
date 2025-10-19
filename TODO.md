@@ -1,6 +1,6 @@
 # TODO stuff
 
-fix max notification toast size
+prevent mobile rubberbanding thingie
 
 slider
 change sides
