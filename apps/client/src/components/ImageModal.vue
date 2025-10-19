@@ -12,6 +12,7 @@ const emit = defineEmits<ModalEmits>();
 
 const store = useStore();
 const file = ref<File | null>(null);
+const url = ref('');
 const imgRef = ref<HTMLImageElement | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 const isProcessing = ref(false);
@@ -19,6 +20,10 @@ const isProcessing = ref(false);
 const reset = () => {
   emit('close');
   file.value = null;
+  if (url.value) {
+    URL.revokeObjectURL(url.value);
+  }
+  url.value = '';
 };
 
 const handleChange = async (event: Event) => {
@@ -32,13 +37,17 @@ const handleChange = async (event: Event) => {
 
   // To avoid layout shift, test with a new Image first
   const image = new Image();
-  const url = URL.createObjectURL(firstFile);
-  image.src = url;
+
+  if (url.value) {
+    URL.revokeObjectURL(url.value);
+  }
+  url.value = URL.createObjectURL(firstFile);
+  image.src = url.value;
 
   try {
     await image.decode();
 
-    imgRef.value.src = url;
+    imgRef.value.src = url.value;
     await imgRef.value.decode();
     file.value = firstFile;
   } catch (error) {
@@ -50,8 +59,6 @@ const handleChange = async (event: Event) => {
       'ExclamationTriangleIcon',
       'error',
     );
-  } finally {
-    URL.revokeObjectURL(url);
   }
 };
 
