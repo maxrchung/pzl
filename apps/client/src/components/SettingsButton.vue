@@ -63,7 +63,7 @@ onBeforeUnmount(() =>
   <div class="relative">
     <TooltipButton
       ref="buttonRef"
-      tooltip="Settings..."
+      tooltip="Settings"
       id="settings"
       :isOpen="isOpen"
       @click="isOpen = !isOpen"
@@ -101,15 +101,11 @@ onBeforeUnmount(() =>
       >
         <MenuItem
           :icon="ArrowPathIcon"
-          title="Reset game..."
+          title="Reset game"
           @click="openModal('reset')"
         />
 
-        <MenuItem
-          :icon="PhotoIcon"
-          title="Image..."
-          @click="openModal('image')"
-        />
+        <MenuItem :icon="PhotoIcon" title="Image" @click="openModal('image')" />
       </ul>
     </Transition>
 

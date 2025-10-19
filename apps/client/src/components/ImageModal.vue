@@ -45,7 +45,11 @@ const handleChange = async (event: Event) => {
     // If we error, don't save the file
 
     console.error(error);
-    store.addNotification('Image failed to load', 'ExclamationTriangleIcon');
+    store.addNotification(
+      'Image failed to load',
+      'ExclamationTriangleIcon',
+      'error',
+    );
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -116,7 +120,7 @@ const handleSuccess = async () => {
           class="cursor-pointer self-start border bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
           @click="inputRef?.click()"
         >
-          Change image...
+          Change image
         </button>
 
         <span v-if="!!file?.name" class="truncate">

@@ -65,14 +65,22 @@ watch(notification, (notification) => {
       role="status"
       aria-live="polite"
       :class="[
-        'fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:border-white dark:bg-black',
+        'fixed top-4 left-1/2 flex -translate-x-1/2 justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
+        { 'border-red-500 dark:border-red-500': notification.type === 'error' },
+        {
+          'border-black dark:border-white':
+            !notification.type || notification.type === 'info',
+        },
         `duration-${FADE_DURATION_IN_MS}`,
         Z_INDEX.NOTIFICATION,
       ]"
     >
       <component
         :is="ICONS[notification.icon] || InformationCircleIcon"
-        class="size-6 shrink-0"
+        :class="[
+          'size-6 shrink-0',
+          { 'text-red-500': notification.type === 'error' },
+        ]"
       />
       {{ notification.message }}
     </div>

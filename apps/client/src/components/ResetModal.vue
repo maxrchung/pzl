@@ -31,7 +31,7 @@ const handleSuccess = () => {
     v-bind="$attrs"
   >
     <p>
-      Are you sure you want to reset the game? You will lose your current
+      Are you sure you want to reset the game? You'll lose your current
       progress.
     </p>
   </ModalDialog>

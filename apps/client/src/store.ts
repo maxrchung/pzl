@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { socket } from './socket';
 import { createGame, moveGroup, SecretState, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
-import { Notification } from './types';
+import { Notification, NotificationType } from './types';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -84,8 +84,8 @@ export const useStore = defineStore('store', {
       socket.emit('updateImage', key, height, width);
     },
 
-    addNotification(message: string, icon: string) {
-      const notification = { id: Symbol(), message, icon };
+    addNotification(message: string, icon: string, type?: NotificationType) {
+      const notification = { id: Symbol(), message, icon, type };
       this.notification = notification;
     },
 
