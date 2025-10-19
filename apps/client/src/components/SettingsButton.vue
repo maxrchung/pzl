@@ -63,8 +63,8 @@ onBeforeUnmount(() =>
   <div class="relative">
     <TooltipButton
       ref="buttonRef"
-      tooltip="Open settings..."
-      id="open-settings"
+      tooltip="Settings..."
+      id="settings"
       :isOpen="isOpen"
       @click="isOpen = !isOpen"
       :aria-expanded="isOpen"
@@ -90,7 +90,7 @@ onBeforeUnmount(() =>
         ref="menuRef"
         v-if="isOpen"
         role="menu"
-        aria-labelledby="open-settings"
+        aria-labelledby="settings"
         :aria-hidden="!isOpen"
         :class="[
           'absolute top-full right-0 flex flex-col whitespace-nowrap shadow-md transition-opacity',
@@ -107,7 +107,7 @@ onBeforeUnmount(() =>
 
         <MenuItem
           :icon="PhotoIcon"
-          title="Change image..."
+          title="Image..."
           @click="openModal('image')"
         />
       </ul>

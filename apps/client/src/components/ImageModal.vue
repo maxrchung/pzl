@@ -13,6 +13,7 @@ const emit = defineEmits<ModalEmits>();
 const store = useStore();
 const file = ref<File | null>(null);
 const imgRef = ref<HTMLImageElement | null>(null);
+const inputRef = ref<HTMLInputElement | null>(null);
 const isProcessing = ref(false);
 
 const reset = () => {
@@ -20,18 +21,16 @@ const reset = () => {
   file.value = null;
 };
 
-const handleFileChange = async (event: Event) => {
+const handleChange = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const firstFile = target.files?.[0];
 
   if (!imgRef.value) return;
   if (!firstFile) {
-    file.value = null;
-    imgRef.value.src = '';
     return;
   }
 
-  // To avoid layout shift, test with a separate image
+  // To avoid layout shift, test with a new Image first
   const image = new Image();
   const url = URL.createObjectURL(firstFile);
   image.src = url;
@@ -43,8 +42,7 @@ const handleFileChange = async (event: Event) => {
     await imgRef.value.decode();
     file.value = firstFile;
   } catch (error) {
-    file.value = null;
-    imgRef.value.src = '';
+    // If we error, don't save the file
 
     console.error(error);
     store.addNotification('Image failed to load', 'ExclamationTriangleIcon');
@@ -55,24 +53,18 @@ const handleFileChange = async (event: Event) => {
 
 const handleSuccess = async () => {
   if (!file.value || !imgRef.value) {
-    store.addNotification(
-      'Image needs to be selected',
-      'ExclamationTriangleIcon',
-    );
-    return;
-  }
-
-  // Probably good enough indicator ?
-  const { complete, naturalHeight, naturalWidth } = imgRef.value;
-  if (!complete || !naturalHeight || !naturalWidth) {
-    store.addNotification('Image failed to load', 'ExclamationTriangleIcon');
+    // In this case, nothing was selected. We proceed and keep the existing
+    // image as is.
+    reset();
     return;
   }
 
   try {
     isProcessing.value = true;
 
-    const presign = await axios.get(`${SERVER_URL}/presign`);
+    const presign = await axios.post(`${SERVER_URL}/presign`, {
+      type: file.value.type,
+    });
     const { url, fields } = presign.data;
 
     const formData = new FormData();
@@ -83,7 +75,9 @@ const handleSuccess = async () => {
     await axios.post(url, formData);
 
     const key = fields.key;
+    const { naturalHeight, naturalWidth } = imgRef.value;
     store.updateImage(key, naturalHeight, naturalWidth);
+
     reset();
   } catch (error) {
     console.error(error);
@@ -99,7 +93,7 @@ const handleSuccess = async () => {
     @cancel="reset"
     @success="handleSuccess"
     :icon="PhotoIcon"
-    title="Change image"
+    title="Image"
     cancel-text="Cancel"
     success-text="Save"
     :isOpen="isOpen"
@@ -111,15 +105,32 @@ const handleSuccess = async () => {
         ref="imgRef"
         alt="Preview"
         :src="store.game.imageUrl"
-        :class="['max-h-[320px] max-w-full border object-contain transition']"
+        :class="[
+          'max-h-[320px] max-w-full self-center border object-contain transition',
+        ]"
       />
 
+      <div class="flex items-center gap-2 whitespace-nowrap">
+        <button
+          :disabled="isProcessing"
+          class="cursor-pointer self-start border bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
+          @click="inputRef?.click()"
+        >
+          Change image...
+        </button>
+
+        <span v-if="!!file?.name" class="truncate">
+          {{ file?.name }}
+        </span>
+      </div>
+
       <input
+        ref="inputRef"
         accept="image/*"
         type="file"
         id="file"
-        @change="handleFileChange"
-        class="cursor-pointer file:cursor-pointer file:border file:bg-stone-100 file:px-3 file:py-2 hover:file:bg-stone-200 dark:file:bg-stone-900 dark:hover:file:bg-stone-800"
+        :hidden="true"
+        @change="handleChange"
       />
     </div>
   </ModalDialog>

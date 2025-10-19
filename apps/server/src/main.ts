@@ -22,7 +22,9 @@ import express from 'express';
 import cors from 'cors';
 
 const app = express();
+app.use(express.json());
 app.use(cors(SERVER_CORS));
+
 const server = createServer(app);
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: SERVER_CORS,
@@ -65,6 +67,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
+    console.log('Snap group');
+
     snapGroup(game, fromGroupId, toGroupId);
 
     // lil optimization??? idk
@@ -93,6 +97,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateSides', async (sides) => {
+    console.log('Update sides');
+
     partial.sides = sides;
     await resetGame();
 
@@ -117,7 +123,7 @@ io.on('connection', (socket) => {
     io.emit('refreshGame', game);
     io.emit('addNotification', 'Image changed', 'PhotoIcon');
 
-    // Make sure default file is ok
+    // Make sure we keep default file
     if (oldKey !== DEFAULT_IMAGE_KEY) {
       // Probably best to only delete after people get the new update
       await deleteUpload(oldKey);
@@ -141,10 +147,11 @@ server.listen(SERVER_PORT, async () => {
   await resetGame();
 });
 
-app.get('/presign', async (_, response) => {
+app.post('/presign', async (request, response) => {
   console.log('Presign');
 
-  const presign = await createPresign();
+  const { type } = request.body;
+  const presign = await createPresign(type);
 
   response.json(presign);
 });

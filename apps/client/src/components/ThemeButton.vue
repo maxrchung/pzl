@@ -19,7 +19,7 @@ const handleClick = () => {
 </script>
 
 <template>
-  <TooltipButton tooltip="Change theme" @click="handleClick">
+  <TooltipButton tooltip="Theme" @click="handleClick">
     <span v-if="theme === 'light'"><SunIcon class="size-6" /></span>
     <span v-else-if="theme === 'dark'"><MoonIcon class="size-6" /></span>
   </TooltipButton>

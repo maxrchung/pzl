@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { XMarkIcon } from '@heroicons/vue/24/solid';
+import { ArrowPathIcon, XMarkIcon } from '@heroicons/vue/24/solid';
 import { Z_INDEX } from '../constants';
 import { FocusTrap } from 'focus-trap-vue';
 import type { Component } from 'vue';
@@ -15,7 +15,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-const { isOpen, onSuccess, onCancel, cancelText, successText } =
+const { isOpen, isProcessing, onSuccess, onCancel, cancelText, successText } =
   defineProps<Props>();
 </script>
 
@@ -42,12 +42,13 @@ const { isOpen, onSuccess, onCancel, cancelText, successText } =
         >
           <div
             class="fixed inset-0 bg-black opacity-80 transition dark:bg-white"
-            @click="onCancel"
+            @click="!isProcessing && onCancel()"
+            :aria-disabled="isProcessing"
           />
 
           <div
             :class="[
-              'mx-3 flex max-w-lg flex-col border-1 bg-stone-50 shadow-lg dark:bg-stone-950',
+              'mx-10 flex max-w-lg flex-col border-1 bg-stone-50 shadow-lg dark:bg-stone-950',
               Z_INDEX.MODAL,
             ]"
           >
@@ -61,6 +62,7 @@ const { isOpen, onSuccess, onCancel, cancelText, successText } =
                 class="flex shrink-0 cursor-pointer bg-stone-100 p-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
                 type="button"
                 @click="onCancel"
+                :disabled="isProcessing"
               >
                 <XMarkIcon class="size-6 shrink-0" />
               </button>
@@ -75,16 +77,22 @@ const { isOpen, onSuccess, onCancel, cancelText, successText } =
                 class="cursor-pointer bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
                 type="button"
                 @click="onCancel"
+                :disabled="isProcessing"
               >
                 {{ cancelText }}
               </button>
 
               <button
-                class="cursor-pointer border-t border-l bg-stone-100 px-3 py-2 hover:bg-stone-200 disabled:cursor-wait disabled:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 dark:disabled:bg-stone-800"
+                class="flex cursor-pointer gap-2 border-t border-l bg-stone-100 px-3 py-2 hover:bg-stone-200 disabled:cursor-wait disabled:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800 dark:disabled:bg-stone-800"
                 type="button"
                 @click="onSuccess"
                 :disabled="isProcessing"
               >
+                <ArrowPathIcon
+                  v-if="isProcessing"
+                  class="size-6 animate-spin"
+                />
+
                 {{ successText }}
               </button>
             </footer>
