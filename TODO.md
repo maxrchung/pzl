@@ -1,15 +1,15 @@
 # TODO stuff
 
-prevent mobile rubberbanding thingie
+reset stage view when game resets
 
-slider
-change sides
+longer pzl you won msg
+time completion
+
+create lobby
+copy link
+QR code
 
 Start screen
-
-Lobbies?
-
-QR code
 
 space bar move
 

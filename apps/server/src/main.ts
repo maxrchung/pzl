@@ -105,7 +105,7 @@ io.on('connection', (socket) => {
     io.emit('refreshGame', game);
     io.emit(
       'addNotification',
-      `Sides changed to ${columns}x${rows}`,
+      `Pieces changed to ${columns}x${rows}`,
       'ArrowsPointingOutIcon',
     );
   });
