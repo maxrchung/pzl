@@ -27,7 +27,10 @@ export type PiecesMap = Record<string, PieceConfig[]>;
 export type ConfigMap = Record<string, GroupConfig>;
 
 export interface GameState {
-  sides: number;
+  sides: {
+    columns: number;
+    rows: number;
+  };
 
   /** S3 image key */
   imageKey: string;
@@ -69,7 +72,7 @@ export interface ClientToServerEvents {
   refreshSecret: () => void;
   resetGame: () => void;
   updateImage: (key: string, height: number, width: number) => void;
-  updateSides: (sides: number) => void;
+  updateSides: (columns: number, rows: number) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
 }

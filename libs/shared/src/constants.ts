@@ -23,4 +23,4 @@ export const DEFAULT_IMAGE_SIZE = {
 /** Length of the default stage that server maintains */
 export const STAGE_LENGTH = 1000;
 
-export const DEFAULT_SIDES = 5;
+export const DEFAULT_SIDES = { columns: 5, rows: 5 };

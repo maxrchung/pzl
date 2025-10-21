@@ -96,16 +96,16 @@ io.on('connection', (socket) => {
     io.emit('addNotification', 'Game reset', 'ArrowPathIcon');
   });
 
-  socket.on('updateSides', async (sides) => {
+  socket.on('updateSides', async (columns, rows) => {
     console.log('Update sides');
 
-    partial.sides = sides;
+    partial.sides = { columns, rows };
     await resetGame();
 
     io.emit('refreshGame', game);
     io.emit(
       'addNotification',
-      `Sides changed to ${sides}x${sides}`,
+      `Sides changed to ${columns}x${rows}`,
       'ArrowsPointingOutIcon',
     );
   });

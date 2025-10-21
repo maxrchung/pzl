@@ -21,18 +21,26 @@ export const createGame = (partial?: Partial<GameState>) => {
     ...partial,
   };
 
-  const { data, configs, sides, imageSize, cropSize, pieceSize } = game;
+  const {
+    data,
+    configs,
+    sides: { columns, rows },
+    imageSize,
+    cropSize,
+    pieceSize,
+  } = game;
   const { width, height } = imageSize;
 
-  cropSize.height = height / sides;
-  cropSize.width = width / sides;
+  cropSize.height = height / rows;
+  cropSize.width = width / columns;
 
   const isWidthLarger = width >= height;
   const ratio = width / height;
 
-  const pieceLength = STAGE_LENGTH / sides;
-  pieceSize.width = isWidthLarger ? pieceLength : pieceLength * ratio;
-  pieceSize.height = isWidthLarger ? pieceLength / ratio : pieceLength;
+  const pieceWidth = STAGE_LENGTH / columns;
+  const pieceHeight = STAGE_LENGTH / rows;
+  pieceSize.width = isWidthLarger ? pieceWidth : pieceWidth * ratio;
+  pieceSize.height = isWidthLarger ? pieceHeight / ratio : pieceHeight;
 
   const getPosition = () => {
     const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
@@ -43,8 +51,8 @@ export const createGame = (partial?: Partial<GameState>) => {
 
   let id = 0;
 
-  for (let i = 0; i < sides; ++i) {
-    for (let j = 0; j < sides; ++j) {
+  for (let i = 0; i < rows; ++i) {
+    for (let j = 0; j < columns; ++j) {
       const stringId = (id++).toString();
 
       const piece: PieceData = {

@@ -32,7 +32,7 @@
       "request": "launch",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}/apps/client/src",
-      "runtimeArgs": ["http://localhost:4200", "http://localhost:4200/secret"]
+      "runtimeArgs": ["http://localhost:4200"]
     }
   ],
   "compounds": [

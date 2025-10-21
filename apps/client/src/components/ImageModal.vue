@@ -17,15 +17,6 @@ const imgRef = ref<HTMLImageElement | null>(null);
 const inputRef = ref<HTMLInputElement | null>(null);
 const isProcessing = ref(false);
 
-const reset = () => {
-  emit('close');
-  file.value = null;
-  if (url.value) {
-    URL.revokeObjectURL(url.value);
-  }
-  url.value = '';
-};
-
 const handleChange = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const firstFile = target.files?.[0];
@@ -62,11 +53,14 @@ const handleChange = async (event: Event) => {
   }
 };
 
+const close = () => {
+  emit('close');
+};
+
 const handleSuccess = async () => {
   if (!file.value || !imgRef.value) {
     // In this case, nothing was selected. We proceed and keep the existing
     // image as is.
-    reset();
     return;
   }
 
@@ -89,7 +83,7 @@ const handleSuccess = async () => {
     const { naturalHeight, naturalWidth } = imgRef.value;
     store.updateImage(key, naturalHeight, naturalWidth);
 
-    reset();
+    close();
   } catch (error) {
     console.error(error);
     store.addNotification('Image failed to save', 'ExclamationTriangleIcon');
@@ -101,10 +95,10 @@ const handleSuccess = async () => {
 
 <template>
   <ModalDialog
-    @cancel="reset"
+    @cancel="close"
     @success="handleSuccess"
     :icon="PhotoIcon"
-    title="Image"
+    title="Change image"
     cancel-text="Cancel"
     success-text="Save"
     :isOpen="isOpen"
@@ -127,7 +121,7 @@ const handleSuccess = async () => {
           class="cursor-pointer self-start border bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
           @click="inputRef?.click()"
         >
-          Change image
+          Choose file...
         </button>
 
         <span v-if="!!file?.name" class="truncate">

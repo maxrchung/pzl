@@ -34,7 +34,9 @@
           }
         },
         "configurations": {
-          "development": {},
+          "development": {
+            "watch": true
+          },
           "production": {
             "bundle": true,
             "thirdParty": true,

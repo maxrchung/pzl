@@ -76,8 +76,8 @@ export const useStore = defineStore('store', {
       socket.emit('resetGame');
     },
 
-    updateSides(sides: number) {
-      socket.emit('updateSides', sides);
+    updateSides(columns: number, rows: number) {
+      socket.emit('updateSides', columns, rows);
     },
 
     updateImage(key: string, height: number, width: number) {

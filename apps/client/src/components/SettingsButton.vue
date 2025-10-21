@@ -17,6 +17,7 @@ type Modal = '' | 'reset' | 'image' | 'pieces';
 
 const isOpen = ref(false);
 const modal = ref<Modal>('');
+const modalKey = ref(0);
 
 const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
 const menuRef = ref<HTMLUListElement | null>(null);
@@ -24,6 +25,7 @@ const menuRef = ref<HTMLUListElement | null>(null);
 const openModal = (id: Modal) => {
   modal.value = id;
   isOpen.value = false;
+  ++modalKey.value;
 };
 
 const closeModal = () => {
@@ -65,7 +67,7 @@ onBeforeUnmount(() =>
   <div class="relative">
     <TooltipButton
       ref="buttonRef"
-      tooltip="Settings"
+      tooltip="Open settings..."
       id="settings"
       :isOpen="isOpen"
       @click="isOpen = !isOpen"
@@ -103,27 +105,43 @@ onBeforeUnmount(() =>
       >
         <MenuItem
           :icon="ArrowPathIcon"
-          title="Reset"
+          title="Reset game..."
           @click="openModal('reset')"
         />
 
         <MenuItem
           :icon="ArrowsPointingOutIcon"
-          title="Pieces"
+          title="Change pieces..."
           @click="openModal('pieces')"
         />
 
-        <MenuItem :icon="PhotoIcon" title="Image" @click="openModal('image')" />
+        <MenuItem
+          :icon="PhotoIcon"
+          title="Change image..."
+          @click="openModal('image')"
+        />
       </ul>
     </Transition>
 
     <!-- I had an iteration where modals were inside MenuItem, but this didn't
     really work for some reason because MenuItem would get unrendered and cause
     modals to also close -->
-    <ResetModal :isOpen="modal === 'reset'" @close="closeModal" />
+    <ResetModal
+      :isOpen="modal === 'reset'"
+      @close="closeModal"
+      :key="modalKey"
+    />
 
-    <PiecesModal :isOpen="modal === 'pieces'" @close="closeModal" />
+    <PiecesModal
+      :isOpen="modal === 'pieces'"
+      @close="closeModal"
+      :key="modalKey"
+    />
 
-    <ImageModal :isOpen="modal === 'image'" @close="closeModal" />
+    <ImageModal
+      :isOpen="modal === 'image'"
+      @close="closeModal"
+      :key="modalKey"
+    />
   </div>
 </template>
