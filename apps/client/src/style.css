@@ -6,3 +6,36 @@
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Couldn't really get this to work with Tailwind */
+input[type='range']::-webkit-slider-thumb {
+  @apply h-6 w-6 cursor-pointer appearance-none rounded-none border border-black bg-stone-100;
+}
+
+input[type='range']::-webkit-slider-thumb:hover {
+  @apply bg-stone-200;
+}
+
+.dark input[type='range']::-webkit-slider-thumb {
+  @apply border-white bg-stone-900;
+}
+
+.dark input[type='range']::-webkit-slider-thumb:hover {
+  @apply bg-stone-800;
+}
+
+input[type='range']::-moz-range-thumb {
+  @apply h-6 w-6 cursor-pointer appearance-none rounded-none border border-black bg-stone-100;
+}
+
+input[type='range']::-moz-range-thumb:hover {
+  @apply bg-stone-200;
+}
+
+.dark input[type='range']::-moz-range-thumb {
+  @apply border-white bg-stone-900;
+}
+
+.dark input[type='range']::-moz-range-thumb:hover {
+  @apply bg-stone-800;
+}

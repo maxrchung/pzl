@@ -24,7 +24,7 @@ const handleSuccess = () => {
     @cancel="close"
     @success="handleSuccess"
     :icon="ArrowPathIcon"
-    title="Reset game"
+    title="Reset"
     cancel-text="Cancel"
     success-text="OK"
     :isOpen="isOpen"

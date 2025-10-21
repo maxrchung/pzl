@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   ArrowPathIcon,
+  ArrowsPointingOutIcon,
   PhotoIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/solid';
@@ -10,8 +11,9 @@ import { Z_INDEX } from '../constants';
 import MenuItem from './MenuItem.vue';
 import ResetModal from './ResetModal.vue';
 import ImageModal from './ImageModal.vue';
+import PiecesModal from './PiecesModal.vue';
 
-type Modal = '' | 'reset' | 'image';
+type Modal = '' | 'reset' | 'image' | 'pieces';
 
 const isOpen = ref(false);
 const modal = ref<Modal>('');
@@ -101,8 +103,14 @@ onBeforeUnmount(() =>
       >
         <MenuItem
           :icon="ArrowPathIcon"
-          title="Reset game"
+          title="Reset"
           @click="openModal('reset')"
+        />
+
+        <MenuItem
+          :icon="ArrowsPointingOutIcon"
+          title="Pieces"
+          @click="openModal('pieces')"
         />
 
         <MenuItem :icon="PhotoIcon" title="Image" @click="openModal('image')" />
@@ -111,8 +119,10 @@ onBeforeUnmount(() =>
 
     <!-- I had an iteration where modals were inside MenuItem, but this didn't
     really work for some reason because MenuItem would get unrendered and cause
-    modals to also close. -->
+    modals to also close -->
     <ResetModal :isOpen="modal === 'reset'" @close="closeModal" />
+
+    <PiecesModal :isOpen="modal === 'pieces'" @close="closeModal" />
 
     <ImageModal :isOpen="modal === 'image'" @close="closeModal" />
   </div>

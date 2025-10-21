@@ -63,7 +63,9 @@ const { isOpen, isProcessing, onSuccess, onCancel, cancelText, successText } =
               </div>
 
               <button
-                class="flex shrink-0 cursor-pointer bg-stone-100 p-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
+                :class="[
+                  'flex shrink-0 cursor-pointer bg-stone-100 p-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800',
+                ]"
                 type="button"
                 @click="onCancel"
                 :disabled="isProcessing"

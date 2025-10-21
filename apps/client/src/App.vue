@@ -15,7 +15,10 @@ store.bindEvents();
 
 <template>
   <div
-    :class="['font-serif transition-colors dark:text-white', { dark: isDark }]"
+    :class="[
+      'overscroll-none font-serif transition-colors dark:text-white',
+      { dark: isDark },
+    ]"
   >
     <NotificationToast>
       <RouterView />
