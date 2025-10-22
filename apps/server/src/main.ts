@@ -83,8 +83,21 @@ io.on('connection', (socket) => {
     }
 
     if (groups === 1) {
+      const totalMilliseconds = Date.now() - game.resetTime;
+      const totalSeconds = Math.floor(totalMilliseconds / 1000);
+
+      // TypeScript is missing DurationFormat definition, but it exists in Node
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const time = new (Intl as any).DurationFormat('en', {
+        style: 'long',
+      }).format({
+        hours: Math.floor(totalSeconds / 3600),
+        minutes: Math.floor((totalSeconds % 3600) / 60),
+        seconds: totalSeconds % 60,
+      });
+
       io.emit('addNotification', {
-        message: 'Puzzle solved',
+        message: `Puzzle solved in ${time}!`,
         icon: 'PzlIcon',
         isPermanent: true,
       });

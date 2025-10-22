@@ -19,13 +19,6 @@
           "bundle": false,
           "main": "apps/server/src/main.ts",
           "tsConfig": "apps/server/tsconfig.app.json",
-          "assets": [
-            {
-              "input": "apps/server/uploads",
-              "glob": "**/*",
-              "output": "apps/server/src/uploads"
-            }
-          ],
           "esbuildOptions": {
             "sourcemap": true,
             "outExtension": {

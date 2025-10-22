@@ -32,6 +32,9 @@ export interface GameState {
     rows: number;
   };
 
+  // Timestamp since game was last reset
+  resetTime: number;
+
   /** S3 image key */
   imageKey: string;
 

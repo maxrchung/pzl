@@ -10,6 +10,7 @@ import { Vector2d } from 'konva/lib/types.js';
 
 export const createGame = (partial?: Partial<GameState>) => {
   const game: GameState = {
+    resetTime: Date.now(),
     imageKey: DEFAULT_IMAGE_KEY,
     imageUrl: DEFAULT_IMAGE_URL,
     imageSize: DEFAULT_IMAGE_SIZE,
