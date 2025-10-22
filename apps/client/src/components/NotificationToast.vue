@@ -39,9 +39,11 @@ watch(notification, (notification) => {
     visible.value = true;
     clearTimeout(timeout);
 
-    timeout = window.setTimeout(() => {
-      store.removeNotification();
-    }, FADE_DURATION_IN_MS + ACTIVE_DURATION_IN_MS);
+    if (!notification.isPermanent) {
+      timeout = window.setTimeout(() => {
+        store.removeNotification();
+      }, FADE_DURATION_IN_MS + ACTIVE_DURATION_IN_MS);
+    }
   } else {
     visible.value = false;
   }

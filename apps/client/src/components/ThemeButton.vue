@@ -11,9 +11,15 @@ const handleClick = () => {
   store.setTheme(theme.value === 'light' ? 'dark' : 'light');
 
   if (theme.value === 'light') {
-    store.addNotification('Theme changed to light', 'SunIcon');
+    store.addNotification({
+      message: 'Theme changed to light',
+      icon: 'SunIcon',
+    });
   } else {
-    store.addNotification('Theme changed to dark', 'MoonIcon');
+    store.addNotification({
+      message: 'Theme changed to dark',
+      icon: 'MoonIcon',
+    });
   }
 };
 </script>

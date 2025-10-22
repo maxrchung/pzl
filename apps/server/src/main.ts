@@ -83,7 +83,11 @@ io.on('connection', (socket) => {
     }
 
     if (groups === 1) {
-      io.emit('addNotification', 'Puzzle solved!', 'PzlIcon');
+      io.emit('addNotification', {
+        message: 'Puzzle solved',
+        icon: 'PzlIcon',
+        isPermanent: true,
+      });
     }
 
     socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
@@ -93,7 +97,10 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Game reset', 'ArrowPathIcon');
+    io.emit('addNotification', {
+      message: 'Game reset',
+      icon: 'ArrowPathIcon',
+    });
   });
 
   socket.on('updateSides', async (columns, rows) => {
@@ -103,11 +110,10 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit(
-      'addNotification',
-      `Pieces changed to ${columns}x${rows}`,
-      'ArrowsPointingOutIcon',
-    );
+    io.emit('addNotification', {
+      message: `Pieces changed to ${columns}x${rows}`,
+      icon: 'ArrowsPointingOutIcon',
+    });
   });
 
   socket.on('updateImage', async (key, height, width) => {
@@ -121,7 +127,7 @@ io.on('connection', (socket) => {
     await resetGame();
 
     io.emit('refreshGame', game);
-    io.emit('addNotification', 'Image changed', 'PhotoIcon');
+    io.emit('addNotification', { message: 'Image changed', icon: 'PhotoIcon' });
 
     // Make sure we keep default file
     if (oldKey !== DEFAULT_IMAGE_KEY) {

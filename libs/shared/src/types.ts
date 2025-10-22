@@ -60,12 +60,22 @@ export interface GameState {
   configs: ConfigMap;
 }
 
+export type NotificationType = 'info' | 'error';
+
+export interface Notification {
+  id?: symbol;
+  message: string;
+  icon: string;
+  type?: NotificationType;
+  isPermanent?: boolean;
+}
+
 export interface ServerToClientEvents {
   refreshSecret: (secret: SecretState) => void;
   refreshGame: (game: GameState) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
-  addNotification: (message: string, icon: string) => void;
+  addNotification: (notification: Notification) => void;
 }
 
 export interface ClientToServerEvents {

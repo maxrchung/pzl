@@ -45,11 +45,11 @@ const handleChange = async (event: Event) => {
     // If we error, don't save the file
 
     console.error(error);
-    store.addNotification(
-      'Image failed to load',
-      'ExclamationTriangleIcon',
-      'error',
-    );
+    store.addNotification({
+      message: 'Image failed to load',
+      icon: 'ExclamationTriangleIcon',
+      type: 'error',
+    });
   }
 };
 
@@ -86,7 +86,10 @@ const handleSuccess = async () => {
     close();
   } catch (error) {
     console.error(error);
-    store.addNotification('Image failed to save', 'ExclamationTriangleIcon');
+    store.addNotification({
+      message: 'Image failed to save',
+      icon: 'ExclamationTriangleIcon',
+    });
   } finally {
     isProcessing.value = false;
   }

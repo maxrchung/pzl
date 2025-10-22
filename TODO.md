@@ -1,9 +1,8 @@
 # TODO stuff
 
-reset stage view when game resets
-
-longer pzl you won msg
 time completion
+
+reset stage view when game resets
 
 create lobby
 copy link
