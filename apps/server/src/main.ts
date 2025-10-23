@@ -84,7 +84,7 @@ io.on('connection', (socket) => {
       });
 
       io.emit('addNotification', {
-        message: `Puzzle solved in ${time}!`,
+        message: `Puzzle solved in ${time}`,
         icon: 'PzlIcon',
         isPermanent: true,
       });

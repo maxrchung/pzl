@@ -75,9 +75,7 @@ export const createGame = (partial?: Partial<Game>) => {
 
 /** Given a config map, updates it in place with a new position. Shared with both client/server.  */
 export const moveGroup = (game: Game, groupId: string, position: Vector2d) => {
-  if (!game.configs[groupId]) {
-    return;
-  }
+  if (!game.configs[groupId]) return;
 
   game.configs[groupId].x = position.x;
   game.configs[groupId].y = position.y;
@@ -89,9 +87,7 @@ export const snapGroup = (
   toGroupId: string,
 ) => {
   // Maybe a simple safe guard against weird race conditions
-  if (!game.data[fromGroupId] || !game.data[toGroupId]) {
-    return;
-  }
+  if (!game.data[fromGroupId] || !game.data[toGroupId]) return;
 
   const pieceSize = game.pieceSize;
   const base = game.data[toGroupId][0];

@@ -58,28 +58,19 @@ const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
   event.evt.preventDefault();
 
   const stage = event.target.getStage();
-  if (!stage) {
-    return;
-  }
+  if (!stage) return;
 
   const pointer = stage.getPointerPosition();
-  if (!pointer) {
-    return;
-  }
+  if (!pointer) return;
 
   const deltaY = event.evt.deltaY;
-  if (deltaY === 0) {
-    return;
-  }
+  if (deltaY === 0) return;
 
   const scale =
     event.evt.deltaY > 0
       ? stageScale.value / SCALE_TICK
       : stageScale.value * SCALE_TICK;
-
-  if (scale < SCALE_MIN || scale > SCALE_MAX) {
-    return;
-  }
+  if (scale < SCALE_MIN || scale > SCALE_MAX) return;
 
   // Stage position to pointer with old scaled coordinates
   const toPointer = {
@@ -113,10 +104,7 @@ const stageTouchMove = (event: KonvaEventObject<TouchEvent>) => {
   const touch1 = event.evt.touches[0];
   const touch2 = event.evt.touches[1];
   const stage = event.target.getStage();
-
-  if (!stage) {
-    return;
-  }
+  if (!stage) return;
 
   // Restore dragging if it was suspended by multi-touch
   if (touch1 && !touch2 && !stage.isDragging() && isDragSuspended) {
@@ -125,9 +113,7 @@ const stageTouchMove = (event: KonvaEventObject<TouchEvent>) => {
   }
 
   // If we're not pinching, we're done here
-  if (!touch2) {
-    return;
-  }
+  if (!touch2) return;
 
   if (stage.isDragging()) {
     stage.stopDrag();
@@ -201,14 +187,10 @@ const pieceRefs: Record<string, Image | null> = {};
 let lastThrottle = 0;
 const groupDragMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
-  if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) {
-    return;
-  }
+  if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) return;
 
   const group = groupRefs[groupId];
-  if (!group) {
-    return;
-  }
+  if (!group) return;
 
   lastThrottle = now + THROTTLE_DELAY_IN_MS;
 
