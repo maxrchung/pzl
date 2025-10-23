@@ -5,11 +5,11 @@ import {
   DEFAULT_SIDES,
   STAGE_LENGTH,
 } from './constants.js';
-import { ConfigMap, DataMap, GameState, PieceData } from './types.js';
+import { ConfigMap, DataMap, Game, PieceData } from './types.js';
 import { Vector2d } from 'konva/lib/types.js';
 
-export const createGame = (partial?: Partial<GameState>) => {
-  const game: GameState = {
+export const createGame = (partial?: Partial<Game>) => {
+  const game: Game = {
     resetTime: Date.now(),
     imageKey: DEFAULT_IMAGE_KEY,
     imageUrl: DEFAULT_IMAGE_URL,
@@ -74,11 +74,7 @@ export const createGame = (partial?: Partial<GameState>) => {
 };
 
 /** Given a config map, updates it in place with a new position. Shared with both client/server.  */
-export const moveGroup = (
-  game: GameState,
-  groupId: string,
-  position: Vector2d,
-) => {
+export const moveGroup = (game: Game, groupId: string, position: Vector2d) => {
   if (!game.configs[groupId]) {
     return;
   }
@@ -88,7 +84,7 @@ export const moveGroup = (
 };
 
 export const snapGroup = (
-  game: GameState,
+  game: Game,
   fromGroupId: string,
   toGroupId: string,
 ) => {

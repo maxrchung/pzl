@@ -5,7 +5,7 @@ import {
   type ServerToClientEvents,
   createGame,
   DEFAULT_IMAGE_KEY,
-  GameState,
+  Game,
   moveGroup,
   SERVER_CORS,
   SERVER_PORT,
@@ -31,7 +31,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 
 let game = createGame();
 
-const partial: Partial<GameState> = {
+const partial: Partial<Game> = {
   sides: game.sides,
   imageKey: game.imageKey,
   imageUrl: game.imageUrl,

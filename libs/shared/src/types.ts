@@ -19,7 +19,7 @@ export type DataMap = Record<string, PieceData[]>;
 
 export type ConfigMap = Record<string, GroupConfig>;
 
-export interface GameState {
+export interface Game {
   sides: {
     columns: number;
     rows: number;
@@ -67,7 +67,7 @@ export interface Notification {
 }
 
 export interface ServerToClientEvents {
-  refreshGame: (game: GameState) => void;
+  refreshGame: (game: Game) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
   addNotification: (notification: Notification) => void;
