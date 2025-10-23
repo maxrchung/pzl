@@ -68,6 +68,16 @@ export const useStore = defineStore('store', {
     },
 
     moveGroup(groupId: string, position: Vector2d) {
+      // It may seem weird to update the position locally since it's already
+      // handled by Konva drag, but it's needed to resolve some weird
+      // situations. For example, if you move a group and then reset game, you
+      // may notice that the group's X position keeps its position before reset.
+      // The reason this happens is because the group never received any config
+      // changes, so when reset game happens, it may update the X config value
+      // to 0 again. If the X config value was 0 before, then Konva thinks
+      // nothing's changed.
+      moveGroup(this.game, groupId, position);
+
       socket.emit('moveGroup', groupId, position);
     },
 

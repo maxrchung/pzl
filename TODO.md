@@ -1,7 +1,5 @@
 # TODO stuff
 
-reset stage view when game resets?
-
 create lobby
 copy link
 QR code
