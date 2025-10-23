@@ -1,21 +1,12 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import {
-  createGame,
-  moveGroup,
-  Notification,
-  SecretState,
-  snapGroup,
-} from '@pzl/shared';
+import { createGame, moveGroup, Notification, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 
 export const useStore = defineStore('store', {
   state: () => ({
     isConnected: false,
     game: createGame(),
-    secret: {
-      connections: 0,
-    } as SecretState,
     notification: null as Notification | null,
     theme:
       localStorage.getItem('theme') ||
@@ -32,10 +23,6 @@ export const useStore = defineStore('store', {
 
       socket.on('disconnect', () => {
         this.isConnected = false;
-      });
-
-      socket.on('refreshSecret', (secret) => {
-        this.secret = secret;
       });
 
       socket.on('refreshGame', (game) => {
@@ -61,10 +48,6 @@ export const useStore = defineStore('store', {
 
     disconnectSocket() {
       socket.disconnect();
-    },
-
-    refreshSecret() {
-      socket.emit('refreshSecret');
     },
 
     moveGroup(groupId: string, position: Vector2d) {

@@ -1,11 +1,11 @@
 import { GroupConfig } from 'konva/lib/Group.js';
 import { Vector2d } from 'konva/lib/types.js';
 
-export interface SecretState {
-  connections: number;
-}
-
-/** Contains only the essential data needed to maintain on server */
+/**
+ * Piece data maintained on server. On the client side, this gets stuffed in an
+ * ImageConfig. We can't directly use ImageConfig here because it contains
+ * browser-only types like HTMLImageElement that can't be used on the server.
+ * */
 export interface PieceData {
   id: string;
   groupId: string;
@@ -67,7 +67,6 @@ export interface Notification {
 }
 
 export interface ServerToClientEvents {
-  refreshSecret: (secret: SecretState) => void;
   refreshGame: (game: GameState) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
@@ -75,7 +74,6 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  refreshSecret: () => void;
   resetGame: () => void;
   updateImage: (key: string, height: number, width: number) => void;
   updateSides: (columns: number, rows: number) => void;

@@ -1,8 +1,7 @@
 import { createServer } from 'http';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import {
   type ClientToServerEvents,
-  type SecretState,
   type ServerToClientEvents,
   createGame,
   DEFAULT_IMAGE_KEY,
@@ -40,27 +39,15 @@ const partial: Partial<GameState> = {
 };
 
 io.on('connection', (socket) => {
-  const refreshSecret = (socket: Socket) => {
-    const secret: SecretState = {
-      connections: io.sockets.sockets.size,
-    };
-
-    socket.emit('refreshSecret', secret);
-  };
-
   console.log(`Client connected: ${socket.id}`);
   socket.emit('refreshGame', game);
-  refreshSecret(socket);
 
   socket.on('disconnect', (reason) => {
     console.log(`Client ${socket.id} disconnected: ${reason}`);
   });
 
-  socket.on('refreshSecret', () => {
-    refreshSecret(socket);
-  });
-
   socket.on('moveGroup', (groupId, position) => {
+    // Logging this would probably be too noisy
     moveGroup(game, groupId, position);
 
     socket.broadcast.emit('moveGroup', groupId, position);
