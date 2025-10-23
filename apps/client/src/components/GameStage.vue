@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useImage } from 'vue-konva';
 import { useStore } from '../store';
 import { Group } from 'konva/lib/Group';
@@ -27,13 +27,16 @@ import { getCenter, getDistance } from '../vector';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).Konva.hitOnDragEnabled = true;
 
-const stageScale = ref(
-  Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH,
-);
-const stagePosition = reactive({
-  x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * stageScale.value,
-  y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * stageScale.value,
+const calculateStageScale = () =>
+  Math.min(window.innerWidth, window.innerHeight) / STAGE_LENGTH;
+
+const calculateStagePosition = () => ({
+  x: window.innerWidth / 2 - (STAGE_LENGTH / 2) * calculateStageScale(),
+  y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * calculateStageScale(),
 });
+
+const stageScale = ref(calculateStageScale());
+const stagePosition = reactive(calculateStagePosition());
 
 const { windowWidth, windowHeight } = useWindowSize();
 const stageConfig = computed(
@@ -181,6 +184,16 @@ const isConnected = computed(() => store.isConnected);
 const imageUrl = computed(() => store.game.imageUrl);
 const [image] = useImage(imageUrl);
 const data = computed(() => store.game.data);
+
+watch(
+  () => store.game,
+  () => {
+    stageScale.value = calculateStageScale();
+    const position = calculateStagePosition();
+    stagePosition.x = position.x;
+    stagePosition.y = position.y;
+  },
+);
 
 const groupRefs: Record<string, Group | null> = {};
 const pieceRefs: Record<string, Image | null> = {};
