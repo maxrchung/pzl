@@ -53,29 +53,29 @@ watch(notification, (notification) => {
 <template>
   <slot />
 
-  <Transition
-    enter-active-class="ease-out"
-    enter-from-class="opacity-0 -translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="ease-in"
-    leave-from-class="opacity-100 translate-y-0"
-    leave-to-class="opacity-0 translate-y-2"
+  <div
+    :class="[
+      'fixed top-4 right-0 left-0 flex justify-center px-5',
+      // I don't know about this one lol
+      'pointer-events-none',
+      Z_INDEX.NOTIFICATION,
+    ]"
   >
-    <div
-      v-if="visible && notification"
-      :class="[
-        'fixed top-4 right-0 left-0 flex justify-center px-5',
-        // I don't know about this one lol
-        'pointer-events-none',
-        Z_INDEX.NOTIFICATION,
-      ]"
+    <Transition
+      enter-active-class="ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-2"
     >
       <div
+        v-if="visible && notification"
         :key="notification.id"
         role="status"
         aria-live="polite"
         :class="[
-          'flex max-w-sm justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
+          'absolute flex max-w-sm justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
           // Does this work and will it matter? ionno
           'pointer-events-auto',
           {
@@ -97,6 +97,6 @@ watch(notification, (notification) => {
         />
         {{ notification.message }}
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </div>
 </template>
