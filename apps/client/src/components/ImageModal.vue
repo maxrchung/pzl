@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { SERVER_URL } from '../constants';
 import { useStore } from '../store';
 import { ModalEmits, ModalProps } from '../types';
 import ModalDialog from './ModalDialog.vue';
 import { PhotoIcon } from '@heroicons/vue/24/solid';
-import axios from 'axios';
 
 const { isOpen } = defineProps<ModalProps>();
 const emit = defineEmits<ModalEmits>();
@@ -61,28 +59,15 @@ const handleSuccess = async () => {
   if (!file.value || !imgRef.value) {
     // In this case, nothing was selected. We proceed and keep the existing
     // image as is.
+    close();
     return;
   }
 
   try {
     isProcessing.value = true;
 
-    const presign = await axios.post(`${SERVER_URL}/presign`, {
-      type: file.value.type,
-    });
-    const { url, fields } = presign.data;
-
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(fields)) {
-      formData.append(key, value as string);
-    }
-    formData.append('file', file.value);
-    await axios.post(url, formData);
-
-    const key = fields.key;
     const { naturalHeight, naturalWidth } = imgRef.value;
-    store.updateImage(key, naturalHeight, naturalWidth);
-
+    await store.updateImage(file.value, naturalHeight, naturalWidth);
     close();
   } catch (error) {
     console.error(error);

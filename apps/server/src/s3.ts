@@ -27,14 +27,14 @@ const getKey = async (): Promise<string> => {
   }
 };
 
-export const createPresign = async (type: string) => {
+export const createPresign = async (contentType: string) => {
   const key = await getKey();
 
   const presign = await createPresignedPost(s3, {
     Bucket: S3_BUCKET,
     Key: key,
     Fields: {
-      'Content-Type': type,
+      'Content-Type': contentType,
     },
     Conditions: [
       ['content-length-range', 0, 10 * 1024 * 1024], // max 10 MB

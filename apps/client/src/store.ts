@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { socket } from './socket';
 import { createGame, moveGroup, Notification, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
+import axios from 'axios';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -78,8 +79,27 @@ export const useStore = defineStore('store', {
       socket.emit('updateSides', columns, rows);
     },
 
-    updateImage(key: string, height: number, width: number) {
-      socket.emit('updateImage', key, height, width);
+    // Updating image is a bit special because we're using presign. Presign lets
+    // a client upload (with restrictions). It's lighter on the server since the
+    // client is responsible for uploading now.
+    async updateImage(file: File, height: number, width: number) {
+      return new Promise<void>((resolve) => {
+        socket.emit('presign', file.type, async (presign) => {
+          const { url, fields } = presign;
+
+          const formData = new FormData();
+          for (const [key, value] of Object.entries(fields)) {
+            formData.append(key, value as string);
+          }
+          formData.append('file', file);
+          await axios.post(url, formData);
+
+          const key = fields.key;
+          socket.emit('updateImage', key, height, width);
+
+          resolve();
+        });
+      });
     },
 
     addNotification(notification: Notification) {

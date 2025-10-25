@@ -17,14 +17,8 @@ import {
   deleteUpload,
   getImageUrl,
 } from './s3';
-import express from 'express';
-import cors from 'cors';
 
-const app = express();
-app.use(express.json());
-app.use(cors(SERVER_CORS));
-
-const server = createServer(app);
+const server = createServer();
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
   cors: SERVER_CORS,
 });
@@ -116,6 +110,13 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('presign', async (contentType, callback) => {
+    console.log('Presign');
+
+    const presign = await createPresign(contentType);
+    callback(presign);
+  });
+
   socket.on('updateImage', async (key, height, width) => {
     console.log('Update image');
 
@@ -151,13 +152,4 @@ server.listen(SERVER_PORT, async () => {
   await deleteAllUploads();
 
   await resetGame();
-});
-
-app.post('/presign', async (request, response) => {
-  console.log('Presign');
-
-  const { type } = request.body;
-  const presign = await createPresign(type);
-
-  response.json(presign);
 });

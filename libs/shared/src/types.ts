@@ -1,5 +1,6 @@
 import { GroupConfig } from 'konva/lib/Group.js';
 import { Vector2d } from 'konva/lib/types.js';
+import { PresignedPost } from '@aws-sdk/s3-presigned-post';
 
 /**
  * Piece data maintained on server. On the client side, this gets stuffed in an
@@ -79,4 +80,8 @@ export interface ClientToServerEvents {
   updateSides: (columns: number, rows: number) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
+  presign: (
+    contentType: string,
+    callback: (presign: PresignedPost) => void,
+  ) => void;
 }
