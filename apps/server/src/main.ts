@@ -183,11 +183,13 @@ io.on('connection', (socket) => {
     log(socket, 'Create lobby');
 
     const lobbyId = createLobbyId(lobbies);
-    lobbies.set(lobbyId, {
+    const lobby = {
       game: createGame(),
       partial: {},
-    });
+    };
+    lobbies.set(lobbyId, lobby);
 
+    socket.emit('refreshGame', lobby.game);
     callback(lobbyId);
   });
 
@@ -206,6 +208,7 @@ io.on('connection', (socket) => {
     }
     socket.data.lobbyId = lobbyId;
     socket.join(lobbyId);
+    clearTimeout(lobby.cleanupTimeout);
 
     socket.emit('refreshGame', lobby.game);
     callback(true);
@@ -220,23 +223,35 @@ io.on('connection', (socket) => {
   });
 });
 
-// Cleanup lobby
+// Clean up lobby
 io.of('/').adapter.on('leave-room', (roomId) => {
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
 
-  const room = io.of('/').adapter.rooms.get(roomId);
-  if (!room) return;
-  if (room.size > 0) return;
+  // Use a timeout so that we cleanup only after a certain period has passed. If
+  // we immediately cleanup, that could be problematic if you for example just
+  // did a refresh of your page.
 
-  const imageKey = lobby.game.imageKey;
-  // Make sure we keep default file
-  if (imageKey !== DEFAULT_IMAGE_KEY) {
-    // Probably best to delete after we send notify clients
-    deleteUpload(imageKey);
-  }
+  const timeout = setTimeout(
+    () => {
+      const room = io.of('/').adapter.rooms.get(roomId);
+      if (!room) return;
+      if (room.size > 0) return;
 
-  lobbies.delete(roomId);
+      console.log(roomId, 'clean up');
+
+      const imageKey = lobby.game.imageKey;
+      // Make sure we keep default file
+      if (imageKey !== DEFAULT_IMAGE_KEY) {
+        // Probably best to delete after we send notify clients
+        deleteUpload(imageKey);
+      }
+
+      lobbies.delete(roomId);
+    },
+    1000 * 60 * 10, // Allow 1 hour of inactivity
+  );
+  lobby.cleanupTimeout = timeout;
 });
 
 server.listen(SERVER_PORT, async () => {

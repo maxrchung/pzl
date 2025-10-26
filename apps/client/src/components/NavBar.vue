@@ -5,8 +5,13 @@ import CreateButton from './CreateButton.vue';
 import SettingsButton from './SettingsButton.vue';
 import { Z_INDEX } from '../constants';
 import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import { useStore } from '../store';
 
 const route = useRoute();
+const store = useStore();
+
+const isGameReady = computed(() => store.game.sides.columns > 0);
 </script>
 
 <template>
@@ -19,7 +24,7 @@ const route = useRoute();
     leave-to-class="opacity-0 -translate-y-10"
   >
     <nav
-      v-if="route.path !== '/'"
+      v-if="route.path !== '/' && isGameReady"
       :class="[
         'fixed top-0 right-0 left-0 flex h-10 translate-y-0 items-center justify-between border-b-1 bg-stone-50 opacity-100 shadow-sm transition dark:border-b-white dark:bg-stone-950',
         Z_INDEX.NAVBAR,

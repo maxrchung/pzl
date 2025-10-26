@@ -8,6 +8,10 @@ import {
 import { ConfigMap, DataMap, Game, PieceData } from './types.js';
 import { Vector2d } from 'konva/lib/types.js';
 
+// For client so nothing displays
+export const createEmptyGame = () =>
+  createGame({ sides: { columns: 0, rows: 0 } });
+
 export const createGame = (partial?: Partial<Game>) => {
   const game: Game = {
     resetTime: Date.now(),
@@ -26,11 +30,14 @@ export const createGame = (partial?: Partial<Game>) => {
     data,
     configs,
     sides: { columns, rows },
-    imageSize,
+    imageSize: { width, height },
     cropSize,
     pieceSize,
   } = game;
-  const { width, height } = imageSize;
+
+  if (columns === 0 || rows === 0) {
+    return game;
+  }
 
   cropSize.height = height / rows;
   cropSize.width = width / columns;

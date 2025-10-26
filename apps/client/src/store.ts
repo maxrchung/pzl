@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia';
 import { socket } from './socket';
-import { createGame, moveGroup, Notification, snapGroup } from '@pzl/shared';
+import {
+  createEmptyGame,
+  moveGroup,
+  Notification,
+  snapGroup,
+} from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 import axios from 'axios';
 import router from './router';
@@ -8,7 +13,7 @@ import router from './router';
 export const useStore = defineStore('store', {
   state: () => ({
     isConnected: false,
-    game: createGame(),
+    game: createEmptyGame(),
     notification: null as Notification | null,
     theme:
       localStorage.getItem('theme') ||
@@ -132,16 +137,10 @@ export const useStore = defineStore('store', {
 
     joinLobby(lobbyId: string) {
       socket.emit('joinLobby', lobbyId, (ok) => {
-        if (ok) {
-          this.addNotification({
-            message: 'Lobby joined',
-            icon: 'UserIcon',
-          });
-        }
-
         if (!ok) {
           this.addNotification({
-            message: "Lobby couldn't load. It may not exist.",
+            message:
+              "Lobby couldn't load. It may have expired or doesn't exist.",
             icon: 'ExclamationTriangleIcon',
             type: 'error',
             isPermanent: true,
@@ -154,6 +153,10 @@ export const useStore = defineStore('store', {
 
     leaveLobby() {
       socket.emit('leaveLobby');
+    },
+
+    emptyGame() {
+      this.game = createEmptyGame();
     },
   },
 });
