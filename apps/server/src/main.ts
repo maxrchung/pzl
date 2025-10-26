@@ -1,15 +1,15 @@
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import {
   type ClientToServerEvents,
   type ServerToClientEvents,
   createGame,
   DEFAULT_IMAGE_KEY,
-  Game,
   moveGroup,
   SERVER_CORS,
   SERVER_PORT,
   snapGroup,
+  SocketData,
 } from '@pzl/shared';
 import {
   createPresign,
@@ -17,43 +17,58 @@ import {
   deleteUpload,
   getImageUrl,
 } from './s3';
+import { Lobbies, Lobby } from './types';
+import { getLobbyId as createLobbyId } from './lobby';
+
+const lobbies: Lobbies = new Map();
 
 const server = createServer();
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  never,
+  SocketData
+>(server, {
   cors: SERVER_CORS,
 });
 
-let game = createGame();
-
-const partial: Partial<Game> = {
-  sides: game.sides,
-  imageKey: game.imageKey,
-  imageUrl: game.imageUrl,
-  imageSize: game.imageSize,
+const log = (socket: Socket, message: string) => {
+  console.log(`${socket.id} ${message}`);
 };
 
 io.on('connection', (socket) => {
-  console.log(`Client connected: ${socket.id}`);
-  socket.emit('refreshGame', game);
+  log(socket, 'Connected');
 
   socket.on('disconnect', (reason) => {
-    console.log(`Client ${socket.id} disconnected: ${reason}`);
+    log(socket, `Disconnected: ${reason}`);
   });
 
   socket.on('moveGroup', (groupId, position) => {
     // Logging this would probably be too noisy
+
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
+
+    const game = lobbies.get(lobbyId)?.game;
+    if (!game) return;
+
     moveGroup(game, groupId, position);
 
-    socket.broadcast.emit('moveGroup', groupId, position);
+    socket.to(lobbyId).emit('moveGroup', groupId, position);
   });
 
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
-    console.log('Snap group');
+    log(socket, 'Snap group');
+
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
+
+    const game = lobbies.get(lobbyId)?.game;
+    if (!game) return;
 
     snapGroup(game, fromGroupId, toGroupId);
 
     // lil optimization??? idk
-
     let groups = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const _key in game.data) {
@@ -77,71 +92,129 @@ io.on('connection', (socket) => {
         seconds: totalSeconds % 60,
       });
 
-      io.emit('addNotification', {
+      io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
         icon: 'PzlIcon',
         isPermanent: true,
       });
     }
 
-    socket.broadcast.emit('snapGroup', fromGroupId, toGroupId);
+    socket.to(lobbyId).emit('snapGroup', fromGroupId, toGroupId);
   });
 
   socket.on('resetGame', async () => {
-    await resetGame();
+    log(socket, 'Reset game');
 
-    io.emit('refreshGame', game);
-    io.emit('addNotification', {
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
+
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) return;
+
+    resetGame(lobby);
+
+    io.to(lobbyId).emit('refreshGame', lobby.game);
+    io.to(lobbyId).emit('addNotification', {
       message: 'Game reset',
       icon: 'ArrowPathIcon',
     });
   });
 
   socket.on('updateSides', async (columns, rows) => {
-    console.log('Update sides');
+    log(socket, 'Update sides');
 
-    partial.sides = { columns, rows };
-    await resetGame();
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
 
-    io.emit('refreshGame', game);
-    io.emit('addNotification', {
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) return;
+
+    lobby.partial.sides = { columns, rows };
+    resetGame(lobby);
+
+    io.to(lobbyId).emit('refreshGame', lobby.game);
+    io.to(lobbyId).emit('addNotification', {
       message: `Pieces changed to ${columns}x${rows}`,
       icon: 'ArrowsPointingOutIcon',
     });
   });
 
   socket.on('presign', async (contentType, callback) => {
-    console.log('Presign');
+    log(socket, 'Presign');
 
     const presign = await createPresign(contentType);
     callback(presign);
   });
 
   socket.on('updateImage', async (key, height, width) => {
-    console.log('Update image');
+    log(socket, 'Update image');
 
-    const oldKey = game.imageKey;
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
 
-    partial.imageSize = { height, width };
-    partial.imageKey = key;
-    partial.imageUrl = getImageUrl(key);
-    await resetGame();
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) return;
 
-    io.emit('refreshGame', game);
-    io.emit('addNotification', { message: 'Image changed', icon: 'PhotoIcon' });
+    const oldKey = lobby.game.imageKey;
+
+    lobby.partial.imageSize = { height, width };
+    lobby.partial.imageKey = key;
+    lobby.partial.imageUrl = getImageUrl(key);
+    resetGame(lobby);
+
+    io.to(lobbyId).emit('refreshGame', lobby.game);
+    io.to(lobbyId).emit('addNotification', {
+      message: 'Image changed',
+      icon: 'PhotoIcon',
+    });
 
     // Make sure we keep default file
     if (oldKey !== DEFAULT_IMAGE_KEY) {
-      // Probably best to only delete after people get the new update
-      await deleteUpload(oldKey);
+      // Probably best to delete after we send notify clients
+      deleteUpload(oldKey);
     }
+  });
+
+  socket.on('createLobby', (callback) => {
+    const lobbyId = createLobbyId(lobbies);
+    lobbies.set(lobbyId, {
+      game: createGame(),
+      partial: {},
+    });
+
+    callback(lobbyId);
+  });
+
+  socket.on('joinLobby', (lobbyId, callback) => {
+    const lobby = lobbies.get(lobbyId);
+
+    if (!lobby) {
+      callback(false);
+      return;
+    }
+
+    // Leave existing and go to new room
+    if (socket.data.lobbyId) {
+      socket.leave(socket.data.lobbyId);
+    }
+    socket.data.lobbyId = lobbyId;
+    socket.join(lobbyId);
+
+    socket.emit('refreshGame', lobby.game);
+    callback(true);
+  });
+
+  socket.on('leaveLobby', () => {
+    const lobbyId = socket.data.lobbyId;
+    if (!lobbyId) return;
+
+    socket.leave(lobbyId);
+    socket.data.lobbyId = undefined;
   });
 });
 
-const resetGame = async () => {
-  console.log('Game reset');
-
-  game = createGame(partial);
+const resetGame = (lobby: Lobby) => {
+  lobby.game = createGame(lobby.partial);
 };
 
 server.listen(SERVER_PORT, async () => {
@@ -150,6 +223,4 @@ server.listen(SERVER_PORT, async () => {
   // Clear all objects at start
   // TODO: This probably won't work when there are multiple servers possible
   await deleteAllUploads();
-
-  await resetGame();
 });

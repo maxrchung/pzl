@@ -7,12 +7,11 @@ import {
 } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { S3_FOLDER, S3_BUCKET } from '@pzl/shared';
-import { customAlphabet } from 'nanoid';
+import { nanoid } from 'nanoid';
 
 const s3 = new S3Client();
-const nanoid = customAlphabet('pzl1234567890', 10);
 
-const getKey = async (): Promise<string> => {
+const createKey = async (): Promise<string> => {
   const key = `${S3_FOLDER}/${nanoid()}`;
   const head = new HeadObjectCommand({ Bucket: S3_BUCKET, Key: key });
 
@@ -20,7 +19,7 @@ const getKey = async (): Promise<string> => {
     await s3.send(head);
     console.log('Collision lol');
 
-    return getKey();
+    return createKey();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return key;
@@ -28,7 +27,7 @@ const getKey = async (): Promise<string> => {
 };
 
 export const createPresign = async (contentType: string) => {
-  const key = await getKey();
+  const key = await createKey();
 
   const presign = await createPresignedPost(s3, {
     Bucket: S3_BUCKET,

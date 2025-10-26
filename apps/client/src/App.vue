@@ -3,6 +3,7 @@ import { socket } from './socket';
 import { useStore } from './store';
 import NotificationToast from './components/NotificationToast.vue';
 import { computed } from 'vue';
+import NavBar from './components/NavBar.vue';
 
 const store = useStore();
 const isDark = computed(() => store.theme === 'dark');
@@ -22,6 +23,8 @@ store.bindEvents();
   >
     <NotificationToast>
       <RouterView />
+
+      <NavBar />
 
       <div id="modals" />
     </NotificationToast>

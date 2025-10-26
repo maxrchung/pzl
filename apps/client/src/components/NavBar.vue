@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PzlIcon from './PzlIcon.vue';
 import ThemeButton from './ThemeButton.vue';
+import CreateButton from './CreateButton.vue';
 import SettingsButton from './SettingsButton.vue';
 import { Z_INDEX } from '../constants';
 </script>
@@ -21,6 +22,8 @@ import { Z_INDEX } from '../constants';
 
     <div class="flex">
       <ThemeButton />
+
+      <CreateButton />
 
       <SettingsButton />
     </div>

@@ -84,4 +84,12 @@ export interface ClientToServerEvents {
     contentType: string,
     callback: (presign: PresignedPost) => void,
   ) => void;
+  createLobby: (callback: (lobbyId: string) => void) => void;
+  joinLobby: (lobbyId: string, callback: (ok: boolean) => void) => void;
+  // This happens if they go to the homepage
+  leaveLobby: () => void;
+}
+
+export interface SocketData {
+  lobbyId?: string;
 }

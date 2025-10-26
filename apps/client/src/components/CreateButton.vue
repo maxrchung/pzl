@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { PlusIcon } from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
+import { useStore } from '../store';
 
-const handleClick = async () => {};
+const store = useStore();
+
+const handleClick = async () => {
+  store.createLobby();
+};
 </script>
 
 <template>

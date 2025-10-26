@@ -3,6 +3,7 @@ import { socket } from './socket';
 import { createGame, moveGroup, Notification, snapGroup } from '@pzl/shared';
 import { Vector2d } from 'konva/lib/types';
 import axios from 'axios';
+import router from './router';
 
 export const useStore = defineStore('store', {
   state: () => ({
@@ -116,6 +117,36 @@ export const useStore = defineStore('store', {
     setTheme(theme: string) {
       this.theme = theme;
       localStorage.setItem('theme', theme);
+    },
+
+    createLobby() {
+      socket.emit('createLobby', (lobbyId) => {
+        router.push(`/${lobbyId}`);
+
+        this.addNotification({
+          message: 'New lobby created',
+          icon: 'PlusIcon',
+        });
+      });
+    },
+
+    joinLobby(lobbyId: string) {
+      socket.emit('joinLobby', lobbyId, (ok) => {
+        if (!ok) {
+          this.addNotification({
+            message: "Lobby couldn't be joined. It may not exist.",
+            icon: 'ExclamationTriangleIcon',
+            type: 'error',
+          });
+        }
+      });
+    },
+
+    /**
+     * Called on home page when we want to clear out connected lobby
+     */
+    leaveLobby() {
+      socket.emit('leaveLobby');
     },
   },
 });
