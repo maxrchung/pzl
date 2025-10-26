@@ -132,11 +132,19 @@ export const useStore = defineStore('store', {
 
     joinLobby(lobbyId: string) {
       socket.emit('joinLobby', lobbyId, (ok) => {
+        if (ok) {
+          this.addNotification({
+            message: 'Lobby joined',
+            icon: 'UserIcon',
+          });
+        }
+
         if (!ok) {
           this.addNotification({
-            message: "Couldn't join lobby, it may not exist",
+            message: "Lobby couldn't load. It may not exist.",
             icon: 'ExclamationTriangleIcon',
             type: 'error',
+            isPermanent: true,
           });
 
           router.push('/');
@@ -144,9 +152,6 @@ export const useStore = defineStore('store', {
       });
     },
 
-    /**
-     * Called on home page when we want to clear out connected lobby
-     */
     leaveLobby() {
       socket.emit('leaveLobby');
     },

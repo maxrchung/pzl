@@ -25,12 +25,12 @@ const route = useRoute();
         Z_INDEX.NAVBAR,
       ]"
     >
-      <div class="flex items-center gap-1 pl-2">
+      <RouterLink to="/" class="flex items-center gap-1 pl-2">
         <PzlIcon class="size-6 rotate-180" />
 
         <!-- Translate a bit to center better -->
         <h1 class="-translate-y-0.5 text-2xl">pzl</h1>
-      </div>
+      </RouterLink>
 
       <div class="flex">
         <ThemeButton />

@@ -36,6 +36,10 @@ const log = (socket: Socket, message: string) => {
   console.log(`${socket.id} ${message}`);
 };
 
+const resetGame = (lobby: Lobby) => {
+  lobby.game = createGame(lobby.partial);
+};
+
 io.on('connection', (socket) => {
   log(socket, 'Connected');
 
@@ -176,6 +180,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createLobby', (callback) => {
+    log(socket, 'Create lobby');
+
     const lobbyId = createLobbyId(lobbies);
     lobbies.set(lobbyId, {
       game: createGame(),
@@ -186,8 +192,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('joinLobby', (lobbyId, callback) => {
-    const lobby = lobbies.get(lobbyId);
+    log(socket, 'Join lobby');
 
+    const lobby = lobbies.get(lobbyId);
     if (!lobby) {
       callback(false);
       return;
@@ -213,9 +220,24 @@ io.on('connection', (socket) => {
   });
 });
 
-const resetGame = (lobby: Lobby) => {
-  lobby.game = createGame(lobby.partial);
-};
+// Cleanup lobby
+io.of('/').adapter.on('leave-room', (roomId) => {
+  const lobby = lobbies.get(roomId);
+  if (!lobby) return;
+
+  const room = io.of('/').adapter.rooms.get(roomId);
+  if (!room) return;
+  if (room.size > 0) return;
+
+  const imageKey = lobby.game.imageKey;
+  // Make sure we keep default file
+  if (imageKey !== DEFAULT_IMAGE_KEY) {
+    // Probably best to delete after we send notify clients
+    deleteUpload(imageKey);
+  }
+
+  lobbies.delete(roomId);
+});
 
 server.listen(SERVER_PORT, async () => {
   console.log(`Server listening on port: ${SERVER_PORT}`);

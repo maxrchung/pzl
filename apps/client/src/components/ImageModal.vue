@@ -44,7 +44,7 @@ const handleChange = async (event: Event) => {
 
     console.error(error);
     store.addNotification({
-      message: "Couldn't load image, it may not be a valid image file",
+      message: "Image couldn't load. It may not be a valid image file.",
       icon: 'ExclamationTriangleIcon',
       type: 'error',
     });
@@ -72,7 +72,7 @@ const handleSuccess = async () => {
   } catch (error) {
     console.error(error);
     store.addNotification({
-      message: "Couldn't upload image, it may be too large",
+      message: "Image couldn't upload. It may be too large.",
       icon: 'ExclamationTriangleIcon',
     });
   } finally {
