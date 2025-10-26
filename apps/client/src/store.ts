@@ -134,10 +134,12 @@ export const useStore = defineStore('store', {
       socket.emit('joinLobby', lobbyId, (ok) => {
         if (!ok) {
           this.addNotification({
-            message: "Lobby couldn't be joined. It may not exist.",
+            message: "Couldn't join lobby, it may not exist",
             icon: 'ExclamationTriangleIcon',
             type: 'error',
           });
+
+          router.push('/');
         }
       });
     },
