@@ -215,6 +215,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leaveLobby', () => {
+    log(socket, 'Leave lobby');
+
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -228,16 +230,16 @@ io.of('/').adapter.on('leave-room', (roomId) => {
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
 
+  const room = io.of('/').adapter.rooms.get(roomId);
+  if (!room) return;
+  if (room.size > 0) return;
+
   // Use a timeout so that we cleanup only after a certain period has passed. If
   // we immediately cleanup, that could be problematic if you for example just
   // did a refresh of your page.
 
   const timeout = setTimeout(
     () => {
-      const room = io.of('/').adapter.rooms.get(roomId);
-      if (!room) return;
-      if (room.size > 0) return;
-
       console.log(roomId, 'clean up');
 
       const imageKey = lobby.game.imageKey;
@@ -249,7 +251,7 @@ io.of('/').adapter.on('leave-room', (roomId) => {
 
       lobbies.delete(roomId);
     },
-    1000 * 60 * 10, // Allow 1 hour of inactivity
+    1000 * 60 * 60, // Allow 1 hour of inactivity
   );
   lobby.cleanupTimeout = timeout;
 });
