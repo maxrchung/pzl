@@ -139,8 +139,7 @@ export const useStore = defineStore('store', {
       socket.emit('joinLobby', lobbyId, (ok) => {
         if (!ok) {
           this.addNotification({
-            message:
-              "Lobby couldn't load. It may have expired or doesn't exist.",
+            message: "Lobby couldn't load. It may not exist or has expired.",
             icon: 'ExclamationTriangleIcon',
             type: 'error',
             isPermanent: true,
