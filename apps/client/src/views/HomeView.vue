@@ -22,7 +22,7 @@ const handleClick = () => {
       <h1 class="-translate-y-0.5 text-2xl">pzl</h1>
     </div>
 
-    <p class="px-3">
+    <p class="px-3 text-center">
       Multiplayer online real-time co-op custom jigsaw puzzle web game
     </p>
 
