@@ -11,6 +11,7 @@ import {
   PlusIcon,
   SunIcon,
   UserIcon,
+  LinkIcon,
 } from '@heroicons/vue/24/solid';
 import PzlIcon from './PzlIcon.vue';
 import { Z_INDEX } from '../constants';
@@ -27,6 +28,7 @@ const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
     SunIcon,
     PlusIcon,
     UserIcon,
+    LinkIcon,
   };
 const FADE_DURATION_IN_MS = 150;
 const ACTIVE_DURATION_IN_MS = 2000;

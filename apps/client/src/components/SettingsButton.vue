@@ -12,6 +12,7 @@ import MenuItem from './MenuItem.vue';
 import ResetModal from './ResetModal.vue';
 import ImageModal from './ImageModal.vue';
 import PiecesModal from './PiecesModal.vue';
+import CopyItem from './CopyItem.vue';
 
 type Modal = '' | 'reset' | 'image' | 'pieces';
 
@@ -103,6 +104,8 @@ onBeforeUnmount(() =>
           { 'opacity-100': isOpen },
         ]"
       >
+        <CopyItem @click="isOpen = false" />
+
         <MenuItem
           :icon="ArrowPathIcon"
           title="Reset game..."

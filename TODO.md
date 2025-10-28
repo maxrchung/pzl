@@ -1,19 +1,15 @@
 # TODO stuff
 
-create lobby
-copy link
 QR code
-
-Start screen
-
-space bar move
-
-view image
 
 border around pieces
 Jigsaw shape
 if shape is too small, just go back to straight edges?
 hover effect?
+
+space bar move?
+
+view image
 
 Drag and drop image selector UI?
 
