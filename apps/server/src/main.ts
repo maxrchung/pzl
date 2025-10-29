@@ -18,7 +18,7 @@ import {
   getImageUrl,
 } from './s3';
 import { Lobbies, Lobby } from './types';
-import { getLobbyId as createLobbyId } from './lobby';
+import { createLobbyId } from './lobby';
 
 const lobbies: Lobbies = new Map();
 
@@ -236,7 +236,9 @@ io.on('connection', (socket) => {
 
 // Clean up lobby
 io.of('/').adapter.on('leave-room', (roomId, socketId) => {
-  console.log({ message: 'leave-room', lobbyId: roomId, socketId });
+  console.log(
+    JSON.stringify({ message: 'leave-room', lobbyId: roomId, socketId }),
+  );
 
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
@@ -251,7 +253,9 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
   const timeout = setTimeout(
     () => {
-      console.log({ message: 'cleanup', lobbyId: roomId, socketId });
+      console.log(
+        JSON.stringify({ message: 'cleanup', lobbyId: roomId, socketId }),
+      );
 
       const imageKey = lobby.game.imageKey;
       // Make sure we keep default file

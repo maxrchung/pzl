@@ -6,11 +6,13 @@ import { Lobbies } from './types';
 // like a thousand lobbies before regeneration gets kind of annoying? Idk.
 const nanoid = customAlphabet('pzl', 9);
 
-export const getLobbyId = (lobbies: Lobbies): string => {
+export const createLobbyId = (lobbies: Lobbies): string => {
   const id = nanoid();
 
   if (lobbies.has(id)) {
-    return getLobbyId(lobbies);
+    console.log('lobby collision');
+
+    return createLobbyId(lobbies);
   }
 
   return id;

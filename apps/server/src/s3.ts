@@ -17,7 +17,7 @@ const createKey = async (): Promise<string> => {
 
   try {
     await s3.send(head);
-    console.log('Collision lol');
+    console.log('s3 collision');
 
     return createKey();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
