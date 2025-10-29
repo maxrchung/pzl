@@ -32,8 +32,13 @@ const io = new Server<
   cors: SERVER_CORS,
 });
 
-const log = (socket: Socket, message: string) => {
-  console.log(`${socket.id} ${message}`);
+const log = (socket: Socket, message: string, data?: string) => {
+  console.log({
+    message,
+    ...(data && { data }),
+    socketId: socket.id,
+    ...(socket.data.lobbyId && { lobbyId: socket.data.lobbyId }),
+  });
 };
 
 const resetGame = (lobby: Lobby) => {
@@ -41,10 +46,10 @@ const resetGame = (lobby: Lobby) => {
 };
 
 io.on('connection', (socket) => {
-  log(socket, 'Connected');
+  log(socket, 'connection');
 
   socket.on('disconnect', (reason) => {
-    log(socket, `Disconnected: ${reason}`);
+    log(socket, `disconnect ${reason}`);
   });
 
   socket.on('moveGroup', (groupId, position) => {
@@ -62,7 +67,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
-    log(socket, 'Snap group');
+    log(socket, 'snapGroup');
 
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
@@ -96,6 +101,8 @@ io.on('connection', (socket) => {
         seconds: totalSeconds % 60,
       });
 
+      log(socket, 'solved', time);
+
       io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
         icon: 'PzlIcon',
@@ -107,7 +114,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('resetGame', async () => {
-    log(socket, 'Reset game');
+    log(socket, 'resetGame');
 
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
@@ -125,7 +132,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateSides', async (columns, rows) => {
-    log(socket, 'Update sides');
+    log(socket, 'updateSides', `${columns}x${rows}`);
 
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
@@ -144,14 +151,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('presign', async (contentType, callback) => {
-    log(socket, 'Presign');
+    log(socket, 'presign', contentType);
 
     const presign = await createPresign(contentType);
     callback(presign);
   });
 
   socket.on('updateImage', async (key, height, width) => {
-    log(socket, 'Update image');
+    log(socket, 'updateImage', `${key} ${width}x${height}`);
 
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
@@ -180,8 +187,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createLobby', (callback) => {
-    log(socket, 'Create lobby');
-
     const lobbyId = createLobbyId(lobbies);
     const lobby = {
       game: createGame(),
@@ -189,12 +194,14 @@ io.on('connection', (socket) => {
     };
     lobbies.set(lobbyId, lobby);
 
+    log(socket, 'createLobby', lobbyId);
+
     socket.emit('refreshGame', lobby.game);
     callback(lobbyId);
   });
 
   socket.on('joinLobby', (lobbyId, callback) => {
-    log(socket, 'Join lobby');
+    log(socket, 'joinLobby', lobbyId);
 
     const lobby = lobbies.get(lobbyId);
     if (!lobby) {
@@ -215,7 +222,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('leaveLobby', () => {
-    log(socket, 'Leave lobby');
+    log(socket, 'leaveLobby');
 
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
@@ -226,7 +233,9 @@ io.on('connection', (socket) => {
 });
 
 // Clean up lobby
-io.of('/').adapter.on('leave-room', (roomId) => {
+io.of('/').adapter.on('leave-room', (roomId, socketId) => {
+  console.log({ message: 'leave-room', lobbyId: roomId, socketId });
+
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
 
@@ -240,7 +249,7 @@ io.of('/').adapter.on('leave-room', (roomId) => {
 
   const timeout = setTimeout(
     () => {
-      console.log(roomId, 'clean up');
+      console.log({ message: 'cleanup', lobbyId: roomId, socketId });
 
       const imageKey = lobby.game.imageKey;
       // Make sure we keep default file
@@ -251,7 +260,7 @@ io.of('/').adapter.on('leave-room', (roomId) => {
 
       lobbies.delete(roomId);
     },
-    1000 * 60 * 60, // Allow 1 hour of inactivity
+    1000 * 60 * 10, // Allow 1 hour of inactivity
   );
   lobby.cleanupTimeout = timeout;
 });
