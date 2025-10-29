@@ -11,7 +11,7 @@ const handleClick = async () => {
 </script>
 
 <template>
-  <TooltipButton tooltip="Create new lobby" @click="handleClick">
+  <TooltipButton tooltip="Create new puzzle" @click="handleClick">
     <PlusIcon class="size-6" />
   </TooltipButton>
 </template>

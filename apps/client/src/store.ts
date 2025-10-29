@@ -129,7 +129,7 @@ export const useStore = defineStore('store', {
         router.push(`/${lobbyId}`);
 
         this.addNotification({
-          message: 'New lobby created',
+          message: 'New puzzle created',
           icon: 'PlusIcon',
         });
       });
@@ -139,7 +139,7 @@ export const useStore = defineStore('store', {
       socket.emit('joinLobby', lobbyId, (ok) => {
         if (!ok) {
           this.addNotification({
-            message: "Lobby couldn't load. It may not exist or has expired.",
+            message: "Puzzle couldn't load. It may not exist or has expired.",
             icon: 'ExclamationTriangleIcon',
             type: 'error',
             isPermanent: true,

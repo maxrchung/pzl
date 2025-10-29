@@ -119,7 +119,7 @@ onBeforeUnmount(() =>
 
         <MenuItem
           :icon="ArrowPathIcon"
-          title="Reset game..."
+          title="Reset puzzle..."
           @click="openModal('reset')"
         />
 

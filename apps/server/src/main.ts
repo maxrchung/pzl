@@ -119,7 +119,7 @@ io.on('connection', (socket) => {
 
     io.to(lobbyId).emit('refreshGame', lobby.game);
     io.to(lobbyId).emit('addNotification', {
-      message: 'Game reset',
+      message: 'Puzzle reset',
       icon: 'ArrowPathIcon',
     });
   });

@@ -30,7 +30,7 @@ const handleClick = () => {
       class="mt-2 flex cursor-pointer gap-2 border bg-stone-100 px-3 py-2 shadow-md hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
       @click="handleClick"
     >
-      <PlusIcon class="size-6" /> Create new lobby
+      <PlusIcon class="size-6" /> Create new puzzle
     </button>
   </div>
 </template>

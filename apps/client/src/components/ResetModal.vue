@@ -24,14 +24,14 @@ const handleSuccess = () => {
     @cancel="close"
     @success="handleSuccess"
     :icon="ArrowPathIcon"
-    title="Reset"
+    title="Reset puzzle"
     cancel-text="Cancel"
     success-text="OK"
     :isOpen="isOpen"
     v-bind="$attrs"
   >
     <p>
-      Are you sure you want to reset the game? You'll lose your current
+      Are you sure you want to reset the puzzle? You'll lose your current
       progress.
     </p>
   </ModalDialog>

@@ -29,11 +29,6 @@ const imageSettings = {
     :isOpen="isOpen"
     v-bind="$attrs"
   >
-    <QrcodeVue
-      :value="url"
-      render-as="svg"
-      :size="300"
-      :image-settings="imageSettings"
-    />
+    <QrcodeVue :value="url" :size="300" :image-settings="imageSettings" />
   </ModalDialog>
 </template>

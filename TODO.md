@@ -1,6 +1,6 @@
 # TODO stuff
 
-QR code
+better logging, pino?
 
 border around pieces
 Jigsaw shape

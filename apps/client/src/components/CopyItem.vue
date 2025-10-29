@@ -10,7 +10,7 @@ const handleClick = () => {
 
   store.addNotification({
     icon: 'LinkIcon',
-    message: 'Lobby link copied to clipboard',
+    message: 'Puzzle link copied to clipboard',
   });
 };
 </script>
