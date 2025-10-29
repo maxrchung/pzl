@@ -33,12 +33,14 @@ const io = new Server<
 });
 
 const log = (socket: Socket, message: string, data?: string) => {
-  console.log({
-    message,
-    ...(data && { data }),
-    socketId: socket.id,
-    ...(socket.data.lobbyId && { lobbyId: socket.data.lobbyId }),
-  });
+  console.log(
+    JSON.stringify({
+      message,
+      ...(data && { data }),
+      socketId: socket.id,
+      ...(socket.data.lobbyId && { lobbyId: socket.data.lobbyId }),
+    }),
+  );
 };
 
 const resetGame = (lobby: Lobby) => {
