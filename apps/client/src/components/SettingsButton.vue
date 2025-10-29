@@ -3,21 +3,26 @@ import {
   ArrowPathIcon,
   ArrowsPointingOutIcon,
   PhotoIcon,
+  QrCodeIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/solid';
 import TooltipButton from './TooltipButton.vue';
 import { onBeforeUnmount, onMounted, Ref, ref } from 'vue';
 import { Z_INDEX } from '../constants';
 import MenuItem from './MenuItem.vue';
+import QrCodeModal from './QrCodeModal.vue';
 import ResetModal from './ResetModal.vue';
 import ImageModal from './ImageModal.vue';
 import PiecesModal from './PiecesModal.vue';
 import CopyItem from './CopyItem.vue';
 
-type Modal = '' | 'reset' | 'image' | 'pieces';
+type Modal = '' | 'qrcode' | 'reset' | 'image' | 'pieces';
 
 const isOpen = ref(false);
 const modal = ref<Modal>('');
+
+/** Instead of ensuring each modal cleans up for itself, we just increment this
+ * to force a new modal to be made */
 const modalKey = ref(0);
 
 const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
@@ -107,6 +112,12 @@ onBeforeUnmount(() =>
         <CopyItem @click="isOpen = false" />
 
         <MenuItem
+          :icon="QrCodeIcon"
+          title="QR code..."
+          @click="openModal('qrcode')"
+        />
+
+        <MenuItem
           :icon="ArrowPathIcon"
           title="Reset game..."
           @click="openModal('reset')"
@@ -129,6 +140,12 @@ onBeforeUnmount(() =>
     <!-- I had an iteration where modals were inside MenuItem, but this didn't
     really work for some reason because MenuItem would get unrendered and cause
     modals to also close -->
+    <QrCodeModal
+      :isOpen="modal === 'qrcode'"
+      @close="closeModal"
+      :key="modalKey"
+    />
+
     <ResetModal
       :isOpen="modal === 'reset'"
       @close="closeModal"

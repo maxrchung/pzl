@@ -9,7 +9,7 @@ interface Props {
   isProcessing?: boolean;
   icon: Component;
   title: string;
-  cancelText: string;
+  cancelText?: string;
   successText: string;
   onCancel: () => void;
   onSuccess: () => void;
@@ -80,6 +80,7 @@ const { isOpen, isProcessing, onSuccess, onCancel, cancelText, successText } =
 
             <footer class="flex justify-end">
               <button
+                v-if="cancelText"
                 class="cursor-pointer bg-stone-100 px-3 py-2 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
                 type="button"
                 @click="onCancel"
