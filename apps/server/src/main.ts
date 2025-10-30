@@ -23,6 +23,7 @@ import {
   log,
   logArgs,
   logBroadcast,
+  logCallback,
   logEmit,
   logIncoming,
   logOutgoing,
@@ -150,12 +151,7 @@ io.on('connection', (socket) => {
     callback(presign);
 
     // Callbacks don't get captured via onAnyOutgoing so we have to do it manually
-    log.info({
-      network: 'outgoing',
-      event: 'presign',
-      socketId: socket.id,
-      lobbyId: socket.data.lobbyId,
-    });
+    logCallback(socket, callback, presign);
   });
 
   socket.on('updateImage', async (key, height, width) => {
@@ -193,26 +189,13 @@ io.on('connection', (socket) => {
     };
     lobbies.set(lobbyId, lobby);
 
-    callback(lobbyId);
-    log.info({
-      network: 'outgoing',
-      event: 'callback',
-      socketId: socket.id,
-      lobbyId: socket.data.lobbyId,
-    });
+    logCallback(socket, callback, lobbyId);
   });
 
   socket.on('joinLobby', (lobbyId, callback) => {
     const lobby = lobbies.get(lobbyId);
     if (!lobby) {
-      callback(false);
-      log.info({
-        network: 'outgoing',
-        event: 'callback',
-        args: [false],
-        socketId: socket.id,
-        lobbyId: socket.data.lobbyId,
-      });
+      logCallback(socket, callback, false);
       return;
     }
 
@@ -225,14 +208,7 @@ io.on('connection', (socket) => {
     clearTimeout(lobby.cleanupTimeout);
 
     socket.emit('refreshGame', lobby.game);
-    callback(true);
-    log.info({
-      network: 'outgoing',
-      event: 'callback',
-      args: [true],
-      socketId: socket.id,
-      lobbyId: socket.data.lobbyId,
-    });
+    logCallback(socket, callback, true);
   });
 
   socket.on('leaveLobby', () => {

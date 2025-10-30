@@ -114,3 +114,20 @@ export const logOutgoing = (
     });
   });
 };
+
+export const logCallback = (
+  socket: Socket<ClientToServerEvents, ServerToClientEvents, never, SocketData>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  callback: (...args: any[]) => void,
+  ...args: unknown[]
+) => {
+  log.info({
+    network: 'outgoing',
+    event: 'callback',
+    args,
+    socketId: socket.id,
+    lobbyId: socket.data.lobbyId,
+  });
+
+  callback(...args);
+};
