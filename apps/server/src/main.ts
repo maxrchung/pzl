@@ -38,22 +38,31 @@ const resetGame = (lobby: Lobby) => {
 };
 
 io.on('connection', (socket) => {
-  log.info({ event: 'connection', socketId: socket.id });
+  log.info({ socketId: socket.id }, 'connection');
 
   socket.onAny((event, ...args) => {
     // Don't log this as it'll be too noisy
     if (event === 'moveGroup') return;
 
-    log.info({
+    log.info(
+      {
+        args: logArgs(args),
+        socketId: socket.id,
+        lobbyId: socket.data.lobbyId,
+      },
       event,
-      args: logArgs(args),
-      socketId: socket.id,
-      lobbyId: socket.data.lobbyId,
-    });
+    );
   });
 
   socket.on('disconnect', (...args) => {
-    log.info({ event: 'disconnect', args: logArgs(args), socketId: socket.id });
+    log.info(
+      {
+        args: logArgs(args),
+        socketId: socket.id,
+        lobbyId: socket.data.lobbyId,
+      },
+      'disconnect',
+    );
   });
 
   socket.on('moveGroup', (groupId, position) => {
@@ -99,12 +108,14 @@ io.on('connection', (socket) => {
         seconds: totalSeconds % 60,
       });
 
-      log.info({
-        event: 'solved',
-        args: [time],
-        socketId: socket.id,
-        lobbyId: socket.data.lobbyId,
-      });
+      log.info(
+        {
+          args: [time],
+          socketId: socket.id,
+          lobbyId: socket.data.lobbyId,
+        },
+        'solved',
+      );
 
       io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
@@ -218,7 +229,7 @@ io.on('connection', (socket) => {
 
 // Clean up lobby
 io.of('/').adapter.on('leave-room', (roomId, socketId) => {
-  log.info({ event: 'leave-room', socketId, lobbyId: roomId });
+  log.info({ lobbyId: roomId, socketId }, 'leave-room');
 
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
@@ -232,7 +243,7 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
   const timeout = setTimeout(
     () => {
-      log.info({ event: 'cleanup', socketId, lobbyId: roomId });
+      log.info({ socketId, lobbyId: roomId }, 'cleanup');
 
       const imageKey = lobby.game.imageKey;
       // Make sure we keep default file
