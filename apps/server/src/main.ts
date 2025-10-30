@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import {
   type ClientToServerEvents,
   type ServerToClientEvents,
@@ -19,6 +19,14 @@ import {
 } from './s3';
 import { Lobbies, Lobby } from './types';
 import { createLobbyId } from './lobby';
+import {
+  log,
+  logArgs,
+  logBroadcast,
+  logEmit,
+  logIncoming,
+  logOutgoing,
+} from './log';
 
 const lobbies: Lobbies = new Map();
 
@@ -32,31 +40,24 @@ const io = new Server<
   cors: SERVER_CORS,
 });
 
-const log = (socket: Socket, message: string, data?: string) => {
-  console.log(
-    JSON.stringify({
-      message,
-      ...(data && { data }),
-      socketId: socket.id,
-      ...(socket.data.lobbyId && { lobbyId: socket.data.lobbyId }),
-    }),
-  );
-};
-
 const resetGame = (lobby: Lobby) => {
   lobby.game = createGame(lobby.partial);
 };
 
-io.on('connection', (socket) => {
-  log(socket, 'connection');
+logEmit(io);
 
-  socket.on('disconnect', (reason) => {
-    log(socket, `disconnect ${reason}`);
+io.on('connection', (socket) => {
+  log.info({ event: 'connection', socketId: socket.id });
+
+  logBroadcast(socket);
+  logIncoming(socket);
+  logOutgoing(socket);
+
+  socket.on('disconnect', (...args) => {
+    log.info({ event: 'disconnect', args: logArgs(args), socketId: socket.id });
   });
 
   socket.on('moveGroup', (groupId, position) => {
-    // Logging this would probably be too noisy
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -69,8 +70,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
-    log(socket, 'snapGroup');
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -103,8 +102,6 @@ io.on('connection', (socket) => {
         seconds: totalSeconds % 60,
       });
 
-      log(socket, 'solved', time);
-
       io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
         icon: 'PzlIcon',
@@ -116,8 +113,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('resetGame', async () => {
-    log(socket, 'resetGame');
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -134,8 +129,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateSides', async (columns, rows) => {
-    log(socket, 'updateSides', `${columns}x${rows}`);
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -153,15 +146,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('presign', async (contentType, callback) => {
-    log(socket, 'presign', contentType);
-
     const presign = await createPresign(contentType);
     callback(presign);
+
+    // Callbacks don't get captured via onAnyOutgoing so we have to do it manually
+    log.info({
+      network: 'outgoing',
+      event: 'presign',
+      socketId: socket.id,
+      lobbyId: socket.data.lobbyId,
+    });
   });
 
   socket.on('updateImage', async (key, height, width) => {
-    log(socket, 'updateImage', `${key} ${width}x${height}`);
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -196,18 +193,26 @@ io.on('connection', (socket) => {
     };
     lobbies.set(lobbyId, lobby);
 
-    log(socket, 'createLobby', lobbyId);
-
-    socket.emit('refreshGame', lobby.game);
     callback(lobbyId);
+    log.info({
+      network: 'outgoing',
+      event: 'callback',
+      socketId: socket.id,
+      lobbyId: socket.data.lobbyId,
+    });
   });
 
   socket.on('joinLobby', (lobbyId, callback) => {
-    log(socket, 'joinLobby', lobbyId);
-
     const lobby = lobbies.get(lobbyId);
     if (!lobby) {
       callback(false);
+      log.info({
+        network: 'outgoing',
+        event: 'callback',
+        args: [false],
+        socketId: socket.id,
+        lobbyId: socket.data.lobbyId,
+      });
       return;
     }
 
@@ -221,11 +226,16 @@ io.on('connection', (socket) => {
 
     socket.emit('refreshGame', lobby.game);
     callback(true);
+    log.info({
+      network: 'outgoing',
+      event: 'callback',
+      args: [true],
+      socketId: socket.id,
+      lobbyId: socket.data.lobbyId,
+    });
   });
 
   socket.on('leaveLobby', () => {
-    log(socket, 'leaveLobby');
-
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
 
@@ -236,9 +246,7 @@ io.on('connection', (socket) => {
 
 // Clean up lobby
 io.of('/').adapter.on('leave-room', (roomId, socketId) => {
-  console.log(
-    JSON.stringify({ message: 'leave-room', lobbyId: roomId, socketId }),
-  );
+  log.info({ event: 'leave-room', socketId, lobbyId: roomId });
 
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
@@ -253,9 +261,7 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
   const timeout = setTimeout(
     () => {
-      console.log(
-        JSON.stringify({ message: 'cleanup', lobbyId: roomId, socketId }),
-      );
+      log.info({ event: 'cleanup', socketId, lobbyId: roomId });
 
       const imageKey = lobby.game.imageKey;
       // Make sure we keep default file
