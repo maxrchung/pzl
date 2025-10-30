@@ -19,15 +19,7 @@ import {
 } from './s3';
 import { Lobbies, Lobby } from './types';
 import { createLobbyId } from './lobby';
-import {
-  log,
-  logArgs,
-  logBroadcast,
-  logCallback,
-  logEmit,
-  logIncoming,
-  logOutgoing,
-} from './log';
+import { log, logArgs } from './log';
 
 const lobbies: Lobbies = new Map();
 
@@ -45,14 +37,20 @@ const resetGame = (lobby: Lobby) => {
   lobby.game = createGame(lobby.partial);
 };
 
-logEmit(io);
-
 io.on('connection', (socket) => {
   log.info({ event: 'connection', socketId: socket.id });
 
-  logBroadcast(socket);
-  logIncoming(socket);
-  logOutgoing(socket);
+  socket.onAny((event, ...args) => {
+    // Don't log this as it'll be too noisy
+    if (event === 'moveGroup') return;
+
+    log.info({
+      event,
+      args: logArgs(args),
+      socketId: socket.id,
+      lobbyId: socket.data.lobbyId,
+    });
+  });
 
   socket.on('disconnect', (...args) => {
     log.info({ event: 'disconnect', args: logArgs(args), socketId: socket.id });
@@ -61,7 +59,6 @@ io.on('connection', (socket) => {
   socket.on('moveGroup', (groupId, position) => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
-
     const game = lobbies.get(lobbyId)?.game;
     if (!game) return;
 
@@ -73,7 +70,6 @@ io.on('connection', (socket) => {
   socket.on('snapGroup', (fromGroupId, toGroupId) => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
-
     const game = lobbies.get(lobbyId)?.game;
     if (!game) return;
 
@@ -103,6 +99,13 @@ io.on('connection', (socket) => {
         seconds: totalSeconds % 60,
       });
 
+      log.info({
+        event: 'solved',
+        args: [time],
+        socketId: socket.id,
+        lobbyId: socket.data.lobbyId,
+      });
+
       io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
         icon: 'PzlIcon',
@@ -116,7 +119,6 @@ io.on('connection', (socket) => {
   socket.on('resetGame', async () => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
-
     const lobby = lobbies.get(lobbyId);
     if (!lobby) return;
 
@@ -132,7 +134,6 @@ io.on('connection', (socket) => {
   socket.on('updateSides', async (columns, rows) => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
-
     const lobby = lobbies.get(lobbyId);
     if (!lobby) return;
 
@@ -149,15 +150,11 @@ io.on('connection', (socket) => {
   socket.on('presign', async (contentType, callback) => {
     const presign = await createPresign(contentType);
     callback(presign);
-
-    // Callbacks don't get captured via onAnyOutgoing so we have to do it manually
-    logCallback(socket, callback, presign);
   });
 
   socket.on('updateImage', async (key, height, width) => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
-
     const lobby = lobbies.get(lobbyId);
     if (!lobby) return;
 
@@ -188,14 +185,13 @@ io.on('connection', (socket) => {
       partial: {},
     };
     lobbies.set(lobbyId, lobby);
-
-    logCallback(socket, callback, lobbyId);
+    callback(lobbyId);
   });
 
   socket.on('joinLobby', (lobbyId, callback) => {
     const lobby = lobbies.get(lobbyId);
     if (!lobby) {
-      logCallback(socket, callback, false);
+      callback(false);
       return;
     }
 
@@ -208,7 +204,7 @@ io.on('connection', (socket) => {
     clearTimeout(lobby.cleanupTimeout);
 
     socket.emit('refreshGame', lobby.game);
-    logCallback(socket, callback, true);
+    callback(true);
   });
 
   socket.on('leaveLobby', () => {
@@ -226,7 +222,6 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
   const lobby = lobbies.get(roomId);
   if (!lobby) return;
-
   const room = io.of('/').adapter.rooms.get(roomId);
   if (!room) return;
   if (room.size > 0) return;
@@ -257,6 +252,6 @@ server.listen(SERVER_PORT, async () => {
   console.log(`Server listening on port: ${SERVER_PORT}`);
 
   // Clear all objects at start
-  // TODO: This probably won't work when there are multiple servers possible
+  // TODO: This probably won't work when there are multiple servers
   await deleteAllUploads();
 });

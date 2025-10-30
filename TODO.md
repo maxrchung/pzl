@@ -1,7 +1,5 @@
 # TODO stuff
 
-better logging, pino?
-
 border around pieces
 Jigsaw shape
 if shape is too small, just go back to straight edges?
