@@ -5,9 +5,22 @@ Jigsaw shape
 if shape is too small, just go back to straight edges?
 hover effect?
 
+## Infra
+
+Move frontend to Railway static Railpack SPA
+
+Railway redis cache - for multiple servers but also saves pending games when
+server updates
+
+maybe figure out Railway bucket, presign may be supported for public, but have to figure out public presign/get way or setup
+
+btw don't delete s3 on server startup if we have horizontal scaled servers
+
+## hmm
+
 space bar move?
 
-view image
+dedicated view image
 
 Drag and drop image selector UI?
 
@@ -19,18 +32,7 @@ Better error handling?
 
 better client side validation?
 
-testing?
-
-## Infra
-
-Move frontend to Railway static Railpack SPA
-
-Railway redis cache - for multiple servers but also saves pending games when
-server updates
-
-maybe figure out Railway bucket
-
-btw don't delete s3 on server startup if we have horizontal scaled servers
+testing? lul
 
 ## Maybe dunno
 

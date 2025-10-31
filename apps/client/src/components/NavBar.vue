@@ -7,6 +7,7 @@ import { Z_INDEX } from '../constants';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import { useStore } from '../store';
+import GitHubButton from './GitHubButton.vue';
 
 const route = useRoute();
 const store = useStore();
@@ -38,6 +39,8 @@ const isGameReady = computed(() => store.game.sides.columns > 0);
       </RouterLink>
 
       <div class="flex">
+        <GitHubButton />
+
         <ThemeButton />
 
         <CreateButton />

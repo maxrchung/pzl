@@ -25,7 +25,7 @@ const modal = ref<Modal>('');
  * to force a new modal to be made */
 const modalKey = ref(0);
 
-const buttonRef = ref<Ref<{ buttonRef: HTMLButtonElement }> | null>(null);
+const buttonRef = ref<Ref<{ containerRef: HTMLDivElement }> | null>(null);
 const menuRef = ref<HTMLUListElement | null>(null);
 
 const openModal = (id: Modal) => {
@@ -49,7 +49,7 @@ function handleClickOutside(event: MouseEvent) {
   // for some reason makes it so that clicking the button sometimes doesn't
   // allow you to open the settings. There's probably some competing setter
   // where we try to open but then this handler fires and immediately closes.
-  const button = buttonRef.value?.buttonRef;
+  const button = buttonRef.value?.containerRef;
   if (!button) return;
   if (button.contains(target)) return;
 
