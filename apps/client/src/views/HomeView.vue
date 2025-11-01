@@ -23,7 +23,8 @@ const handleClick = () => {
     </div>
 
     <p class="px-3 text-center">
-      Multiplayer online real-time co-op custom jigsaw puzzle web game
+      Multiplayer online real-time co-op no-talking custom jigsaw puzzle web
+      game
     </p>
 
     <button
