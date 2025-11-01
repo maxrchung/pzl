@@ -41,9 +41,9 @@ const isGameReady = computed(() => store.game.sides.columns > 0);
       <div class="flex">
         <GitHubButton />
 
-        <ThemeButton />
-
         <CreateButton />
+
+        <ThemeButton />
 
         <SettingsButton />
       </div>
