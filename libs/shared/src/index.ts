@@ -1,3 +1,3 @@
-export * from './types.js';
-export * from './constants.js';
-export * from './game.js';
+export * from './types';
+export * from './constants';
+export * from './game';

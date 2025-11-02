@@ -1,5 +1,5 @@
-import { GroupConfig } from 'konva/lib/Group.js';
-import { Vector2d } from 'konva/lib/types.js';
+import { GroupConfig } from 'konva/lib/Group';
+import { Vector2d } from 'konva/lib/types';
 import { PresignedPost } from '@aws-sdk/s3-presigned-post';
 
 /**

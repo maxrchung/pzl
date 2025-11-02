@@ -1,9 +1,22 @@
+# bug
+
+debug doesn't work in pzl/shared
+
+sort of a bug where something during image loading, the boy image gets stuck in
+a square on one image briefly, dunno why
+
 # TODO stuff
 
 border around pieces
 Jigsaw shape
 if shape is too small, just go back to straight edges?
 hover effect?
+
+konva cache()
+
+focus handling
+
+something on main page, maybe puzzle in background
 
 ## Infra
 

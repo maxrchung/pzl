@@ -4,9 +4,9 @@ import {
   DEFAULT_IMAGE_URL,
   DEFAULT_SIDES,
   STAGE_LENGTH,
-} from './constants.js';
-import { ConfigMap, DataMap, Game, PieceData } from './types.js';
-import { Vector2d } from 'konva/lib/types.js';
+} from './constants';
+import { ConfigMap, DataMap, Game, PieceData } from './types';
+import { Vector2d } from 'konva/lib/types';
 
 // For client so nothing displays
 export const createEmptyGame = () =>
