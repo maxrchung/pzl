@@ -1,7 +1,5 @@
 # bug
 
-debug doesn't work in pzl/shared
-
 sort of a bug where something during image loading, the boy image gets stuck in
 a square on one image briefly, dunno why
 

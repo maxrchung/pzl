@@ -32,7 +32,8 @@
       "request": "launch",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}/apps/client/src",
-      "runtimeArgs": ["http://localhost:4200"]
+      "runtimeArgs": ["http://localhost:4200"],
+      "sourceMaps": true
     }
   ],
   "compounds": [
