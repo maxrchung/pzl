@@ -10,7 +10,6 @@
       "name": "Launch server",
       "runtimeExecutable": "nx",
       "runtimeArgs": ["serve", "server"],
-      "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "cwd": "${workspaceFolder}",
       "autoAttachChildProcesses": true
@@ -21,7 +20,6 @@
       "name": "Launch client",
       "runtimeExecutable": "nx",
       "runtimeArgs": ["serve", "client"],
-      "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "cwd": "${workspaceFolder}",
       "autoAttachChildProcesses": true
