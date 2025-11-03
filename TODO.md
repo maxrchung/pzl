@@ -6,8 +6,6 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
-border around pieces
-
 Jigsaw shape
 if shape is too small, just go back to straight edges?
 hover effect?
