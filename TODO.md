@@ -1,16 +1,19 @@
 # bug
 
 sort of a bug where something during image loading, the boy image gets stuck in
-a square on one image briefly, dunno why
+a square on one image briefly, dunno why. this is because of piece order in a
+group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
 border around pieces
+
 Jigsaw shape
 if shape is too small, just go back to straight edges?
 hover effect?
+shadow?
 
-konva cache()
+konva cache()?
 
 focus handling
 

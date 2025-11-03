@@ -64,7 +64,7 @@ export const createGame = (partial?: Partial<Game>) => {
       const stringId = (id++).toString();
 
       const piece: PieceData = {
-        id: 'p' + stringId,
+        id: stringId,
         groupId: stringId,
         index: {
           x: j,
@@ -95,9 +95,10 @@ export const snapGroup = (
 ) => {
   // Maybe a simple safe guard against weird race conditions
   if (!game.data[fromGroupId] || !game.data[toGroupId]) return;
+  const base = game.data[toGroupId].find((data) => data.id === data.groupId);
+  if (!base) return;
 
   const pieceSize = game.pieceSize;
-  const base = game.data[toGroupId][0];
 
   // Move all pieces to other group
   for (const data of game.data[fromGroupId]) {
@@ -110,6 +111,15 @@ export const snapGroup = (
 
     game.data[toGroupId].push(copy);
   }
+
+  // This doesn't work, base would get shuffled and the group would be positioned incorrectly
+
+  // Sort is needed so the group order is always expected and strokes overlap properly
+  game.data[toGroupId].sort((a, b) => {
+    if (a.index.y < b.index.y) return 1;
+    if (a.index.x < b.index.x) return 1;
+    return -1;
+  });
 
   delete game.data[fromGroupId];
 };

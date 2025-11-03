@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { PieceData } from '@pzl/shared';
 import { useStore } from '../store';
+import { ImageConfig } from 'konva/lib/shapes/Image';
 
 interface Props {
   image: HTMLImageElement;
@@ -13,6 +14,7 @@ const { image, data } = defineProps<Props>();
 const imageRef = ref();
 
 const store = useStore();
+const theme = computed(() => store.theme);
 
 const piece = computed(() => {
   const { cropSize, pieceSize } = store.game;
@@ -28,7 +30,15 @@ const piece = computed(() => {
     },
     height: pieceSize.height,
     width: pieceSize.width,
-  };
+    stroke: theme.value === 'dark' ? 'white' : 'black',
+    strokeWidth: 2,
+    strokeScaleEnabled: false,
+    perfectDrawEnabled: false,
+    shadowForStrokeEnabled: false,
+    shadowEnabled: false,
+    dashEnabled: false,
+    hitStrokeWidth: 0,
+  } as ImageConfig;
 });
 
 defineExpose({ imageRef });

@@ -20,6 +20,8 @@ export const DEFAULT_IMAGE_SIZE = {
   width: 240,
 };
 
+export const STROKE_WIDTH = 2;
+
 /** Length of the default stage that server maintains */
 export const STAGE_LENGTH = 1000;
 
