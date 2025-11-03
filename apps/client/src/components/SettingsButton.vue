@@ -140,28 +140,11 @@ onBeforeUnmount(() =>
     <!-- I had an iteration where modals were inside MenuItem, but this didn't
     really work for some reason because MenuItem would get unrendered and cause
     modals to also close -->
-    <QrCodeModal
-      :isOpen="modal === 'qrcode'"
-      @close="closeModal"
-      :key="modalKey"
-    />
-
-    <ResetModal
-      :isOpen="modal === 'reset'"
-      @close="closeModal"
-      :key="modalKey"
-    />
-
-    <PiecesModal
-      :isOpen="modal === 'pieces'"
-      @close="closeModal"
-      :key="modalKey"
-    />
-
-    <ImageModal
-      :isOpen="modal === 'image'"
-      @close="closeModal"
-      :key="modalKey"
-    />
+    <div :key="modalKey">
+      <QrCodeModal :isOpen="modal === 'qrcode'" @close="closeModal" />
+      <ResetModal :isOpen="modal === 'reset'" @close="closeModal" />
+      <PiecesModal :isOpen="modal === 'pieces'" @close="closeModal" />
+      <ImageModal :isOpen="modal === 'image'" @close="closeModal" />
+    </div>
   </div>
 </template>
