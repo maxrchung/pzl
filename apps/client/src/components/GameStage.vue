@@ -169,7 +169,7 @@ const store = useStore();
 const isConnected = computed(() => store.isConnected);
 const imageUrl = computed(() => store.game.imageUrl);
 const [image] = useImage(imageUrl);
-const data = computed(() => store.game.data);
+const pieceConfigs = computed(() => store.game.pieceConfigs);
 
 watch(
   () => store.game,
@@ -188,11 +188,10 @@ let lastThrottle = 0;
 const groupDragMove = (groupId: string, force: boolean = false) => {
   const now = Date.now();
   if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) return;
+  lastThrottle = now + THROTTLE_DELAY_IN_MS;
 
   const group = groupRefs[groupId];
   if (!group) return;
-
-  lastThrottle = now + THROTTLE_DELAY_IN_MS;
 
   store.moveGroup(groupId, group.position());
 };
@@ -205,10 +204,10 @@ const groupDragEnd = (groupId: string) => {
   // example, two players take the same piece and one person snaps it. The
   // second person will be out of sync and potentially end up in a stuck piece
   // situation as iterating over undefined throws an exception.
-  const group = data.value[groupId];
-  if (!group) return;
+  const pieces = pieceConfigs.value[groupId];
+  if (!pieces) return;
 
-  for (const piece of group) {
+  for (const piece of pieces) {
     if (!piece) continue;
 
     const curr = pieceRefs[piece.id];
@@ -218,10 +217,10 @@ const groupDragEnd = (groupId: string) => {
     const currX = piece.index.x;
     const currY = piece.index.y;
 
-    for (const otherGroupId in data.value) {
+    for (const otherGroupId in pieceConfigs.value) {
       if (otherGroupId === groupId) continue;
 
-      for (const piece of data.value[otherGroupId]) {
+      for (const piece of pieceConfigs.value[otherGroupId]) {
         const otherX = piece.index.x;
         const otherY = piece.index.y;
         const diffX = Math.abs(currX - otherX);
@@ -258,7 +257,7 @@ const groupDragEnd = (groupId: string) => {
     >
       <v-layer ref="layer">
         <GameGroup
-          v-for="(datas, groupId) in data"
+          v-for="(pieces, groupId) in pieceConfigs"
           :key="groupId"
           :groupId="groupId"
           @dragmove="() => groupDragMove(groupId)"
@@ -269,11 +268,11 @@ const groupDragEnd = (groupId: string) => {
           "
         >
           <GamePiece
-            v-for="data in datas"
-            :key="data.id"
+            v-for="piece in pieces"
+            :key="piece.id"
             :image="image"
-            :data="data"
-            :ref="(el: any) => (pieceRefs[data.id] = el?.imageRef?.getNode())"
+            :pieceConfig="piece"
+            :ref="(el: any) => (pieceRefs[piece.id] = el?.imageRef?.getNode())"
           />
         </GameGroup>
       </v-layer>

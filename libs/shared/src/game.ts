@@ -6,7 +6,7 @@ import {
   STAGE_LENGTH,
   STROKE_WIDTH,
 } from './constants';
-import { ConfigMap, DataMap, Game, PieceData } from './types';
+import { Game, PieceConfig } from './types';
 import { Vector2d } from 'konva/lib/types';
 
 // For client so nothing displays
@@ -22,14 +22,14 @@ export const createGame = (partial?: Partial<Game>) => {
     sides: DEFAULT_SIDES,
     cropSize: { height: 1, width: 1 },
     pieceSize: { height: 1, width: 1 },
-    data: {} as DataMap,
-    configs: {} as ConfigMap,
+    pieceConfigs: {},
+    groupConfigs: {},
     ...partial,
   };
 
   const {
-    data,
-    configs,
+    pieceConfigs,
+    groupConfigs,
     sides: { columns, rows },
     imageSize: { width, height },
     cropSize,
@@ -64,7 +64,7 @@ export const createGame = (partial?: Partial<Game>) => {
     for (let j = 0; j < columns; ++j) {
       const stringId = (id++).toString();
 
-      const piece: PieceData = {
+      const piece: PieceConfig = {
         id: stringId,
         groupId: stringId,
         index: {
@@ -73,8 +73,8 @@ export const createGame = (partial?: Partial<Game>) => {
         },
       };
 
-      data[stringId] = [piece];
-      configs[stringId] = getPosition();
+      pieceConfigs[stringId] = [piece];
+      groupConfigs[stringId] = getPosition();
     }
   }
 
@@ -83,10 +83,10 @@ export const createGame = (partial?: Partial<Game>) => {
 
 /** Given a config map, updates it in place with a new position. Shared with both client/server.  */
 export const moveGroup = (game: Game, groupId: string, position: Vector2d) => {
-  if (!game.configs[groupId]) return;
+  if (!game.groupConfigs[groupId]) return;
 
-  game.configs[groupId].x = position.x;
-  game.configs[groupId].y = position.y;
+  game.groupConfigs[groupId].x = position.x;
+  game.groupConfigs[groupId].y = position.y;
 };
 
 export const snapGroup = (
@@ -95,23 +95,22 @@ export const snapGroup = (
   toGroupId: string,
 ) => {
   // Maybe a simple safe guard against weird race conditions
-  if (!game.data[fromGroupId] || !game.data[toGroupId]) return;
-  const base = game.data[toGroupId].find((data) => data.id === data.groupId);
-  if (!base) return;
+  if (!game.pieceConfigs[fromGroupId] || !game.pieceConfigs[toGroupId]) return;
 
   const pieceSize = game.pieceSize;
+  const base = game.pieceConfigs[toGroupId][0];
 
   // Move all pieces to other group
-  for (const data of game.data[fromGroupId]) {
+  for (const piece of game.pieceConfigs[fromGroupId]) {
     const copy = {
-      ...data,
+      ...piece,
       groupId: toGroupId,
-      x: (data.index.x - base.index.x) * (pieceSize.width + STROKE_WIDTH / 2),
-      y: (data.index.y - base.index.y) * (pieceSize.height + STROKE_WIDTH / 2),
+      x: (piece.index.x - base.index.x) * (pieceSize.width + STROKE_WIDTH / 2),
+      y: (piece.index.y - base.index.y) * (pieceSize.height + STROKE_WIDTH / 2),
     };
 
-    game.data[toGroupId].push(copy);
+    game.pieceConfigs[toGroupId].push(copy);
   }
 
-  delete game.data[fromGroupId];
+  delete game.pieceConfigs[fromGroupId];
 };

@@ -7,7 +7,7 @@ import { PresignedPost } from '@aws-sdk/s3-presigned-post';
  * ImageConfig. We can't directly use ImageConfig here because it contains
  * browser-only types like HTMLImageElement that can't be used on the server.
  * */
-export interface PieceData {
+export interface PieceConfig {
   id: string;
   groupId: string;
   index: {
@@ -15,10 +15,6 @@ export interface PieceData {
     y: number;
   };
 }
-
-export type DataMap = Record<string, PieceData[]>;
-
-export type ConfigMap = Record<string, GroupConfig>;
 
 export interface Game {
   sides: {
@@ -53,8 +49,8 @@ export interface Game {
     width: number;
   };
 
-  data: DataMap;
-  configs: ConfigMap;
+  pieceConfigs: Record<string, PieceConfig[]>;
+  groupConfigs: Record<string, GroupConfig>;
 }
 
 export type NotificationType = 'info' | 'error';

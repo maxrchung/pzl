@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { PieceData, STROKE_WIDTH } from '@pzl/shared';
+import { PieceConfig, STROKE_WIDTH } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
 
 interface Props {
   image: HTMLImageElement;
-  data: PieceData;
+  pieceConfig: PieceConfig;
 }
 
-const { image, data } = defineProps<Props>();
+const { image, pieceConfig } = defineProps<Props>();
 
 const imageRef = ref();
 
@@ -20,13 +20,13 @@ const piece = computed(() => {
   const { cropSize, pieceSize } = store.game;
 
   return {
-    ...data,
+    ...pieceConfig,
     image,
     crop: {
       height: cropSize.height,
       width: cropSize.width,
-      x: data.index.x * cropSize.width,
-      y: data.index.y * cropSize.height,
+      x: pieceConfig.index.x * cropSize.width,
+      y: pieceConfig.index.y * cropSize.height,
     },
     height: pieceSize.height,
     width: pieceSize.width,

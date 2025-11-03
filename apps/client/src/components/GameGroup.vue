@@ -12,7 +12,7 @@ const groupRef = ref();
 
 const store = useStore();
 const config = computed(() => ({
-  ...store.game.configs[groupId],
+  ...store.game.groupConfigs[groupId],
   draggable: true,
 }));
 

@@ -87,7 +87,7 @@ io.on('connection', (socket) => {
     // lil optimization??? idk
     let groups = 0;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const _key in game.data) {
+    for (const _key in game.pieceConfigs) {
       groups++;
       if (groups > 1) {
         break;
