@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { PieceData } from '@pzl/shared';
+import { PieceData, STROKE_WIDTH } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
 
@@ -31,8 +31,8 @@ const piece = computed(() => {
     height: pieceSize.height,
     width: pieceSize.width,
     stroke: theme.value === 'dark' ? 'white' : 'black',
-    strokeWidth: 2,
-    strokeScaleEnabled: false,
+    strokeWidth: STROKE_WIDTH,
+    strokeScaleEnabled: true,
     perfectDrawEnabled: false,
     shadowForStrokeEnabled: false,
     shadowEnabled: false,

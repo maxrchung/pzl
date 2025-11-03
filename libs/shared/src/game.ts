@@ -4,6 +4,7 @@ import {
   DEFAULT_IMAGE_URL,
   DEFAULT_SIDES,
   STAGE_LENGTH,
+  STROKE_WIDTH,
 } from './constants';
 import { ConfigMap, DataMap, Game, PieceData } from './types';
 import { Vector2d } from 'konva/lib/types';
@@ -105,21 +106,12 @@ export const snapGroup = (
     const copy = {
       ...data,
       groupId: toGroupId,
-      x: (data.index.x - base.index.x) * pieceSize.width,
-      y: (data.index.y - base.index.y) * pieceSize.height,
+      x: (data.index.x - base.index.x) * (pieceSize.width + STROKE_WIDTH / 2),
+      y: (data.index.y - base.index.y) * (pieceSize.height + STROKE_WIDTH / 2),
     };
 
     game.data[toGroupId].push(copy);
   }
-
-  // This doesn't work, base would get shuffled and the group would be positioned incorrectly
-
-  // Sort is needed so the group order is always expected and strokes overlap properly
-  game.data[toGroupId].sort((a, b) => {
-    if (a.index.y < b.index.y) return 1;
-    if (a.index.x < b.index.x) return 1;
-    return -1;
-  });
 
   delete game.data[fromGroupId];
 };
