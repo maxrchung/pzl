@@ -54,6 +54,11 @@ watch(notification, (notification) => {
     visible.value = false;
   }
 });
+
+const handleClick = () => {
+  clearTimeout(timeout);
+  store.removeNotification();
+};
 </script>
 
 <template>
@@ -80,8 +85,9 @@ watch(notification, (notification) => {
         :key="notification.id"
         role="status"
         aria-live="polite"
+        @click="handleClick"
         :class="[
-          'absolute flex max-w-sm justify-between gap-2 border bg-white px-3 py-2 shadow-lg transition dark:bg-black',
+          'absolute flex max-w-sm cursor-pointer justify-between gap-2 border bg-stone-100 px-3 py-2 shadow-lg transition hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800',
           // Does this work and will it matter? ionno
           'pointer-events-auto',
           {
