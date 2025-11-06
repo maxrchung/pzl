@@ -12,4 +12,9 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to) => {
+  const id = to.params.id;
+  document.title = id ? `pzl - ${id}` : 'pzl';
+});
+
 export default router;
