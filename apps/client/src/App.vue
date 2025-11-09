@@ -2,7 +2,7 @@
 import { socket } from './socket';
 import { useStore } from './store';
 import NotificationToast from './components/NotificationToast.vue';
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import NavBar from './components/NavBar.vue';
 
 const store = useStore();
@@ -12,15 +12,15 @@ const isDark = computed(() => store.theme === 'dark');
 socket.off();
 
 store.bindEvents();
+
+// Applying this to body so it'll affect the background color on like resize
+watchEffect(() => {
+  document.body.className = isDark.value ? 'dark' : '';
+});
 </script>
 
 <template>
-  <div
-    :class="[
-      'overscroll-none font-serif transition-colors dark:text-white',
-      { dark: isDark },
-    ]"
-  >
+  <div class="overscroll-none font-serif transition-colors dark:text-white">
     <NotificationToast>
       <RouterView />
 

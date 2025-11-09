@@ -39,3 +39,11 @@ input[type='range']::-moz-range-thumb:hover {
 .dark input[type='range']::-moz-range-thumb:hover {
   @apply bg-stone-800;
 }
+
+body {
+  @apply bg-white transition-colors;
+}
+
+body.dark {
+  @apply bg-black transition-colors;
+}
