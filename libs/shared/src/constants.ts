@@ -20,7 +20,8 @@ export const DEFAULT_IMAGE_SIZE = {
   width: 240,
 };
 
-export const STROKE_WIDTH = 1;
+// TODO: Temp 0 as we refactor piece clip group
+export const STROKE_WIDTH = 0;
 
 /** Length of the default stage that server maintains */
 export const STAGE_LENGTH = 1000;

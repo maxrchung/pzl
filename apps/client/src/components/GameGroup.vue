@@ -8,19 +8,18 @@ interface Props {
 
 const { groupId } = defineProps<Props>();
 
-const groupRef = ref();
-
 const store = useStore();
-const config = computed(() => ({
+const group = computed(() => ({
   ...store.game.groupConfigs[groupId],
   draggable: true,
 }));
 
+const groupRef = ref();
 defineExpose({ groupRef });
 </script>
 
 <template>
-  <v-group ref="groupRef" :key="groupId" :config="config">
+  <v-group ref="groupRef" :config="group">
     <slot />
   </v-group>
 </template>

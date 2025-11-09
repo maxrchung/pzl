@@ -12,9 +12,10 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+router.beforeEach((to, _from, next) => {
   const id = to.params.id;
   document.title = id ? `pzl - ${id}` : 'pzl';
+  next();
 });
 
 export default router;

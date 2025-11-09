@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { PieceConfig, STROKE_WIDTH } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
+import { GroupConfig } from 'konva/lib/Group';
 
 interface Props {
   image: HTMLImageElement;
@@ -11,16 +12,13 @@ interface Props {
 
 const { image, pieceConfig } = defineProps<Props>();
 
-const imageRef = ref();
-
 const store = useStore();
 const theme = computed(() => store.theme);
 
-const piece = computed(() => {
+const piece = computed<ImageConfig>(() => {
   const { cropSize, pieceSize } = store.game;
 
   return {
-    ...pieceConfig,
     image,
     crop: {
       height: cropSize.height,
@@ -38,12 +36,28 @@ const piece = computed(() => {
     shadowEnabled: false,
     dashEnabled: false,
     hitStrokeWidth: 0,
-  } as ImageConfig;
+  };
 });
 
-defineExpose({ imageRef });
+const group = computed<GroupConfig>(() => ({
+  ...pieceConfig,
+  clipFunc: (context) => {
+    const width = store.game.pieceSize.width;
+    const height = store.game.pieceSize.height;
+
+    context.lineTo(width, 0);
+    context.lineTo(width, height);
+    context.lineTo(0, height);
+    context.lineTo(0, 0);
+  },
+}));
+
+const pieceRef = ref();
+defineExpose({ pieceRef });
 </script>
 
 <template>
-  <v-image ref="imageRef" :key="piece.id" :config="piece" />
+  <v-group ref="pieceRef" :config="group">
+    <v-image :config="piece" />
+  </v-group>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useImage } from 'vue-konva';
 import { useStore } from '../store';
 import { Group } from 'konva/lib/Group';
@@ -13,7 +13,7 @@ import {
   THROTTLE_DELAY_IN_MS,
 } from '../constants';
 import { hasSnap } from '../snap';
-import { StageConfig } from 'konva/lib/Stage';
+import { Stage, StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
 import { useWindowSize } from '../useWindowSize';
 import { KonvaEventObject } from 'konva/lib/Node';
@@ -35,23 +35,28 @@ const calculateStagePosition = () => ({
   y: window.innerHeight / 2 - (STAGE_LENGTH / 2) * calculateStageScale(),
 });
 
-const stageScale = ref(calculateStageScale());
-const stagePosition = reactive(calculateStagePosition());
-
 const { windowWidth, windowHeight } = useWindowSize();
-const stageConfig = computed(
-  (): StageConfig => ({
-    width: windowWidth.value,
-    height: windowHeight.value,
-    draggable: true,
-    x: stagePosition.x,
-    y: stagePosition.y,
-    scale: {
-      x: stageScale.value,
-      y: stageScale.value,
-    },
-  }),
-);
+
+const initialStageConfig: StageConfig = {
+  width: windowWidth.value,
+  height: windowHeight.value,
+  draggable: true,
+  x: calculateStagePosition().x,
+  y: calculateStagePosition().y,
+  scale: {
+    x: calculateStageScale(),
+    y: calculateStageScale(),
+  },
+};
+
+// When window size changes, update stage
+watch([windowWidth, windowHeight], ([windowWidth, windowHeight]) => {
+  const stage = stageRef.value;
+  if (!stage) return;
+
+  stage.width(windowWidth);
+  stage.height(windowHeight);
+});
 
 // Ionno but seems to work https://konvajs.org/docs/sandbox/Zooming_Relative_To_Pointer.html
 const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
@@ -66,24 +71,25 @@ const stageWheel = (event: KonvaEventObject<WheelEvent>) => {
   const deltaY = event.evt.deltaY;
   if (deltaY === 0) return;
 
+  const stageScale = stage.scaleX();
   const scale =
-    event.evt.deltaY > 0
-      ? stageScale.value / SCALE_TICK
-      : stageScale.value * SCALE_TICK;
+    event.evt.deltaY > 0 ? stageScale / SCALE_TICK : stageScale * SCALE_TICK;
   if (scale < SCALE_MIN || scale > SCALE_MAX) return;
 
   // Stage position to pointer with old scaled coordinates
   const toPointer = {
-    x: (pointer.x - stage.x()) / stageScale.value,
-    y: (pointer.y - stage.y()) / stageScale.value,
+    x: (pointer.x - stage.x()) / stageScale,
+    y: (pointer.y - stage.y()) / stageScale,
   };
 
   // With the pointer as the center point, determine new position
-  stagePosition.x = pointer.x - toPointer.x * scale;
-  stagePosition.y = pointer.y - toPointer.y * scale;
+  stage.position({
+    x: pointer.x - toPointer.x * scale,
+    y: pointer.y - toPointer.y * scale,
+  });
 
   // Make sure this is at the end so old value doesn't mess things up
-  stageScale.value = scale;
+  stage.scale({ x: scale, y: scale });
 };
 
 // Helper variables for touch detection
@@ -127,21 +133,25 @@ const stageTouchMove = (event: KonvaEventObject<TouchEvent>) => {
   const distance = getDistance(v1, v2);
   if (!lastDistance) lastDistance = distance;
 
+  const stageScale = stage.scaleX();
+
   // Stage position to pointer with old scaled coordinates
   const toCenter = {
-    x: (center.x - stagePosition.x) / stageScale.value,
-    y: (center.y - stagePosition.y) / stageScale.value,
+    x: (center.x - stage.position().x) / stageScale,
+    y: (center.y - stage.position().y) / stageScale,
   };
 
-  const scale = stageScale.value * (distance / lastDistance);
-  stageScale.value = scale;
+  const scale = stageScale * (distance / lastDistance);
+  stage.scale({ x: scale, y: scale });
 
   // calculate new position of the stage
   const dx = center.x - lastCenter.x;
   const dy = center.y - lastCenter.y;
 
-  stagePosition.x = center.x - toCenter.x * scale + dx;
-  stagePosition.y = center.y - toCenter.y * scale + dy;
+  stage.position({
+    x: center.x - toCenter.x * scale + dx,
+    y: center.y - toCenter.y * scale + dy,
+  });
 
   lastDistance = distance;
   lastCenter = center;
@@ -152,18 +162,13 @@ const stageTouchEnd = () => {
   lastCenter = null;
 };
 
-const stageDragEnd = (event: KonvaEventObject<DragEvent>) => {
+const stageDragEnd = () => {
   isDragSuspended = false;
-
-  const stage = event.target.getStage();
-  if (!stage) {
-    return;
-  }
-
-  // Ensure stage position is synchronized
-  stagePosition.x = stage.x();
-  stagePosition.y = stage.y();
 };
+
+const stageRef = ref<Stage | null>(null);
+const groupRefs: Record<string, Group | null> = {};
+const pieceRefs: Record<string, Image | null> = {};
 
 const store = useStore();
 const isConnected = computed(() => store.isConnected);
@@ -171,18 +176,20 @@ const imageUrl = computed(() => store.game.imageUrl);
 const [image] = useImage(imageUrl);
 const pieceConfigs = computed(() => store.game.pieceConfigs);
 
+// When game updates, reset stage
 watch(
   () => store.game,
   () => {
-    stageScale.value = calculateStageScale();
+    const stage = stageRef.value;
+    if (!stage) return;
+
+    const scale = calculateStageScale();
+    stage.scale({ x: scale, y: scale });
+
     const position = calculateStagePosition();
-    stagePosition.x = position.x;
-    stagePosition.y = position.y;
+    stage.position(position);
   },
 );
-
-const groupRefs: Record<string, Group | null> = {};
-const pieceRefs: Record<string, Image | null> = {};
 
 let lastThrottle = 0;
 const groupDragMove = (groupId: string, force: boolean = false) => {
@@ -246,16 +253,22 @@ const groupDragEnd = (groupId: string) => {
 </script>
 
 <template>
-  <main class="transition-colors dark:bg-black">
+  <main>
     <v-stage
-      :config="stageConfig"
+      :config="initialStageConfig"
       v-if="image && isConnected"
       @wheel="stageWheel"
       @touchmove="stageTouchMove"
       @touchend="stageTouchEnd"
       @dragend="stageDragEnd"
+      :ref="
+        // Not sure but this should get the node back for us?
+        (el: any) => {
+          stageRef = el?.getNode();
+        }
+      "
     >
-      <v-layer ref="layer">
+      <v-layer>
         <GameGroup
           v-for="(pieces, groupId) in pieceConfigs"
           :key="groupId"
@@ -264,7 +277,9 @@ const groupDragEnd = (groupId: string) => {
           @dragend="() => groupDragEnd(groupId)"
           :ref="
             // Not sure but this should get the node back for us?
-            (el: any) => (groupRefs[groupId] = el?.groupRef?.getNode())
+            (el: any) => {
+              groupRefs[groupId] = el?.groupRef?.getNode();
+            }
           "
         >
           <GamePiece
@@ -272,7 +287,11 @@ const groupDragEnd = (groupId: string) => {
             :key="piece.id"
             :image="image"
             :pieceConfig="piece"
-            :ref="(el: any) => (pieceRefs[piece.id] = el?.imageRef?.getNode())"
+            :ref="
+              (el: any) => {
+                pieceRefs[piece.id] = el?.pieceRef?.getNode();
+              }
+            "
           />
         </GameGroup>
       </v-layer>
