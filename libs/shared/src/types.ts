@@ -14,6 +14,12 @@ export interface PieceConfig {
     x: number;
     y: number;
   };
+  edges: {
+    top: Edge;
+    right: Edge;
+    bottom: Edge;
+    left: Edge;
+  };
 }
 
 export interface Game {
@@ -48,6 +54,12 @@ export interface Game {
     height: number;
     width: number;
   };
+
+  /** How large a tab should be */
+  tabLength: number;
+
+  /** What edge style to use */
+  edge: Edge;
 
   pieceConfigs: Record<string, PieceConfig[]>;
   groupConfigs: Record<string, GroupConfig>;
@@ -87,4 +99,10 @@ export interface ClientToServerEvents {
 
 export interface SocketData {
   lobbyId?: string;
+}
+
+export enum Edge {
+  SquareBlank = -1,
+  None = 0,
+  SquareTab = 1,
 }

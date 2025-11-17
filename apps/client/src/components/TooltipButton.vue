@@ -49,7 +49,7 @@ defineExpose({ containerRef });
     <div
       aria-hidden="true"
       :class="[
-        'pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-lg transition dark:bg-black',
+        'pointer-events-none absolute top-full right-2.5 mt-4 border-1 bg-white px-3 py-2 whitespace-nowrap opacity-0 shadow-md transition dark:bg-black',
         Z_INDEX.TOOLTIP,
         // Focus visible ensures tooltip only appears on keyboard navigation and not on mobile press
         {

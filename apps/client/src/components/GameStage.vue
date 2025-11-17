@@ -207,6 +207,13 @@ const groupDragEnd = (groupId: string) => {
   // Ensure end position is updated
   groupDragMove(groupId, true);
 
+  const stage = stageRef.value;
+  if (!stage) return;
+
+  // Since we're comparing snap in actual rect sizes, we need to normalize tab
+  // length so that it takes stage scale into account
+  const tabLength = store.game.tabLength * stage.scaleX();
+
   // It's possible in weird data update situations for this to happen. For
   // example, two players take the same piece and one person snaps it. The
   // second person will be out of sync and potentially end up in a stuck piece
@@ -242,7 +249,9 @@ const groupDragEnd = (groupId: string) => {
 
         const otherRect = other.getClientRect();
 
-        if (hasSnap(currRect, currX, currY, otherRect, otherX, otherY)) {
+        if (
+          hasSnap(currRect, currX, currY, otherRect, otherX, otherY, tabLength)
+        ) {
           store.snapGroup(groupId, otherGroupId);
           return;
         }

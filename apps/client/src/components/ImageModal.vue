@@ -44,7 +44,7 @@ const handleChange = async (event: Event) => {
 
     console.error(error);
     store.addNotification({
-      message: "Image couldn't load. It may not be a valid image file.",
+      message: "File couldn't load. It may not be a valid image file.",
       icon: 'ExclamationTriangleIcon',
       type: 'error',
     });

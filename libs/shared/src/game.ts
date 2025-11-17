@@ -6,12 +6,8 @@ import {
   STAGE_LENGTH,
   STROKE_WIDTH,
 } from './constants';
-import { Game, PieceConfig } from './types';
+import { Edge, Game, PieceConfig } from './types';
 import { Vector2d } from 'konva/lib/types';
-
-// For client so nothing displays
-export const createEmptyGame = () =>
-  createGame({ sides: { columns: 0, rows: 0 } });
 
 export const createGame = (partial?: Partial<Game>) => {
   const game: Game = {
@@ -24,6 +20,8 @@ export const createGame = (partial?: Partial<Game>) => {
     pieceSize: { height: 1, width: 1 },
     pieceConfigs: {},
     groupConfigs: {},
+    edge: Edge.None,
+    tabLength: 0,
     ...partial,
   };
 
@@ -34,8 +32,10 @@ export const createGame = (partial?: Partial<Game>) => {
     imageSize: { width, height },
     cropSize,
     pieceSize,
+    edge,
   } = game;
 
+  // Little hack for empty game
   if (columns === 0 || rows === 0) {
     return game;
   }
@@ -51,6 +51,8 @@ export const createGame = (partial?: Partial<Game>) => {
   pieceSize.width = isWidthLarger ? pieceWidth : pieceWidth * ratio;
   pieceSize.height = isWidthLarger ? pieceHeight / ratio : pieceHeight;
 
+  game.tabLength = Math.min(pieceSize.width, pieceSize.height) / 5;
+
   const getPosition = () => {
     const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
     const y = Math.random() * (STAGE_LENGTH - pieceSize.height);
@@ -58,8 +60,18 @@ export const createGame = (partial?: Partial<Game>) => {
     return { x, y };
   };
 
-  let id = 0;
+  const getEdges = (i: number, j: number): PieceConfig['edges'] => {
+    const edges = {
+      top: i === 0 ? 0 : pieceConfigs[i - 1][0].edges.bottom * -1,
+      right: j === columns - 1 ? 0 : Math.random() > 0.5 ? edge : -edge,
+      bottom: i === rows - 1 ? 0 : Math.random() > 0.5 ? edge : -edge,
+      left: j === 0 ? 0 : pieceConfigs[j - 1][0].edges.right * -1,
+    };
 
+    return edges;
+  };
+
+  let id = 0;
   for (let i = 0; i < rows; ++i) {
     for (let j = 0; j < columns; ++j) {
       const stringId = (id++).toString();
@@ -71,6 +83,7 @@ export const createGame = (partial?: Partial<Game>) => {
           x: j,
           y: i,
         },
+        edges: getEdges(i, j),
       };
 
       pieceConfigs[stringId] = [piece];
@@ -80,6 +93,10 @@ export const createGame = (partial?: Partial<Game>) => {
 
   return game;
 };
+
+// For client so nothing displays
+export const createEmptyGame = () =>
+  createGame({ sides: { columns: 0, rows: 0 } });
 
 /** Given a config map, updates it in place with a new position. Shared with both client/server.  */
 export const moveGroup = (game: Game, groupId: string, position: Vector2d) => {

@@ -13,29 +13,29 @@ const snap = (a: Vector2d, b: Vector2d) => {
   return hasSnap;
 };
 
-const snapLeftRight = (a: IRect, b: IRect) => {
+const snapLeftRight = (a: IRect, b: IRect, tabLength: number) => {
   const left: Vector2d = {
-    x: a.x + a.width,
+    x: a.x + a.width - tabLength,
     y: a.y + a.height / 2,
   };
 
   const right: Vector2d = {
-    x: b.x,
+    x: b.x + tabLength,
     y: b.y + a.height / 2,
   };
 
   return snap(left, right);
 };
 
-const snapTopBottom = (a: IRect, b: IRect) => {
+const snapTopBottom = (a: IRect, b: IRect, tabLength: number) => {
   const top: Vector2d = {
     x: a.x + a.width / 2,
-    y: a.y + a.height,
+    y: a.y + a.height - tabLength,
   };
 
   const bottom: Vector2d = {
     x: b.x + b.width / 2,
-    y: b.y,
+    y: b.y + tabLength,
   };
 
   return snap(top, bottom);
@@ -48,15 +48,16 @@ export const hasSnap = (
   b: IRect,
   bX: number,
   bY: number,
+  tabLength: number,
 ) => {
   if (aX < bX) {
-    return snapLeftRight(a, b);
+    return snapLeftRight(a, b, tabLength);
   } else if (aX > bX) {
-    return snapLeftRight(b, a);
+    return snapLeftRight(b, a, tabLength);
   } else if (aY < bY) {
-    return snapTopBottom(a, b);
+    return snapTopBottom(a, b, tabLength);
   } else if (aY > bY) {
-    return snapTopBottom(b, a);
+    return snapTopBottom(b, a, tabLength);
   }
 
   return false;
