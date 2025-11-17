@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { socket } from './socket';
 import {
   createEmptyGame,
+  Edge,
   moveGroup,
   Notification,
   snapGroup,
@@ -81,8 +82,8 @@ export const useStore = defineStore('store', {
       socket.emit('resetGame');
     },
 
-    updateSides(columns: number, rows: number) {
-      socket.emit('updateSides', columns, rows);
+    updatePieces(columns: number, rows: number, edge: Edge) {
+      socket.emit('updatePieces', columns, rows, edge);
     },
 
     // Updating image is a bit special because we're using presign. Presign lets

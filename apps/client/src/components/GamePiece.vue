@@ -44,15 +44,15 @@ const piece = computed<ImageConfig>(() => {
 
 const group = computed<GroupConfig>(() => {
   const {
-    edge,
     pieceSize: { width, height },
     tabLength,
   } = store.game;
+  const { edges } = pieceConfig;
 
   return {
     ...pieceConfig,
     clipFunc: (context) => {
-      const drawTop = (length: number) => {
+      const drawTop = (length: number, edge: Edge) => {
         switch (edge) {
           case Edge.SquareTab:
             context.lineTo(length / 2 - tabLength / 2, 0);
@@ -80,22 +80,22 @@ const group = computed<GroupConfig>(() => {
       context.translate(tabLength, tabLength);
 
       // Top
-      drawTop(width);
+      drawTop(width, edges.top);
 
       // Right
       context.translate(width, 0);
       context.rotate(Math.PI / 2);
-      drawTop(height);
+      drawTop(height, edges.right);
 
       // Bottom
       context.translate(height, 0);
       context.rotate(Math.PI / 2);
-      drawTop(width);
+      drawTop(width, edges.bottom);
 
       // Left
       context.translate(width, 0);
       context.rotate(Math.PI / 2);
-      drawTop(height);
+      drawTop(height, edges.left);
 
       // Reset back to top left corner
       context.restore();

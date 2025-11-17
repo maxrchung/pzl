@@ -5,6 +5,7 @@ import {
   type ServerToClientEvents,
   createGame,
   DEFAULT_IMAGE_KEY,
+  Edge,
   moveGroup,
   SERVER_CORS,
   SERVER_PORT,
@@ -142,18 +143,22 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on('updateSides', async (columns, rows) => {
+  socket.on('updatePieces', async (columns, rows, edge) => {
     const lobbyId = socket.data.lobbyId;
     if (!lobbyId) return;
     const lobby = lobbies.get(lobbyId);
     if (!lobby) return;
 
     lobby.partial.sides = { columns, rows };
+    lobby.partial.edge = edge;
     resetGame(lobby);
+
+    const design =
+      edge === Edge.None ? 'straight' : Edge.SquareTab ? 'square' : '';
 
     io.to(lobbyId).emit('refreshGame', lobby.game);
     io.to(lobbyId).emit('addNotification', {
-      message: `Pieces changed to ${columns}x${rows}`,
+      message: `Pieces changed to ${columns}x${rows} ${design}`,
       icon: 'ArrowsPointingOutIcon',
     });
   });

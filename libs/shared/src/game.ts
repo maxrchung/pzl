@@ -36,9 +36,7 @@ export const createGame = (partial?: Partial<Game>) => {
   } = game;
 
   // Little hack for empty game
-  if (columns === 0 || rows === 0) {
-    return game;
-  }
+  if (columns === 0 || rows === 0) return game;
 
   cropSize.height = height / rows;
   cropSize.width = width / columns;
@@ -62,10 +60,12 @@ export const createGame = (partial?: Partial<Game>) => {
 
   const getEdges = (i: number, j: number): PieceConfig['edges'] => {
     const edges = {
-      top: i === 0 ? 0 : pieceConfigs[i - 1][0].edges.bottom * -1,
-      right: j === columns - 1 ? 0 : Math.random() > 0.5 ? edge : -edge,
-      bottom: i === rows - 1 ? 0 : Math.random() > 0.5 ? edge : -edge,
-      left: j === 0 ? 0 : pieceConfigs[j - 1][0].edges.right * -1,
+      top:
+        // Note: Accounting for column/row indexing
+        i === 0 ? 0 : pieceConfigs[(i - 1) * columns + j][0].edges.bottom * -1,
+      right: j === columns - 1 ? 0 : Math.random() > 0.5 ? +edge : -edge,
+      bottom: i === rows - 1 ? 0 : Math.random() > 0.5 ? +edge : -edge,
+      left: j === 0 ? 0 : pieceConfigs[i * columns + j - 1][0].edges.right * -1,
     };
 
     return edges;

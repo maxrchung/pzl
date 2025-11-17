@@ -85,7 +85,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   resetGame: () => void;
   updateImage: (key: string, height: number, width: number) => void;
-  updateSides: (columns: number, rows: number) => void;
+  updatePieces: (columns: number, rows: number, edge: Edge) => void;
   moveGroup: (groupId: string, position: Vector2d) => void;
   snapGroup: (fromGroupId: string, toGroupId: string) => void;
   presign: (
