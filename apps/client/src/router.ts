@@ -14,7 +14,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const id = to.params.id;
-  document.title = id ? `pzl - ${id}` : 'pzl';
+  document.title = id ? `pzl 🧩 ${id}` : 'pzl';
   next();
 });
 
