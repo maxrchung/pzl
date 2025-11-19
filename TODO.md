@@ -6,16 +6,21 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
+addback stroke
+
 Jigsaw shape
 if shape is too small, just go back to straight edges?
+
+something on main page, maybe puzzle in background
+
+focus handling
+
+weird dragging behavior
+
 hover effect?
 shadow?
 
 konva cache()?
-
-focus handling
-
-something on main page, maybe puzzle in background
 
 ## Infra
 
