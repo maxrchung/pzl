@@ -4,7 +4,6 @@ import {
   DEFAULT_IMAGE_URL,
   DEFAULT_SIDES,
   STAGE_LENGTH,
-  STROKE_WIDTH,
 } from './constants';
 import { Edge, Game, PieceConfig } from './types';
 import { Vector2d } from 'konva/lib/types';
@@ -122,8 +121,8 @@ export const snapGroup = (
     const copy = {
       ...piece,
       groupId: toGroupId,
-      x: (piece.index.x - base.index.x) * (pieceSize.width + STROKE_WIDTH / 2),
-      y: (piece.index.y - base.index.y) * (pieceSize.height + STROKE_WIDTH / 2),
+      x: (piece.index.x - base.index.x) * pieceSize.width,
+      y: (piece.index.y - base.index.y) * pieceSize.height,
     };
 
     game.pieceConfigs[toGroupId].push(copy);

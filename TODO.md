@@ -6,7 +6,7 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
-addback stroke
+warning for too small shape
 
 Jigsaw shape
 if shape is too small, just go back to straight edges?

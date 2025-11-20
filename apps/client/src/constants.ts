@@ -21,3 +21,5 @@ export const Z_INDEX = {
   MODAL: 'z-40',
   NOTIFICATION: 'z-50',
 };
+
+export const STROKE_WIDTH = 1;
