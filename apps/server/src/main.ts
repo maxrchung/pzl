@@ -154,11 +154,11 @@ io.on('connection', (socket) => {
     resetGame(lobby);
 
     const design =
-      edge === Edge.None ? 'straight' : Edge.SquareTab ? 'square' : '';
+      edge === Edge.None ? 'Straight' : Edge.SquareTab ? 'Square' : '';
 
     io.to(lobbyId).emit('refreshGame', lobby.game);
     io.to(lobbyId).emit('addNotification', {
-      message: `Pieces changed to ${columns}x${rows} ${design}`,
+      message: `Pieces changed to ${design} ${columns}x${rows}`,
       icon: 'ArrowsPointingOutIcon',
     });
   });
