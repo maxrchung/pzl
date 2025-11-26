@@ -12,24 +12,23 @@ import {
   SunIcon,
   UserIcon,
   LinkIcon,
+  ClockIcon,
 } from '@heroicons/vue/24/solid';
-import PzlIcon from './PzlIcon.vue';
 import { Z_INDEX } from '../constants';
 
 // lol
-const ICONS: { [componentName: string]: FunctionalComponent | typeof PzlIcon } =
-  {
-    ArrowPathIcon,
-    ArrowsPointingOutIcon,
-    ExclamationTriangleIcon,
-    MoonIcon,
-    PhotoIcon,
-    PzlIcon,
-    SunIcon,
-    PlusIcon,
-    UserIcon,
-    LinkIcon,
-  };
+const ICONS: { [componentName: string]: FunctionalComponent } = {
+  ArrowPathIcon,
+  ArrowsPointingOutIcon,
+  ExclamationTriangleIcon,
+  MoonIcon,
+  PhotoIcon,
+  ClockIcon,
+  SunIcon,
+  PlusIcon,
+  UserIcon,
+  LinkIcon,
+};
 const FADE_DURATION_IN_MS = 150;
 const ACTIVE_DURATION_IN_MS = 2000;
 

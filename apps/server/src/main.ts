@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
 
       io.to(lobbyId).emit('addNotification', {
         message: `Puzzle solved in ${time}`,
-        icon: 'PzlIcon',
+        icon: 'ClockIcon',
         isPermanent: true,
       });
     }

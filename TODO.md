@@ -15,7 +15,7 @@ something on main page, maybe puzzle in background
 
 focus handling
 
-weird dragging behavior
+weird dragging behavior while scaling
 
 hover effect?
 shadow?
