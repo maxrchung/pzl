@@ -31,7 +31,7 @@ const handleSuccess = () => {
     v-bind="$attrs"
   >
     <p>
-      Are you sure you want to reset the puzzle? You'll lose your current
+      Are you sure you want to reset the puzzle? You'll lose all your current
       progress.
     </p>
   </ModalDialog>
