@@ -153,8 +153,9 @@ io.on('connection', (socket) => {
     lobby.partial.edge = edge;
     resetGame(lobby);
 
-    const design =
-      edge === Edge.None ? 'Straight' : Edge.SquareTab ? 'Square' : '';
+    let design = 'Straight';
+    if (edge === Edge.SquareTab) design = 'Square';
+    else if (edge === Edge.JigsawTab) design = 'Jigsaw';
 
     io.to(lobbyId).emit('refreshGame', lobby.game);
     io.to(lobbyId).emit('addNotification', {

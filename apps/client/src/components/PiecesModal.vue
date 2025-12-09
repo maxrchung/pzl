@@ -90,8 +90,9 @@ const handleSuccess = () => {
               :value="edgeValue"
               class="cursor-pointer appearance-none border bg-stone-100 py-1.25 pr-7 pl-3 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
             >
-              <option :value="Edge.None">Straight</option>
+              <option :value="Edge.JigsawTab">Jigsaw</option>
               <option :value="Edge.SquareTab">Square</option>
+              <option :value="Edge.None">Straight</option>
             </select>
 
             <ChevronDownIcon

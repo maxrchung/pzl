@@ -6,6 +6,8 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
+performance, make 33x33 work at least
+
 something on main page, maybe puzzle in background
 
 focus handling
