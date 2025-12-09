@@ -102,7 +102,9 @@ export interface SocketData {
 }
 
 export enum Edge {
-  SquareBlank = -1,
-  None = 0,
+  JigsawTab = 2,
   SquareTab = 1,
+  None = 0,
+  SquareBlank = -1,
+  JigsawBlank = -2,
 }

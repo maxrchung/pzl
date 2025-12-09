@@ -19,7 +19,7 @@ export const createGame = (partial?: Partial<Game>) => {
     pieceSize: { height: 1, width: 1 },
     pieceConfigs: {},
     groupConfigs: {},
-    edge: Edge.None,
+    edge: Edge.JigsawTab,
     tabLength: 0,
     ...partial,
   };
