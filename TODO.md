@@ -6,11 +6,6 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
-warning for too small shape
-
-Jigsaw shape
-if shape is too small, just go back to straight edges?
-
 something on main page, maybe puzzle in background
 
 focus handling
@@ -34,6 +29,10 @@ maybe figure out Railway bucket, presign may be supported for public, but have t
 btw don't delete s3 on server startup if we have horizontal scaled servers
 
 ## hmm
+
+maybe round jigsaw shape edge
+warning for too small shape
+if shape is too small, just go back to straight edges?
 
 space bar move?
 

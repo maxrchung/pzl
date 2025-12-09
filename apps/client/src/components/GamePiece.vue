@@ -64,27 +64,16 @@ const piece = computed<ImageConfig>(() => {
   };
 });
 
-/** Coordinates are based on heroicon puzzle icon that is 24x24 and needs to be scaled accordingly */
-const bezier = (
-  context: Context,
-  tabLength: number,
-  cp1x: number,
-  cp1y: number,
-  cp2x: number,
-  cp2y: number,
-  x: number,
-  y: number,
-) => {
-  const magic = (1 / 24) * tabLength * 1.5;
-  context.bezierCurveTo(
-    cp1x * magic,
-    cp1y * magic,
-    cp2x * magic,
-    cp2y * magic,
-    x * magic,
-    y * magic,
-  );
-};
+const JIGSAW_BEZIERS = [
+  [0.332, 0.02, 0.61, -0.246, 0.61, -0.578],
+  [0, -0.355, -0.186, -0.676, -0.401, -0.959],
+  [-0.221, -0.29, -0.349, -0.634, -0.349, -1.003],
+  [0, -1.036, 1.007, -1.875, 2.25, -1.875],
+  [1.243, 0, 2.25, 0.84, 2.25, 1.875],
+  [0, 0.369, -0.128, 0.713, -0.349, 1.003],
+  [-0.215, 0.283, -0.401, 0.604, -0.401, 0.959],
+  [0, 0.332, 0.278, 0.598, 0.61, 0.578],
+];
 
 const drawPath = (
   context: Context,
@@ -109,28 +98,19 @@ const drawPath = (
         context.lineTo(length / 2 + tabLength / 2, 0);
         context.lineTo(length, 0);
         break;
-      case Edge.JigsawTab:
-        let cx = length / 2 - tabLength / 2 + (0.75 * tabLength) / 4.5;
-        let cy = 0;
+      case Edge.JigsawTab: {
+        const magic = tabLength / 4.5;
+        let cx = length / 2 - 2.11 * magic;
+        let cy = 0.578 * magic;
         context.lineTo(cx, cy);
-
         context.save();
+
         context.translate(cx, cy);
         cx = 0;
         cy = 0;
+        context.scale(magic, magic);
 
-        context.scale(tabLength / 4.5, tabLength / 4.5);
-
-        const beziers = [
-          [0, -0.355, -0.186, -0.676, -0.401, -0.959],
-          [-0.208, -0.295, -0.354, -0.68, -0.349, -1.003],
-          [0, -1.036, 1.007, -1.875, 2.25, -1.875],
-          [1.243, 0, 2.25, 0.84, 2.25, 1.875],
-          [0, 0.369, -0.128, 0.713, -0.349, 1.003],
-          [-0.215, 0.283, -0.401, 0.604, -0.401, 0.959],
-        ];
-
-        for (const [cp1x, cp1y, cp2x, cp2y, x, y] of beziers) {
+        for (const [cp1x, cp1y, cp2x, cp2y, x, y] of JIGSAW_BEZIERS) {
           const nx = cx + x;
           const ny = cy + y;
 
@@ -151,6 +131,41 @@ const drawPath = (
 
         context.lineTo(length, 0);
         break;
+      }
+      case Edge.JigsawBlank: {
+        const magic = tabLength / 4.5;
+        let cx = length / 2 - 2.11 * magic;
+        let cy = -0.578 * magic;
+        context.lineTo(cx, cy);
+        context.save();
+
+        context.translate(cx, cy);
+        cx = 0;
+        cy = 0;
+        context.scale(magic, magic);
+
+        for (const [cp1x, cp1y, cp2x, cp2y, x, y] of JIGSAW_BEZIERS) {
+          const nx = cx + x;
+          const ny = cy - y;
+
+          context.bezierCurveTo(
+            cx + cp1x,
+            cy - cp1y,
+            cx + cp2x,
+            cy - cp2y,
+            nx,
+            ny,
+          );
+
+          cx = nx;
+          cy = ny;
+        }
+
+        context.restore();
+
+        context.lineTo(length, 0);
+        break;
+      }
       case Edge.None:
       default:
         context.lineTo(length, 0);

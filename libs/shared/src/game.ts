@@ -48,7 +48,7 @@ export const createGame = (partial?: Partial<Game>) => {
   pieceSize.width = isWidthLarger ? pieceWidth : pieceWidth * ratio;
   pieceSize.height = isWidthLarger ? pieceHeight / ratio : pieceHeight;
 
-  game.tabLength = Math.min(pieceSize.width, pieceSize.height) / 5;
+  game.tabLength = Math.min(pieceSize.width, pieceSize.height) / 4;
 
   const getPosition = () => {
     const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
