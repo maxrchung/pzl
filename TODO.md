@@ -6,31 +6,29 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
-performance, make 33x33 work at least
+performance, make 33x33 work at least?
+konva cache()?
 
 something on main page, maybe puzzle in background
 
-focus handling
-
 weird dragging behavior while scaling
-
-hover effect?
-shadow?
-
-konva cache()?
 
 ## Infra
 
 Move frontend to Railway static Railpack SPA
 
+maybe figure out Railway bucket, presign may be supported for public, but have to figure out public presign/get way or setup
+
 Railway redis cache - for multiple servers but also saves pending games when
 server updates
-
-maybe figure out Railway bucket, presign may be supported for public, but have to figure out public presign/get way or setup
 
 btw don't delete s3 on server startup if we have horizontal scaled servers
 
 ## hmm
+
+focus handling?
+hover effect?
+shadow?
 
 maybe round jigsaw shape edge
 warning for too small shape

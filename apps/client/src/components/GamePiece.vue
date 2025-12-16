@@ -218,7 +218,10 @@ const group = computed<GroupConfig>(() => {
 const border = computed<ShapeConfig>(() => {
   return {
     ...pieceConfig, // I think the `id` is needed
-    stroke: theme.value === 'dark' ? 'white' : 'black',
+    stroke:
+      theme.value === 'dark'
+        ? 'rgba(255, 255, 255, 0.5)'
+        : 'rgba(0, 0, 0, 0.5)',
     strokeWidth: STROKE_WIDTH,
     strokeScaleEnabled: false,
     perfectDrawEnabled: false,
