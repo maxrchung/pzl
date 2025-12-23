@@ -34,8 +34,8 @@ const handleChange = (reference: Ref<number>) => (event: Event) => {
     return;
   }
 
-  if (num > 50) {
-    reference.value = 50;
+  if (num > 33) {
+    reference.value = 33;
     return;
   }
 
@@ -111,7 +111,7 @@ const handleSuccess = () => {
             id="columns-number"
             name="columns-number"
             min="1"
-            max="50"
+            max="33"
             class="bg-stone border bg-stone-100 px-3 py-1 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
             @change="handleColumnChange"
             :value="columnValue"
@@ -121,7 +121,7 @@ const handleSuccess = () => {
         <RangeInput
           name="columns-range"
           min="1"
-          max="50"
+          max="33"
           step="1"
           inputmode="numeric"
           class="h-1 w-80 cursor-pointer appearance-none border-none bg-black dark:bg-white"
@@ -139,7 +139,7 @@ const handleSuccess = () => {
             id="rows-number"
             name="rows-number"
             min="1"
-            max="50"
+            max="33"
             step="1"
             class="bg-stone border bg-stone-100 px-3 py-1 hover:bg-stone-200 dark:bg-stone-900 dark:hover:bg-stone-800"
             @change="handleRowChange"
@@ -150,7 +150,7 @@ const handleSuccess = () => {
         <RangeInput
           name="rows-range"
           min="1"
-          max="50"
+          max="33"
           :class="[
             'h-1 w-80 cursor-pointer appearance-none border-none bg-black dark:bg-white',
           ]"

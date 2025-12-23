@@ -6,12 +6,10 @@ group and stroke gets applied outside so there are overlaps
 
 # TODO stuff
 
-performance, make 33x33 work at least?
-konva cache()?
+weird dragging behavior while scaling
+seems like pinching is too sensitive?
 
 something on main page, maybe puzzle in background
-
-weird dragging behavior while scaling
 
 ## Infra
 
@@ -41,8 +39,6 @@ dedicated view image
 Drag and drop image selector UI?
 
 multi group snapping?
-
-performance - some things like zoom don't work well in 50x50?
 
 Better error handling?
 

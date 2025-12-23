@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { Edge, PieceConfig } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
@@ -229,6 +229,7 @@ const border = computed<ShapeConfig>(() => {
     shadowEnabled: false,
     dashEnabled: false,
     hitStrokeWidth: 0,
+    listening: false, // We don't need listener for border
     sceneFunc: (context, shape) => {
       const {
         pieceSize: { width, height },
@@ -245,6 +246,21 @@ const border = computed<ShapeConfig>(() => {
     },
   };
 });
+
+// Whenever config changes, recache
+watch(
+  () => group,
+  async () => {
+    // Need to wait for next tick so that draw functions are updated as expected
+    await nextTick();
+    pieceRef.value?.getNode()?.cache({
+      pixelRatio: window.devicePixelRatio + 3, // Cache at higher resolution
+    });
+  },
+  { deep: true, immediate: true },
+);
+
+// Note, I tested a version also caching border but it does not scale well
 
 const pieceRef = ref();
 defineExpose({ pieceRef });
