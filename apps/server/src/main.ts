@@ -260,7 +260,9 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
       lobbies.delete(roomId);
     },
-    1000 * 60 * 60 * 24, // Allow 1 day of inactivity
+    // Allow 1 day of inactivity, note however that Railway's serverless timeout
+    // is 10 minutes
+    1000 * 60 * 60 * 24,
   );
   lobby.cleanupTimeout = timeout;
 });

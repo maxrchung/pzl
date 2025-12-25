@@ -16,6 +16,7 @@ something on main page, maybe puzzle in background
 Move frontend to Railway static Railpack SPA
 
 maybe figure out Railway bucket, presign may be supported for public, but have to figure out public presign/get way or setup
+should allow week long presign which is good enough for me
 
 Railway redis cache - for multiple servers but also saves pending games when
 server updates
