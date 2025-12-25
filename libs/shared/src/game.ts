@@ -51,8 +51,10 @@ export const createGame = (partial?: Partial<Game>) => {
   game.tabLength = Math.min(pieceSize.width, pieceSize.height) / 4;
 
   const getPosition = () => {
-    const x = Math.random() * (STAGE_LENGTH - pieceSize.width);
-    const y = Math.random() * (STAGE_LENGTH - pieceSize.height);
+    const x =
+      Math.random() * (STAGE_LENGTH - pieceSize.width - 2 * game.tabLength);
+    const y =
+      Math.random() * (STAGE_LENGTH - pieceSize.height - 2 * game.tabLength);
 
     return { x, y };
   };
