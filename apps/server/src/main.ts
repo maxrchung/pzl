@@ -260,7 +260,7 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
 
       lobbies.delete(roomId);
     },
-    1000 * 60 * 10, // Allow 1 hour of inactivity
+    1000 * 60 * 60 * 24, // Allow 1 day of inactivity
   );
   lobby.cleanupTimeout = timeout;
 });
