@@ -42,8 +42,8 @@ const game: Game = {
 };
 
 const leftGroup: GroupConfig = {
-  x: Math.random() * 600 + 200,
-  y: Math.random() * 600 + 200,
+  x: Math.random() * 700,
+  y: Math.random() * 700,
   draggable: true,
 };
 
@@ -60,8 +60,8 @@ const leftPiece: PieceConfig = {
 };
 
 const rightGroup: GroupConfig = {
-  x: Math.random() * 600 + 200,
-  y: Math.random() * 600 + 200,
+  x: Math.random() * 700,
+  y: Math.random() * 700,
   draggable: true,
 };
 
