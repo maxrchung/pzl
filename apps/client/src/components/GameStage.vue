@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import { useImage } from 'vue-konva';
+import { ref, watch } from 'vue';
 import { useStore } from '../store';
-import { Group } from 'konva/lib/Group';
-import { Image } from 'konva/lib/shapes/Image';
-import GamePiece from './GamePiece.vue';
-import GameGroup from './GameGroup.vue';
-import {
-  SCALE_MAX,
-  SCALE_MIN,
-  SCALE_TICK,
-  THROTTLE_DELAY_IN_MS,
-} from '../constants';
-import { hasSnap } from '../snap';
+import { SCALE_MAX, SCALE_MIN, SCALE_TICK } from '../constants';
 import { Stage, StageConfig } from 'konva/lib/Stage';
 import { STAGE_LENGTH } from '@pzl/shared';
 import { useWindowSize } from '../useWindowSize';
 import { KonvaEventObject } from 'konva/lib/Node';
 import { Vector2d } from 'konva/lib/types';
 import { getCenter, getDistance } from '../vector';
+
+const stageRef = ref<Stage | null>(null);
+defineExpose({ stageRef });
 
 // By default Konva prevent some events when node is dragging. It improve the
 // performance and work well for 95% of cases. We need to enable all events on
@@ -166,15 +158,7 @@ const stageDragEnd = () => {
   isDragSuspended = false;
 };
 
-const stageRef = ref<Stage | null>(null);
-const groupRefs: Record<string, Group | null> = {};
-const pieceRefs: Record<string, Image | null> = {};
-
 const store = useStore();
-const isConnected = computed(() => store.isConnected);
-const imageUrl = computed(() => store.game.imageUrl);
-const [image] = useImage(imageUrl);
-const pieceConfigs = computed(() => store.game.pieceConfigs);
 
 // When game updates, reset stage
 watch(
@@ -190,82 +174,12 @@ watch(
     stage.position(position);
   },
 );
-
-let lastThrottle = 0;
-const groupDragMove = (groupId: string, force: boolean = false) => {
-  const now = Date.now();
-  if (!force && now < lastThrottle + THROTTLE_DELAY_IN_MS) return;
-  lastThrottle = now + THROTTLE_DELAY_IN_MS;
-
-  const group = groupRefs[groupId];
-  if (!group) return;
-
-  store.moveGroup(groupId, group.position());
-};
-
-const groupDragEnd = (groupId: string) => {
-  // Ensure end position is updated
-  groupDragMove(groupId, true);
-
-  const stage = stageRef.value;
-  if (!stage) return;
-
-  // Since we're comparing snap in actual rect sizes, we need to normalize tab
-  // length so that it takes stage scale into account
-  const tabLength = store.game.tabLength * stage.scaleX();
-
-  // It's possible in weird data update situations for this to happen. For
-  // example, two players take the same piece and one person snaps it. The
-  // second person will be out of sync and potentially end up in a stuck piece
-  // situation as iterating over undefined throws an exception.
-  const pieces = pieceConfigs.value[groupId];
-  if (!pieces) return;
-
-  for (const piece of pieces) {
-    if (!piece) continue;
-
-    const curr = pieceRefs[piece.id];
-    if (!curr) continue;
-
-    const currRect = curr.getClientRect();
-    const currX = piece.index.x;
-    const currY = piece.index.y;
-
-    for (const otherGroupId in pieceConfigs.value) {
-      if (otherGroupId === groupId) continue;
-
-      for (const piece of pieceConfigs.value[otherGroupId]) {
-        const otherX = piece.index.x;
-        const otherY = piece.index.y;
-        const diffX = Math.abs(currX - otherX);
-        const diffY = Math.abs(currY - otherY);
-
-        // Only do collision test if pieces are directly adjacent
-        if (!(diffX === 1 && diffY === 0) && !(diffX === 0 && diffY === 1))
-          continue;
-
-        const other = pieceRefs[piece.id];
-        if (!other) continue;
-
-        const otherRect = other.getClientRect();
-
-        if (
-          hasSnap(currRect, currX, currY, otherRect, otherX, otherY, tabLength)
-        ) {
-          store.snapGroup(groupId, otherGroupId);
-          return;
-        }
-      }
-    }
-  }
-};
 </script>
 
 <template>
   <main>
     <v-stage
       :config="initialStageConfig"
-      v-if="image && isConnected"
       @wheel="stageWheel"
       @touchmove="stageTouchMove"
       @touchend="stageTouchEnd"
@@ -278,31 +192,7 @@ const groupDragEnd = (groupId: string) => {
       "
     >
       <v-layer>
-        <GameGroup
-          v-for="(pieces, groupId) in pieceConfigs"
-          :key="groupId"
-          :groupId="groupId"
-          @dragmove="() => groupDragMove(groupId)"
-          @dragend="() => groupDragEnd(groupId)"
-          :ref="
-            // Not sure but this should get the node back for us?
-            (el: any) => {
-              groupRefs[groupId] = el?.groupRef?.getNode();
-            }
-          "
-        >
-          <GamePiece
-            v-for="piece in pieces"
-            :key="piece.id"
-            :image="image"
-            :pieceConfig="piece"
-            :ref="
-              (el: any) => {
-                pieceRefs[piece.id] = el?.pieceRef?.getNode();
-              }
-            "
-          />
-        </GameGroup>
+        <slot />
       </v-layer>
     </v-stage>
   </main>

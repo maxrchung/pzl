@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { Edge, PieceConfig } from '@pzl/shared';
+import { Edge, Game, PieceConfig } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
 import { GroupConfig } from 'konva/lib/Group';
@@ -11,9 +11,10 @@ import { STROKE_WIDTH } from '../constants';
 interface Props {
   image: HTMLImageElement;
   pieceConfig: PieceConfig;
+  game: Game;
 }
 
-const { image, pieceConfig } = defineProps<Props>();
+const { image, pieceConfig, game } = defineProps<Props>();
 
 const store = useStore();
 const theme = computed(() => store.theme);
@@ -24,7 +25,7 @@ const piece = computed<ImageConfig>(() => {
     pieceSize,
     tabLength,
     sides: { columns, rows },
-  } = store.game;
+  } = game;
   const {
     index: { x, y },
   } = pieceConfig;
@@ -198,7 +199,7 @@ const group = computed<GroupConfig>(() => {
   const {
     pieceSize: { width, height },
     tabLength,
-  } = store.game;
+  } = game;
   const { edges } = pieceConfig;
 
   return {
@@ -234,7 +235,7 @@ const border = computed<ShapeConfig>(() => {
       const {
         pieceSize: { width, height },
         tabLength,
-      } = store.game;
+      } = game;
       const { edges } = pieceConfig;
 
       context.beginPath();

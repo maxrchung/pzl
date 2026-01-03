@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useStore } from '../store';
+import { GroupConfig } from 'konva/lib/Group';
 
 interface Props {
-  groupId: string;
+  groupConfig: GroupConfig;
 }
 
-const { groupId } = defineProps<Props>();
+const { groupConfig } = defineProps<Props>();
 
-const store = useStore();
 const group = computed(() => ({
-  ...store.game.groupConfigs[groupId],
+  ...groupConfig,
   draggable: true,
 }));
 
