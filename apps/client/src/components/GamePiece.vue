@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { Edge, PieceConfig } from '@pzl/shared';
 import { useStore } from '../store';
 import { ImageConfig } from 'konva/lib/shapes/Image';
@@ -247,9 +247,9 @@ const border = computed<ShapeConfig>(() => {
   };
 });
 
-// Whenever config changes, recache
+// Whenever config or image changes, recache
 watch(
-  () => group,
+  () => [group, image],
   async () => {
     // Need to wait for next tick so that draw functions are updated as expected
     await nextTick();
@@ -259,6 +259,12 @@ watch(
   },
   { deep: true, immediate: true },
 );
+
+onMounted(() => {
+  pieceRef.value?.getNode()?.cache({
+    pixelRatio: window.devicePixelRatio + 3, // Cache at higher resolution
+  });
+});
 
 // Note, I tested a version also caching border but it does not scale well
 
