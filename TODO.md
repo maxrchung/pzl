@@ -9,8 +9,6 @@ group and stroke gets applied outside so there are overlaps
 weird dragging behavior while scaling
 seems like pinching is too sensitive?
 
-something on main page, maybe puzzle in background
-
 ## Infra
 
 Move frontend to Railway static Railpack SPA
