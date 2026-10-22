@@ -23,14 +23,5 @@ export class CdkStack extends cdk.Stack {
 
     const user = new iam.User(this, 'pzl-user', { userName: 'pzl-user' });
     bucket.grantReadWrite(user);
-    const key = new iam.AccessKey(this, 'pzl-access-key', { user });
-    new ssm.StringParameter(this, 'pzl-key', {
-      parameterName: 'pzl-key',
-      stringValue: key.accessKeyId,
-    });
-    new ssm.StringParameter(this, 'pzl-secret', {
-      parameterName: 'pzl-secret',
-      stringValue: key.secretAccessKey.unsafeUnwrap(),
-    });
   }
 }
