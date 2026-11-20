@@ -15,7 +15,7 @@ export class CdkStack extends cdk.Stack {
     });
 
     bucket.addCorsRule({
-      allowedOrigins: ['http://localhost:4200', 'https://pzl.maxrchung.com'], // dev & prod
+      allowedOrigins: ['http://localhost:4200', 'https://pzl.max.rodeo'], // dev & prod
       allowedMethods: [s3.HttpMethods.POST],
       allowedHeaders: ['*'],
       maxAge: 3000,

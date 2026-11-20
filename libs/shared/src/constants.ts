@@ -1,6 +1,6 @@
 export const SERVER_CORS = {
   origin:
-    process.env.NODE_ENV === 'production' ? 'https://pzl.maxrchung.com' : '*',
+    process.env.NODE_ENV === 'production' ? 'https://pzl.max.rodeo' : '*',
 };
 
 export const SERVER_PORT = 3000;

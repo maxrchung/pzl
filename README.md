@@ -2,7 +2,7 @@
 
 Multiplayer online real-time co-op no-talking custom jigsaw puzzle web game
 
-<https://pzl.maxrchung.com>
+<https://pzl.max.rodeo>
 
 ## Features
 
