@@ -31,9 +31,6 @@ export interface Game {
   // Timestamp since game was last reset
   resetTime: number;
 
-  /** S3 image key */
-  imageKey: string;
-
   /** Full S3 image URL */
   imageUrl: string;
 

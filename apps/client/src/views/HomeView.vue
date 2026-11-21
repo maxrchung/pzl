@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-  Edge,
-  Game,
-  HOME_IMAGE_SIZE,
-  HOME_IMAGE_URL,
-  PieceConfig,
-} from '@pzl/shared';
+import { Edge, Game, PieceConfig } from '@pzl/shared';
 import PzlIcon from '../components/PzlIcon.vue';
 import { useStore } from '../store';
 import { useImage } from 'vue-konva';
@@ -17,6 +11,7 @@ import { ref } from 'vue';
 import { Image } from 'konva/lib/shapes/Image';
 import { hasSnap } from '../snap';
 import { Stage } from 'konva/lib/Stage';
+import { HOME_IMAGE_SIZE, HOME_IMAGE_URL } from '../constants';
 
 const store = useStore();
 store.leaveLobby();
@@ -29,7 +24,6 @@ const rightRef = ref<Image | null>(null);
 
 const game: Game = {
   resetTime: Date.now(),
-  imageKey: '',
   imageUrl: HOME_IMAGE_URL,
   imageSize: HOME_IMAGE_SIZE,
   sides: { columns: 2, rows: 1 },

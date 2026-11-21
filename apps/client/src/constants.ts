@@ -23,3 +23,6 @@ export const Z_INDEX = {
 };
 
 export const STROKE_WIDTH = 1;
+
+export const HOME_IMAGE_URL = '/eyes.jpg';
+export const HOME_IMAGE_SIZE = { height: 100, width: 200 };

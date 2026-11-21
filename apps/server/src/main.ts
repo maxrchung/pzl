@@ -4,7 +4,7 @@ import {
   type ClientToServerEvents,
   type ServerToClientEvents,
   createGame,
-  DEFAULT_IMAGE_KEY,
+  DEFAULT_IMAGE_URL,
   Edge,
   moveGroup,
   SERVER_CORS,
@@ -175,11 +175,10 @@ io.on('connection', (socket) => {
     const lobby = lobbies.get(lobbyId);
     if (!lobby) return;
 
-    const oldKey = lobby.game.imageKey;
+    const oldImageUrl = lobby.game.imageUrl;
 
     lobby.partial.imageSize = { height, width };
-    lobby.partial.imageKey = key;
-    lobby.partial.imageUrl = getImageUrl(key);
+    lobby.partial.imageUrl = await getImageUrl(key);
     resetGame(lobby);
 
     io.to(lobbyId).emit('refreshGame', lobby.game);
@@ -189,9 +188,9 @@ io.on('connection', (socket) => {
     });
 
     // Make sure we keep default file
-    if (oldKey !== DEFAULT_IMAGE_KEY) {
+    if (oldImageUrl !== DEFAULT_IMAGE_URL) {
       // Probably best to delete after we send notify clients
-      deleteUpload(oldKey);
+      deleteUpload(oldImageUrl);
     }
   });
 
@@ -251,11 +250,11 @@ io.of('/').adapter.on('leave-room', (roomId, socketId) => {
     () => {
       log.info({ socketId, lobbyId: roomId }, 'cleanup');
 
-      const imageKey = lobby.game.imageKey;
+      const imageUrl = lobby.game.imageUrl;
       // Make sure we keep default file
-      if (imageKey !== DEFAULT_IMAGE_KEY) {
+      if (imageUrl !== DEFAULT_IMAGE_URL) {
         // Probably best to delete after we send notify clients
-        deleteUpload(imageKey);
+        deleteUpload(imageUrl);
       }
 
       lobbies.delete(roomId);

@@ -1,15 +1,24 @@
 import {
   S3Client,
+  GetObjectCommand,
   HeadObjectCommand,
   DeleteObjectCommand,
   ListObjectsV2Command,
   DeleteObjectsCommand,
 } from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
-import { S3_FOLDER, S3_BUCKET } from '@pzl/shared';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { S3_FOLDER } from '@pzl/shared';
 import { nanoid } from 'nanoid';
 
-const s3 = new S3Client();
+const S3_BUCKET = process.env.AWS_S3_BUCKET_NAME;
+if (!S3_BUCKET) {
+  throw new Error('AWS_S3_BUCKET_NAME environment variable is not set');
+}
+
+const s3 = new S3Client({
+  region: process.env.AWS_DEFAULT_REGION,
+});
 
 const createKey = async (): Promise<string> => {
   const key = `${S3_FOLDER}/${nanoid()}`;
@@ -44,7 +53,8 @@ export const createPresign = async (contentType: string) => {
   return presign;
 };
 
-export const deleteUpload = async (key: string) => {
+export const deleteUpload = async (imageUrl: string) => {
+  const key = decodeURIComponent(new URL(imageUrl).pathname.slice(1));
   const deleteObject = new DeleteObjectCommand({
     Bucket: S3_BUCKET,
     Key: key,
@@ -74,8 +84,14 @@ export const deleteAllUploads = async () => {
   s3.send(deleteObjects);
 };
 
-export const getImageUrl = (key: string) => {
-  const imageUrl = `https://${S3_BUCKET}.s3.us-west-1.amazonaws.com/${key}`;
+export const getImageUrl = async (key: string) => {
+  const command = new GetObjectCommand({
+    Bucket: S3_BUCKET,
+    Key: key,
+  });
 
-  return imageUrl;
+  return getSignedUrl(s3, command, {
+    // 7 days, max allowed by S3 SDK
+    expiresIn: 60 * 60 * 24 * 7, 
+  });
 };

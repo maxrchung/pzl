@@ -30,7 +30,7 @@ const groupConfigs = computed(() => store.game.groupConfigs);
 const pieceConfigs = computed(() => store.game.pieceConfigs);
 
 const imageUrl = computed(() => store.game.imageUrl);
-const [image] = useImage(imageUrl);
+const [image, status] = useImage(imageUrl);
 
 let lastThrottle = 0;
 const groupDragMove = (groupId: string, force: boolean = false) => {
@@ -104,7 +104,7 @@ const groupDragEnd = (groupId: string) => {
 
 <template>
   <GameStage
-    v-if="image && isConnected"
+    v-if="image && status === 'loaded' && isConnected"
     :ref="
       (el: any) => {
         stageRef = el?.stageRef;

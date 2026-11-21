@@ -37,21 +37,6 @@ Chrome altogether.
 
 Amplify automatically builds the Vue client on push and deploys a static site.
 
-### CDK
-
-I'm using S3 to presign URLs and upload images. You would think this could be
-easily set up through Amplify Storage, but Amplify doesn't let you have public
-S3 access. I want public read access so users can indefinitely access images at
-permanent locations.
-
-So next I turned to CDK, but I had trouble running CDK with NX. The CDK NX
-plugins are either outdated, so don't work with the latest NX, or so opinionated
-(@aws/nx-plugin) that it's painful to integrate with even the basic constructs.
-I just want a public S3 god damn.
-
-So I ended up just rolling a simple embedded CDK project, which is not standard
-but simple enough. You'll need to `cd` into the `cdk` folder to do commands.
-
 ### Railway
 
 Railway automatically builds the socket.io server on push and deploys a Docker
